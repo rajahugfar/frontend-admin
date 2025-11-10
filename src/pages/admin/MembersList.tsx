@@ -23,17 +23,14 @@ export default function MembersList() {
   const fetchMembers = async () => {
     try {
       setIsLoading(true)
-      // TODO: Replace with real API call when backend is ready
-      setMembers([])
-      setTotal(0)
-      // const data = await adminMemberAPI.listMembers({
-      //   page,
-      //   pageSize,
-      //   search: search || undefined,
-      //   status: statusFilter || undefined,
-      // })
-      // setMembers(data.members || [])
-      // setTotal(data.total || 0)
+      const data = await adminMemberAPI.listMembers({
+        page,
+        pageSize,
+        search: search || undefined,
+        status: statusFilter || undefined,
+      })
+      setMembers(data.members || [])
+      setTotal(data.total || 0)
     } catch (error: any) {
       console.error('Failed to fetch members:', error)
       toast.error('ไม่สามารถโหลดรายการสมาชิกได้')

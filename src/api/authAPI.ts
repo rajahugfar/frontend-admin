@@ -1,57 +1,48 @@
 import apiClient from './client'
-import type { LoginCredentials, RegisterData, AuthResponse, RefreshTokenResponse } from '@types/auth'
+
+export interface AdminLoginRequest {
+  username: string
+  password: string
+}
+
+export interface AdminLoginResponse {
+  admin: {
+    id: string
+    username: string
+    role: string
+    fullname?: string
+    email?: string
+  }
+  token: string
+  selector: string
+  expiresAt?: string
+}
 
 export const authAPI = {
-  // Login
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await apiClient.post('/member/login', credentials)
-    const { accessToken, refreshToken, member } = response.data.data
-    return {
-      user: member,
-      accessToken,
-      refreshToken
-    }
+  // Admin Login
+  login: async (credentials: AdminLoginRequest): Promise<AdminLoginResponse> => {
+    const response = await apiClient.post('/login', credentials)
+    const data = response.data.data
+
+    // Save selector to localStorage for subsequent requests
+    localStorage.setItem('admin_selector', data.selector)
+    localStorage.setItem('admin_token', data.token)
+
+    return data
   },
 
-  // Register
-  register: async (data: RegisterData): Promise<AuthResponse> => {
-    const response = await apiClient.post('/member/register', data)
-    const { accessToken, refreshToken, member } = response.data.data
-    return {
-      user: member,
-      accessToken,
-      refreshToken
-    }
-  },
-
-  // Logout
+  // Admin Logout
   logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout')
+    await apiClient.post('/logout')
+    localStorage.removeItem('admin_selector')
+    localStorage.removeItem('admin_token')
+    localStorage.removeItem('admin_user')
+    localStorage.removeItem('admin-storage')
   },
 
-  // Refresh token
-  refreshToken: async (refreshToken: string): Promise<RefreshTokenResponse> => {
-    const response = await apiClient.post<RefreshTokenResponse>('/auth/refresh', {
-      refreshToken,
-    })
-    return response.data
-  },
-
-  // Get current user profile
+  // Get current admin profile
   getProfile: async () => {
-    const response = await apiClient.get('/user/profile')
-    return response.data
-  },
-
-  // Update profile
-  updateProfile: async (data: any) => {
-    const response = await apiClient.put('/user/profile', data)
-    return response.data
-  },
-
-  // Change password
-  changePassword: async (data: { oldPassword: string; newPassword: string }) => {
-    const response = await apiClient.post('/user/change-password', data)
+    const response = await apiClient.get('/profile')
     return response.data
   },
 }

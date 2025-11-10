@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { adminGameAPI } from '../../api/adminAPI'
+import { adminGameAPI } from '@/api/adminAPI'
 
 interface Game {
   id: string

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { adminSystemAPI, adminAPIClient } from '../../api/adminAPI'
+import { adminSystemAPI, adminAPIClient } from '@/api/adminAPI'
 
 interface AdminLog {
   id: string

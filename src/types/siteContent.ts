@@ -34,8 +34,10 @@ export interface PromotionBanner {
   title: string
   description?: string
   image_id?: string
+  image_url?: string
   link_url?: string
   display_location: 'home' | 'member' | 'both'
+  banner_type?: 'small' | 'large' // small = แบนเนอร์เล็ก (แถวบน), large = แบนเนอร์ใหญ่ (แถวล่าง slide)
   sort_order: number
   is_active: boolean
   start_date?: string

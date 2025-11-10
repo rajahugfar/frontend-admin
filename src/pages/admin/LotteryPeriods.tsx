@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { adminLotteryAPI, Lottery, LotteryPeriod } from '../../api/adminLotteryAPI'
+import { adminLotteryAPI, Lottery, LotteryPeriod } from '@/api/adminLotteryAPI'
 import toast from 'react-hot-toast'
 import { FiPlus, FiX, FiCheck, FiClock, FiCalendar, FiDollarSign, FiEye } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'

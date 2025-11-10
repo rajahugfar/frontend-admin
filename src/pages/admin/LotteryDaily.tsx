@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminLotteryDailyAPI, DailyLotteryItem, DailyListStatistics } from '../../api/adminLotteryDailyAPI';
+import { adminLotteryDailyAPI, DailyLotteryItem, DailyListStatistics } from '@/api/adminLotteryDailyAPI';
 import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit } from 'react-icons/fa';
 import LotteryResultModal from '../../components/admin/modals/LotteryResultModal';
 
@@ -184,13 +184,17 @@ const LotteryDaily: React.FC = () => {
   };
 
   const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
+    // API sends time in format "2025-11-07T20:10:00Z" where the time is already in Bangkok timezone
+    // but marked as UTC (Z). We need to treat it as local Bangkok time.
+    const localDateString = dateString.replace('Z', '+07:00');
+    const date = new Date(localDateString);
     return new Intl.DateTimeFormat('th-TH', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'Asia/Bangkok',
     }).format(date);
   };
 

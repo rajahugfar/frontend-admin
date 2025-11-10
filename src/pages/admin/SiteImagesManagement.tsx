@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { FaImage, FaUpload, FaTrash, FaEdit, FaSearch, FaTimes } from 'react-icons/fa'
 import { siteContentAPI } from '@api/siteContentAPI'
 import type { SiteImage, ImageCategory } from '@/types/siteContent'
@@ -32,11 +32,10 @@ const SiteImagesManagement = () => {
       setLoading(true)
       const [imagesRes, categoriesRes] = await Promise.all([
         siteContentAPI.admin.getSiteImages(),
-        // TODO: Add image categories API
-        Promise.resolve({ data: { data: [] } }),
+        siteContentAPI.admin.getImageCategories(),
       ])
-      setImages(imagesRes.data.data)
-      setCategories(categoriesRes.data.data)
+      setImages(imagesRes.data.data || [])
+      setCategories(categoriesRes.data.data || [])
     } catch (error) {
       console.error('Failed to load data:', error)
       toast.error('ไม่สามารถโหลดข้อมูลได้')
@@ -132,138 +131,144 @@ const SiteImagesManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="spinner" />
+      <div className="flex justify-center items-center min-h-screen bg-admin-bg">
+        <div className="text-gold-500">กำลังโหลด...</div>
       </div>
     )
   }
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-admin-bg">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <FaImage className="text-primary-500" />
-            จัดการรูปภาพ
-          </h1>
-          <p className="text-gray-400 mt-1">
-            รูปภาพทั้งหมด {images.length} รูป
-          </p>
-        </div>
-        <button
-          onClick={() => setShowUploadModal(true)}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          <FaUpload />
-          อัปโหลดรูป
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="card p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="ค้นหาด้วยชื่อหรือ code..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input pl-10 w-full"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="input"
-          >
-            <option value="all">ทุกหมวดหมู่</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Images Grid */}
-      {filteredImages.length === 0 ? (
-        <div className="card p-12 text-center">
-          <FaImage className="text-6xl text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400">ไม่พบรูปภาพ</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {filteredImages.map((image) => (
-            <div key={image.id} className="card p-3 group hover:shadow-lg transition-shadow">
-              {/* Image */}
-              <div className="relative aspect-square mb-2 rounded overflow-hidden bg-gray-800">
-                <img
-                  src={image.file_url}
-                  alt={image.alt_text || image.title}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                {!image.is_active && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="bg-red-500 text-white px-2 py-1 rounded text-xs">
-                      ปิดใช้งาน
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="space-y-1">
-                <p className="font-semibold text-sm truncate" title={image.title}>
-                  {image.title}
-                </p>
-                <p className="text-xs text-gray-400 truncate" title={image.code}>
-                  {image.code}
-                </p>
-                {image.width && image.height && (
-                  <p className="text-xs text-gray-500">
-                    {image.width} × {image.height}
-                  </p>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => setEditingImage(image)}
-                  className="btn btn-sm btn-outline flex-1 flex items-center justify-center gap-1"
-                  title="แก้ไข"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  onClick={() => handleDeleteImage(image.id, image.title)}
-                  className="btn btn-sm btn-error flex-1 flex items-center justify-center gap-1"
-                  title="ลบ"
-                >
-                  <FaTrash />
-                </button>
-              </div>
+      <div className="bg-gradient-to-r from-admin-card to-brown-900 border-b border-admin-border shadow-xl">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-display font-bold text-gold-500 mb-2 flex items-center gap-2">
+                <FaImage />
+                จัดการรูปภาพ
+              </h1>
+              <p className="text-brown-300">
+                รูปภาพทั้งหมด {images.length} รูป
+              </p>
             </div>
-          ))}
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className="px-6 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-all flex items-center gap-2"
+            >
+              <FaUpload />
+              อัปโหลดรูป
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Filters */}
+        <div className="bg-admin-card border border-admin-border rounded-xl p-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brown-400" />
+              <input
+                type="text"
+                placeholder="ค้นหาด้วยชื่อหรือ code..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
+            >
+              <option value="all">ทุกหมวดหมู่</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Images Grid */}
+        {filteredImages.length === 0 ? (
+          <div className="bg-admin-card border border-admin-border rounded-xl p-12 text-center">
+            <FaImage className="text-6xl text-brown-600 mx-auto mb-4" />
+            <p className="text-brown-400">ไม่พบรูปภาพ</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {filteredImages.map((image) => (
+              <div key={image.id} className="bg-admin-card border border-admin-border rounded-xl p-3 hover:border-gold-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] transition-all duration-300">
+                {/* Image */}
+                <div className="relative aspect-square mb-2 rounded overflow-hidden bg-admin-bg">
+                  <img
+                    src={image.file_url}
+                    alt={image.alt_text || image.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  {!image.is_active && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="bg-error text-white px-2 py-1 rounded text-xs">
+                        ปิดใช้งาน
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="space-y-1">
+                  <p className="font-semibold text-sm truncate text-brown-200" title={image.title}>
+                    {image.title}
+                  </p>
+                  <p className="text-xs text-brown-400 truncate" title={image.code}>
+                    {image.code}
+                  </p>
+                  {image.width && image.height && (
+                    <p className="text-xs text-brown-500">
+                      {image.width} × {image.height}
+                    </p>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => setEditingImage(image)}
+                    className="flex-1 px-2 py-1 bg-info/10 hover:bg-info/20 text-info rounded-lg transition-all flex items-center justify-center gap-1 text-sm"
+                    title="แก้ไข"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteImage(image.id, image.title)}
+                    className="flex-1 px-2 py-1 bg-error/10 hover:bg-error/20 text-error rounded-lg transition-all flex items-center justify-center gap-1 text-sm"
+                    title="ลบ"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="card max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-admin-border rounded-xl max-w-md w-full p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">อัปโหลดรูปภาพ</h2>
+              <h2 className="text-2xl font-display font-bold text-gold-500">อัปโหลดรูปภาพ</h2>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-brown-400 hover:text-gold-500 transition-colors"
               >
                 <FaTimes size={24} />
               </button>
@@ -271,11 +276,11 @@ const SiteImagesManagement = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">หมวดหมู่</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">หมวดหมู่</label>
                 <select
                   value={uploadForm.category_id}
                   onChange={(e) => setUploadForm({ ...uploadForm, category_id: e.target.value })}
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 >
                   <option value="">เลือกหมวดหมู่</option>
                   {categories.map((cat) => (
@@ -287,57 +292,56 @@ const SiteImagesManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Code</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">Code</label>
                 <input
                   type="text"
                   value={uploadForm.code}
                   onChange={(e) => setUploadForm({ ...uploadForm, code: e.target.value })}
                   placeholder="เช่น logo, btn-main-play"
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">ชื่อรูป</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">ชื่อรูป</label>
                 <input
                   type="text"
                   value={uploadForm.title}
                   onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
                   placeholder="ชื่อรูปภาพ"
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Alt Text (SEO)</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">Alt Text (SEO)</label>
                 <input
                   type="text"
                   value={uploadForm.alt_text}
                   onChange={(e) => setUploadForm({ ...uploadForm, alt_text: e.target.value })}
                   placeholder="คำอธิบายรูปภาพ"
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">เลือกไฟล์</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">เลือกไฟล์</label>
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={handleUpload}
                   disabled={uploading}
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gold-500 file:text-white hover:file:bg-gold-600 file:cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-brown-400 mt-1">
                   รองรับ JPEG, PNG, WebP, GIF (สูงสุด 10MB)
                 </p>
               </div>
 
               {uploading && (
                 <div className="text-center py-4">
-                  <div className="spinner mx-auto" />
-                  <p className="text-sm text-gray-400 mt-2">กำลังอัปโหลด...</p>
+                  <div className="text-gold-500">กำลังอัปโหลด...</div>
                 </div>
               )}
             </div>
@@ -347,13 +351,13 @@ const SiteImagesManagement = () => {
 
       {/* Edit Modal */}
       {editingImage && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="card max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-admin-border rounded-xl max-w-md w-full p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">แก้ไขรูปภาพ</h2>
+              <h2 className="text-2xl font-display font-bold text-gold-500">แก้ไขรูปภาพ</h2>
               <button
                 onClick={() => setEditingImage(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-brown-400 hover:text-gold-500 transition-colors"
               >
                 <FaTimes size={24} />
               </button>
@@ -361,7 +365,7 @@ const SiteImagesManagement = () => {
 
             <div className="space-y-4">
               {/* Preview */}
-              <div className="relative aspect-video rounded overflow-hidden bg-gray-800">
+              <div className="relative aspect-video rounded overflow-hidden bg-admin-bg border border-admin-border">
                 <img
                   src={editingImage.file_url}
                   alt={editingImage.alt_text || editingImage.title}
@@ -370,32 +374,32 @@ const SiteImagesManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Code</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">Code</label>
                 <input
                   type="text"
                   value={editingImage.code}
                   onChange={(e) => setEditingImage({ ...editingImage, code: e.target.value })}
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">ชื่อรูป</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">ชื่อรูป</label>
                 <input
                   type="text"
                   value={editingImage.title}
                   onChange={(e) => setEditingImage({ ...editingImage, title: e.target.value })}
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Alt Text</label>
+                <label className="block text-sm font-medium text-brown-300 mb-2">Alt Text</label>
                 <input
                   type="text"
                   value={editingImage.alt_text || ''}
                   onChange={(e) => setEditingImage({ ...editingImage, alt_text: e.target.value })}
-                  className="input w-full"
+                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
@@ -405,23 +409,23 @@ const SiteImagesManagement = () => {
                   id="is_active"
                   checked={editingImage.is_active}
                   onChange={(e) => setEditingImage({ ...editingImage, is_active: e.target.checked })}
-                  className="checkbox"
+                  className="w-4 h-4 text-gold-500 bg-admin-bg border-admin-border rounded focus:ring-gold-500"
                 />
-                <label htmlFor="is_active" className="text-sm cursor-pointer">
+                <label htmlFor="is_active" className="text-sm text-brown-300 cursor-pointer">
                   เปิดใช้งาน
                 </label>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 <button
                   onClick={handleUpdateImage}
-                  className="btn btn-primary flex-1"
+                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-all"
                 >
                   บันทึก
                 </button>
                 <button
                   onClick={() => setEditingImage(null)}
-                  className="btn btn-outline flex-1"
+                  className="flex-1 px-4 py-2 bg-admin-bg hover:bg-admin-hover text-brown-300 border border-admin-border rounded-lg transition-all"
                 >
                   ยกเลิก
                 </button>

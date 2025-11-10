@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FiRefreshCw, FiCheckCircle, FiClock, FiEye } from 'react-icons/fi'
+import { FiRefreshCw, FiCheckCircle, FiClock, FiEye, FiUsers } from 'react-icons/fi'
 import { adminMemberAPI } from '@/api/adminAPI'
 import toast from 'react-hot-toast'
 
@@ -78,12 +78,15 @@ export default function TodayCustomers() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ลูกค้าสมัครวันนี้</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-3xl font-display font-bold text-gold-500 flex items-center gap-2">
+            <FiUsers />
+            ลูกค้าสมัครวันนี้
+          </h1>
+          <p className="text-brown-400 mt-1">
             {new Date().toLocaleDateString('th-TH', {
               year: 'numeric',
               month: 'long',
@@ -94,7 +97,7 @@ export default function TodayCustomers() {
         <button
           onClick={fetchTodayMembers}
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+          className="btn-primary flex items-center gap-2"
         >
           <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           รีเฟรช
@@ -102,139 +105,139 @@ export default function TodayCustomers() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div
           onClick={() => setFilter('all')}
-          className={`p-6 rounded-lg shadow cursor-pointer transition-all ${
+          className={`p-6 rounded-xl shadow-lg cursor-pointer transition-all ${
             filter === 'all'
-              ? 'bg-blue-600 text-white ring-2 ring-blue-400'
-              : 'bg-white hover:shadow-md'
+              ? 'bg-gradient-to-br from-primary/20 to-primary/30 border-2 border-primary'
+              : 'bg-admin-card border border-admin-border hover:border-primary/50'
           }`}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-sm ${filter === 'all' ? 'text-blue-100' : 'text-gray-600'}`}>
+              <p className={`text-sm ${filter === 'all' ? 'text-primary' : 'text-brown-400'}`}>
                 สมัครทั้งหมด
               </p>
-              <p className="text-3xl font-bold mt-2">{stats.total}</p>
+              <p className={`text-3xl font-bold mt-2 ${filter === 'all' ? 'text-primary' : 'text-brown-200'}`}>{stats.total}</p>
             </div>
-            <FiEye className={`w-8 h-8 ${filter === 'all' ? 'text-blue-100' : 'text-blue-600'}`} />
+            <FiEye className={`w-8 h-8 ${filter === 'all' ? 'text-primary' : 'text-brown-400'}`} />
           </div>
         </div>
 
         <div
           onClick={() => setFilter('deposited')}
-          className={`p-6 rounded-lg shadow cursor-pointer transition-all ${
+          className={`p-6 rounded-xl shadow-lg cursor-pointer transition-all ${
             filter === 'deposited'
-              ? 'bg-green-600 text-white ring-2 ring-green-400'
-              : 'bg-white hover:shadow-md'
+              ? 'bg-gradient-to-br from-success/20 to-success/30 border-2 border-success'
+              : 'bg-admin-card border border-admin-border hover:border-success/50'
           }`}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-sm ${filter === 'deposited' ? 'text-green-100' : 'text-gray-600'}`}>
+              <p className={`text-sm ${filter === 'deposited' ? 'text-success' : 'text-brown-400'}`}>
                 เติมเงินแล้ว
               </p>
-              <p className="text-3xl font-bold mt-2">{stats.deposited}</p>
-              <p className={`text-xs mt-1 ${filter === 'deposited' ? 'text-green-100' : 'text-gray-500'}`}>
+              <p className={`text-3xl font-bold mt-2 ${filter === 'deposited' ? 'text-success' : 'text-brown-200'}`}>{stats.deposited}</p>
+              <p className={`text-xs mt-1 ${filter === 'deposited' ? 'text-success/80' : 'text-brown-400'}`}>
                 {stats.total > 0 ? `${((stats.deposited / stats.total) * 100).toFixed(1)}%` : '0%'}
               </p>
             </div>
-            <FiCheckCircle className={`w-8 h-8 ${filter === 'deposited' ? 'text-green-100' : 'text-green-600'}`} />
+            <FiCheckCircle className={`w-8 h-8 ${filter === 'deposited' ? 'text-success' : 'text-brown-400'}`} />
           </div>
         </div>
 
         <div
           onClick={() => setFilter('notDeposited')}
-          className={`p-6 rounded-lg shadow cursor-pointer transition-all ${
+          className={`p-6 rounded-xl shadow-lg cursor-pointer transition-all ${
             filter === 'notDeposited'
-              ? 'bg-orange-600 text-white ring-2 ring-orange-400'
-              : 'bg-white hover:shadow-md'
+              ? 'bg-gradient-to-br from-warning/20 to-warning/30 border-2 border-warning'
+              : 'bg-admin-card border border-admin-border hover:border-warning/50'
           }`}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-sm ${filter === 'notDeposited' ? 'text-orange-100' : 'text-gray-600'}`}>
+              <p className={`text-sm ${filter === 'notDeposited' ? 'text-warning' : 'text-brown-400'}`}>
                 ยังไม่เติมเงิน
               </p>
-              <p className="text-3xl font-bold mt-2">{stats.notDeposited}</p>
-              <p className={`text-xs mt-1 ${filter === 'notDeposited' ? 'text-orange-100' : 'text-gray-500'}`}>
+              <p className={`text-3xl font-bold mt-2 ${filter === 'notDeposited' ? 'text-warning' : 'text-brown-200'}`}>{stats.notDeposited}</p>
+              <p className={`text-xs mt-1 ${filter === 'notDeposited' ? 'text-warning/80' : 'text-brown-400'}`}>
                 {stats.total > 0 ? `${((stats.notDeposited / stats.total) * 100).toFixed(1)}%` : '0%'}
               </p>
             </div>
-            <FiClock className={`w-8 h-8 ${filter === 'notDeposited' ? 'text-orange-100' : 'text-orange-600'}`} />
+            <FiClock className={`w-8 h-8 ${filter === 'notDeposited' ? 'text-warning' : 'text-brown-400'}`} />
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-admin-card border border-admin-border rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-admin-border">
+            <thead className="bg-admin-hover">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase tracking-wider">
                   เวลาสมัคร
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase tracking-wider">
                   เบอร์โทร
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase tracking-wider">
                   ชื่อ-นามสกุล
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase tracking-wider">
                   เครดิต
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase tracking-wider">
                   ยอดฝากทั้งหมด
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase tracking-wider">
                   สถานะเติมเงิน
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-admin-border">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <FiRefreshCw className="w-5 h-5 animate-spin" />
-                      <span>กำลังโหลด...</span>
+                      <div className="spinner"></div>
+                      <span className="text-brown-400">กำลังโหลด...</span>
                     </div>
                   </td>
                 </tr>
               ) : filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-brown-400">
                     {filter === 'all' ? 'ยังไม่มีลูกค้าสมัครวันนี้' : 'ไม่พบข้อมูล'}
                   </td>
                 </tr>
               ) : (
                 filteredMembers.map((member) => (
-                  <tr key={member.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={member.id} className="hover:bg-admin-hover transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brown-300">
                       {formatTime(member.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-brown-200">
                       {member.phone}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brown-200">
                       {member.fullname || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gold-500 font-semibold">
                       ฿{formatCurrency(member.credit)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gold-500 font-semibold">
                       ฿{formatCurrency(member.totalDeposits)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {member.totalDeposits > 0 ? (
-                        <span className="px-3 py-1 bg-green-100 text-green-800 border border-green-200 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                        <span className="px-3 py-1 bg-success/20 text-success border border-success/30 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
                           <FiCheckCircle className="w-3 h-3" />
                           เติมเงินแล้ว
                         </span>
                       ) : (
-                        <span className="px-3 py-1 bg-orange-100 text-orange-800 border border-orange-200 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                        <span className="px-3 py-1 bg-warning/20 text-warning border border-warning/30 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
                           <FiClock className="w-3 h-3" />
                           ยังไม่เติมเงิน
                         </span>

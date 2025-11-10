@@ -60,12 +60,12 @@ export default function AdminLayout() {
       path: '/admin/pending',
       icon: <FiFilter className="w-5 h-5" />,
       children: [
-        { name: 'จับคู่รายการฝาก SCB', path: '/admin/pending/scb', icon: null, badge: 0 },
-        { name: 'จับคู่รายการฝาก TrueWallet', path: '/admin/pending/truewallet', icon: null, badge: 0 },
-        { name: 'จับคู่รายการฝาก KBANK', path: '/admin/pending/kbank', icon: null, badge: 0 },
-        { name: 'รออนุมัติฝากเงิน', path: '/admin/pending/deposits', icon: null, badge: 0 },
-        { name: 'รออนุมัติถอนเงิน', path: '/admin/pending/withdrawals', icon: null, badge: 0 },
-        { name: 'เครดิตหาย โยกเกมส์', path: '/admin/pending/transfers', icon: null, badge: 0 },
+        { name: 'จับคู่รายการฝาก SCB', path: '/admin/deposits/pending-scb', icon: null, badge: 0 },
+        { name: 'จับคู่รายการฝาก TrueWallet', path: '/admin/deposits/pending-truewallet', icon: null, badge: 0 },
+        { name: 'จับคู่รายการฝาก KBANK', path: '/admin/deposits/pending-kbank', icon: null, badge: 0 },
+        { name: 'รออนุมัติฝากเงิน', path: '/admin/deposits/pending', icon: null, badge: 0 },
+        { name: 'รออนุมัติถอนเงิน', path: '/admin/withdrawals/pending', icon: null, badge: 0 },
+        { name: 'เครดิตหาย โยกเกมส์', path: '/admin/transfers/pending', icon: null, badge: 0 },
       ],
     },
     {
@@ -86,9 +86,6 @@ export default function AdminLayout() {
       children: [
         { name: 'หวยมาสเตอร์', path: '/admin/lottery', icon: null },
         { name: 'รายการหวยรายวัน', path: '/admin/lottery/daily', icon: null },
-        { name: 'ค่าจ่าย/ลิมิต', path: '/admin/lottery/config', icon: null },
-        { name: 'อัตราจ่ายแบบขั้นบันได', path: '/admin/lottery/tiers', icon: null },
-        { name: 'งวดหวย', path: '/admin/lottery/periods', icon: null },
         { name: 'รายการแทง', path: '/admin/lottery/bets', icon: null },
       ],
     },
@@ -100,7 +97,7 @@ export default function AdminLayout() {
         { name: 'สรุปรายได้ทั้งหมด', path: '/admin/reports/profit', icon: null },
         { name: 'รายงานธนาคาร SCB', path: '/admin/reports/bank-scb', icon: null },
         { name: 'รายงาน Pincode', path: '/admin/reports/pincode', icon: null },
-        { name: 'จัดการรีวิว', path: '/admin/reports/reviews', icon: null },
+        { name: 'จัดการรีวิว', path: '/admin/games/reviews', icon: null },
       ],
     },
     {
@@ -109,9 +106,19 @@ export default function AdminLayout() {
       icon: <FiImage className="w-5 h-5" />,
       children: [
         { name: 'รูปภาพ', path: '/admin/site-images', icon: null },
-        { name: 'โปรโมชั่น', path: '/admin/promotions', icon: null },
-        { name: 'ค่ายเกม', path: '/admin/game-providers', icon: null },
+        { name: 'แบนเนอร์โปรโมชั่น', path: '/admin/promotions', icon: null },
+        { name: 'ค่ายเกม', path: '/admin/games/providers', icon: null },
         { name: 'ตั้งค่าเว็บไซต์', path: '/admin/settings', icon: null },
+      ],
+    },
+    {
+      name: 'จัดการโปรโมชั่น',
+      path: '/admin/promotion',
+      icon: <FiGift className="w-5 h-5" />,
+      children: [
+        { name: 'ตั้งค่าโปรโมชั่น', path: '/admin/promotion-settings', icon: null },
+        { name: 'สรุปโปรโมชั่น', path: '/admin/promotion-summary', icon: null },
+        { name: 'ประวัติ Logs', path: '/admin/promotion-logs', icon: null },
       ],
     },
     {
@@ -135,9 +142,9 @@ export default function AdminLayout() {
             path: '/admin/system',
             icon: <FiShield className="w-5 h-5" />,
             children: [
-              { name: 'พนักงาน', path: '/admin/system/staff', icon: null },
-              { name: 'จัดการเกมส์', path: '/admin/system/games', icon: null },
-              { name: 'ประวัติการทำรายการ', path: '/admin/system/logs', icon: null },
+              { name: 'พนักงาน', path: '/admin/staff', icon: null },
+              { name: 'จัดการเกมส์', path: '/admin/games', icon: null },
+              { name: 'ประวัติการทำรายการ', path: '/admin/logs', icon: null },
             ],
           },
         ]

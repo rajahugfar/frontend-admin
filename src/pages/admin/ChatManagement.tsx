@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { adminChatAPI, type ChatRoomWithDetails, type ChatMessage } from '@api/chatAPI'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { FaPaperPlane, FaUser, FaCircle, FaComments, FaImage, FaTimes, FaTrash } from 'react-icons/fa'
 import { useAdminStore } from '@/store/adminStore'
 import ImageModal from '@components/chat/ImageModal'
@@ -166,26 +166,28 @@ const ChatManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-admin-bg p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <FaComments />
+        <div className="bg-admin-card border border-admin-border rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-gold-500 to-gold-600 px-6 py-4">
+            <h1 className="text-2xl font-display font-bold text-white flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <FaComments />
+              </div>
               จัดการแชท
             </h1>
           </div>
 
           <div className="flex h-[calc(100vh-200px)]">
             {/* Chat Rooms List */}
-            <div className="w-80 border-r border-gray-200 overflow-y-auto bg-gray-50">
+            <div className="w-80 border-r border-admin-border overflow-y-auto bg-admin-bg">
               <div className="p-4">
-                <h2 className="text-sm font-semibold text-gray-600 mb-3">
+                <h2 className="text-sm font-semibold text-brown-200 mb-3">
                   ห้องแชท ({rooms.length})
                 </h2>
 
                 {rooms.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-brown-400">
                     <FaComments className="mx-auto text-4xl mb-2" />
                     <p>ยังไม่มีการสนทนา</p>
                   </div>
@@ -197,28 +199,28 @@ const ChatManagement = () => {
                           onClick={() => setSelectedRoom(room)}
                           className={`w-full text-left p-3 rounded-lg transition-all ${
                             selectedRoom?.id === room.id
-                              ? 'bg-orange-100 border-orange-500 border-2'
-                              : 'bg-white hover:bg-gray-100 border border-gray-200'
+                              ? 'bg-gold-500/20 border-gold-500 border-2'
+                              : 'bg-admin-card hover:bg-admin-hover border border-admin-border'
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center gap-2">
-                              <FaUser className="text-gray-400" />
-                              <span className="font-semibold text-gray-800">
+                              <FaUser className="text-brown-400" />
+                              <span className="font-semibold text-brown-100">
                                 {room.memberFullname || room.memberPhone}
                               </span>
                             </div>
                             {room.unreadCount > 0 && (
-                              <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                              <span className="bg-error text-white text-xs font-bold px-2 py-1 rounded-full">
                                 {room.unreadCount}
                               </span>
                             )}
                           </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">{room.memberPhone}</span>
+                          <span className="text-xs text-brown-400">{room.memberPhone}</span>
                           <div className="flex items-center gap-1">
-                            <FaCircle className={`text-xs ${room.status === 'ACTIVE' ? 'text-green-500' : 'text-gray-400'}`} />
-                            <span className="text-xs text-gray-400">
+                            <FaCircle className={`text-xs ${room.status === 'ACTIVE' ? 'text-success' : 'text-brown-500'}`} />
+                            <span className="text-xs text-brown-400">
                               {room.lastMessageAt ? formatTime(room.lastMessageAt) : 'ไม่มีข้อความ'}
                             </span>
                           </div>
@@ -230,7 +232,7 @@ const ChatManagement = () => {
                           e.stopPropagation()
                           handleDeleteRoom(room.id)
                         }}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-error hover:bg-error/80 text-white p-2 rounded-lg"
                         title="ลบแชท"
                       >
                         <FaTrash size={12} />
@@ -247,21 +249,21 @@ const ChatManagement = () => {
               {selectedRoom ? (
                 <>
                   {/* Chat Header */}
-                  <div className="bg-white border-b border-gray-200 px-6 py-4">
+                  <div className="bg-admin-card border-b border-admin-border px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h2 className="text-lg font-bold text-gray-800">
+                        <h2 className="text-lg font-bold text-brown-100">
                           {selectedRoom.memberFullname || selectedRoom.memberPhone}
                         </h2>
-                        <p className="text-sm text-gray-500">{selectedRoom.memberPhone}</p>
+                        <p className="text-sm text-brown-400">{selectedRoom.memberPhone}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Messages Area */}
-                  <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                  <div className="flex-1 overflow-y-auto p-6 bg-admin-bg">
                     {messages.length === 0 ? (
-                      <div className="text-center py-12 text-gray-400">
+                      <div className="text-center py-12 text-brown-400">
                         <p>ยังไม่มีข้อความ</p>
                       </div>
                     ) : (
@@ -274,7 +276,7 @@ const ChatManagement = () => {
                             <React.Fragment key={message.id}>
                               {showDate && (
                                 <div className="text-center my-4">
-                                  <span className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">
+                                  <span className="bg-admin-hover text-brown-300 text-xs px-3 py-1 rounded-full">
                                     {formatDate(message.createdAt)}
                                   </span>
                                 </div>
@@ -287,8 +289,8 @@ const ChatManagement = () => {
                                 <div
                                   className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-2 rounded-lg ${
                                     message.senderType === 'ADMIN'
-                                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-                                      : 'bg-white text-gray-800 border border-gray-200'
+                                      ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white'
+                                      : 'bg-admin-card text-brown-100 border border-admin-border'
                                   }`}
                                 >
                                   {(message.imageUrl || message.image_url) && (
@@ -302,7 +304,7 @@ const ChatManagement = () => {
                                   {message.message && <p className="break-words">{message.message}</p>}
                                   <p
                                     className={`text-xs mt-1 ${
-                                      message.senderType === 'ADMIN' ? 'text-orange-100' : 'text-gray-500'
+                                      message.senderType === 'ADMIN' ? 'text-white/80' : 'text-brown-400'
                                     }`}
                                   >
                                     {formatTime(message.createdAt)}
@@ -318,15 +320,15 @@ const ChatManagement = () => {
                   </div>
 
                   {/* Message Input */}
-                  <div className="bg-white border-t border-gray-200 p-4">
+                  <div className="bg-admin-card border-t border-admin-border p-4">
                     {/* Image Preview */}
                     {imagePreview && (
                       <div className="mb-3 relative inline-block">
-                        <img src={imagePreview} alt="preview" className="max-h-32 rounded-lg border-2 border-orange-300" />
+                        <img src={imagePreview} alt="preview" className="max-h-32 rounded-lg border-2 border-gold-500" />
                         <button
                           type="button"
                           onClick={handleRemoveImage}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          className="absolute -top-2 -right-2 bg-error text-white rounded-full p-1 hover:bg-error/80"
                         >
                           <FaTimes size={12} />
                         </button>
@@ -344,7 +346,7 @@ const ChatManagement = () => {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
+                        className="p-2 text-brown-400 hover:text-gold-500 hover:bg-gold-500/20 rounded-lg transition-all"
                         disabled={loading}
                       >
                         <FaImage size={24} />
@@ -354,13 +356,13 @@ const ChatManagement = () => {
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         placeholder="พิมพ์ข้อความ..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-900 bg-white"
+                        className="flex-1 px-4 py-2 border border-admin-border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 text-brown-100 bg-admin-bg"
                         disabled={loading}
                       />
                       <button
                         type="submit"
                         disabled={loading || (!messageText.trim() && !selectedImage)}
-                        className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                       >
                         <FaPaperPlane />
                         ส่ง
@@ -369,7 +371,7 @@ const ChatManagement = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-400">
+                <div className="flex-1 flex items-center justify-center text-brown-400">
                   <div className="text-center">
                     <FaComments className="mx-auto text-6xl mb-4" />
                     <p className="text-lg">เลือกห้องแชทเพื่อเริ่มสนทนา</p>

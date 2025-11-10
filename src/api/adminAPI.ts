@@ -737,6 +737,14 @@ export const adminReportAPI = {
     return response.data.data
   },
 
+  getDailyProfitReport: async (params: {
+    year: number
+    month: number
+  }) => {
+    const response = await adminAPIClient.get('/reports/profit/daily', { params })
+    return response.data.data
+  },
+
   getBankSCBReport: async (params: {
     startDate?: string
     endDate?: string

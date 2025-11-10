@@ -28,6 +28,10 @@ export interface Lottery {
   officialWebsite?: string | null
   createdAt: string
   updatedAt: string
+  // Additional properties
+  is_active?: boolean
+  lottery_name?: string
+  hauy4?: number
 }
 
 export interface LotteryConfig {
@@ -165,14 +169,37 @@ export interface SetupDefaultTiersRequest {
   type: number
 }
 
+export interface GenerateDailyStocksResult {
+  totalEligible: number
+  created: number
+  skipped: number
+  errors?: string[]
+  stocksCreated: number[]
+}
+
 // ============================================
 // Admin Lottery API
 // ============================================
+
+export interface LotteryStats {
+  total: number
+  active: number
+  inactive: number
+  lastUpdate: string
+  groupStats: {
+    [key: number]: number
+  }
+}
 
 export const adminLotteryAPI = {
   // Lottery Management
   getAllLotteries: async (): Promise<Lottery[]> => {
     const response = await adminAPIClient.get('/lottery')
+    return response.data.data
+  },
+
+  getLotteryStats: async (): Promise<LotteryStats> => {
+    const response = await adminAPIClient.get('/lottery/stats')
     return response.data.data
   },
 
@@ -367,6 +394,13 @@ export const adminLotteryAPI = {
       type,
       tiers
     })
+  },
+
+  // Stock Management
+  generateDailyStocks: async (date?: string): Promise<GenerateDailyStocksResult> => {
+    const params = date ? { date } : {}
+    const response = await adminAPIClient.post('/lottery/stock/generate-daily', null, { params })
+    return response.data.data
   },
 }
 

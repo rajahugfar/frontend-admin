@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { FiFileText, FiCheckCircle, FiXCircle, FiUsers, FiRefreshCw, FiFilter } from 'react-icons/fi'
 import { adminReportAPI } from '../../api/adminAPI'
 

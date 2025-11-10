@@ -29,13 +29,6 @@ interface Member {
   gamePassword?: string
 }
 
-interface MembersResponse {
-  members: Member[]
-  total: number
-  page: number
-  pageSize: number
-}
-
 export default function MembersManagement() {
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(false)
@@ -147,19 +140,34 @@ export default function MembersManagement() {
   }
 
   const getStatusBadge = (status: string) => {
-    const badges = {
-      active: 'bg-green-100 text-green-800 border-green-200',
-      inactive: 'bg-gray-100 text-gray-800 border-gray-200',
-      banned: 'bg-red-100 text-red-800 border-red-200',
+    const configs = {
+      active: {
+        bg: 'bg-success/10',
+        text: 'text-success',
+        border: 'border-success/30',
+        icon: '✓',
+        label: 'ปกติ'
+      },
+      inactive: {
+        bg: 'bg-warning/10',
+        text: 'text-warning',
+        border: 'border-warning/30',
+        icon: '●',
+        label: 'ไม่ใช้งาน'
+      },
+      banned: {
+        bg: 'bg-error/10',
+        text: 'text-error',
+        border: 'border-error/30',
+        icon: '✕',
+        label: 'ระงับ'
+      },
     }
-    const labels = {
-      active: 'ใช้งาน',
-      inactive: 'ไม่ใช้งาน',
-      banned: 'ระงับ',
-    }
+    const config = configs[status as keyof typeof configs] || configs.active
     return (
-      <span className={`px-2 py-1 text-xs font-semibold rounded border ${badges[status as keyof typeof badges]}`}>
-        {labels[status as keyof typeof labels]}
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border ${config.bg} ${config.text} ${config.border}`}>
+        <span className="text-sm leading-none font-bold">{config.icon}</span>
+        {config.label}
       </span>
     )
   }
@@ -167,16 +175,21 @@ export default function MembersManagement() {
   const totalPages = Math.ceil(total / pageSize)
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-[1800px] mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">จัดการสมาชิก</h1>
-          <p className="text-sm text-gray-600 mt-1">รายการสมาชิกทั้งหมด {total.toLocaleString()} คน</p>
+          <h1 className="text-3xl font-display font-bold text-gold-500 mb-2 flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-info/20 to-info/10 rounded-lg flex items-center justify-center">
+              <FiUserPlus className="w-5 h-5 text-info" />
+            </div>
+            จัดการสมาชิก
+          </h1>
+          <p className="text-sm text-brown-300 ml-13">รายการสมาชิกทั้งหมด {total.toLocaleString()} คน</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#C4A962] text-white rounded-lg hover:bg-[#B39952] transition-colors"
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-success to-success/80 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
         >
           <FiUserPlus className="w-5 h-5" />
           เพิ่มสมาชิก
@@ -184,17 +197,17 @@ export default function MembersManagement() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+      <div className="bg-admin-card rounded-xl shadow-lg border border-admin-border p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brown-500" />
             <input
               type="text"
               placeholder="ค้นหาเบอร์โทร หรือชื่อ..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
             />
           </div>
 
@@ -202,7 +215,7 @@ export default function MembersManagement() {
           <select
             value={statusFilter}
             onChange={(e) => handleStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+            className="px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500 appearance-none"
           >
             <option value="">ทุกสถานะ</option>
             <option value="active">ใช้งาน</option>
@@ -214,7 +227,7 @@ export default function MembersManagement() {
           <button
             onClick={fetchMembers}
             disabled={loading}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-info to-info/80 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-semibold"
           >
             <FiRefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
             รีเฟรช
@@ -223,27 +236,27 @@ export default function MembersManagement() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-admin-card rounded-xl shadow-lg border border-admin-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">วันที่สมัคร</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">เบอร์โทร</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">ชื่อ-นามสกุล</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">เครดิต</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">เครดิตในเกม</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">ยอดฝากรวม</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">ยอดถอนรวม</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">สถานะ</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">ล็อคอินล่าสุด</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">จัดการ</th>
+            <thead>
+              <tr className="bg-gradient-to-r from-admin-bg to-admin-bg/50 border-b border-admin-border">
+                <th className="px-4 py-4 text-left text-xs font-semibold text-brown-200 uppercase">วันที่สมัคร</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-brown-200 uppercase">เบอร์โทร</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-brown-200 uppercase">ชื่อ-นามสกุล</th>
+                <th className="px-4 py-4 text-right text-xs font-semibold text-brown-200 uppercase">เครดิต</th>
+                <th className="px-4 py-4 text-right text-xs font-semibold text-brown-200 uppercase">เครดิตในเกม</th>
+                <th className="px-4 py-4 text-right text-xs font-semibold text-brown-200 uppercase">ยอดฝากรวม</th>
+                <th className="px-4 py-4 text-right text-xs font-semibold text-brown-200 uppercase">ยอดถอนรวม</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-brown-200 uppercase">สถานะ</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-brown-200 uppercase">ล็อคอินล่าสุด</th>
+                <th className="px-4 py-4 text-center text-xs font-semibold text-brown-200 uppercase">จัดการ</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-admin-border">
               {loading ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-brown-400">
                     <div className="flex items-center justify-center gap-2">
                       <FiRefreshCw className="w-5 h-5 animate-spin" />
                       กำลังโหลดข้อมูล...
@@ -252,72 +265,104 @@ export default function MembersManagement() {
                 </tr>
               ) : members.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-brown-400">
                     ไม่พบข้อมูลสมาชิก
                   </td>
                 </tr>
               ) : (
-                members.map((member) => (
-                  <tr key={member.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">{formatDate(member.createdAt)}</td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{member.phone}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{member.fullname || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-900">{formatCurrency(member.credit)}</td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-900">{formatCurrency(member.creditGame)}</td>
-                    <td className="px-4 py-3 text-sm text-right text-green-600 font-medium">{formatCurrency(member.totalDeposits)}</td>
-                    <td className="px-4 py-3 text-sm text-right text-red-600 font-medium">{formatCurrency(member.totalWithdraws)}</td>
-                    <td className="px-4 py-3 text-sm">{getStatusBadge(member.status)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{formatDate(member.lastLogin)}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <div className="flex items-center justify-center gap-1">
+                members.map((member, index) => (
+                  <tr key={member.id} className="hover:bg-admin-hover/50 transition-all group" style={{ animationDelay: `${index * 30}ms` }}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <FiClock className="w-4 h-4 text-brown-500" />
+                        <div className="text-sm text-brown-200">{formatDate(member.createdAt)}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-gold-500/20 to-gold-600/10 rounded-full flex items-center justify-center text-gold-500 font-bold text-sm">
+                          {member.phone.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-brown-100">{member.phone}</div>
+                          <div className="text-xs text-brown-500">ID: {member.id.slice(0, 8)}...</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-brown-100">{member.fullname || '-'}</div>
+                      {member.line && <div className="text-xs text-brown-400">LINE: {member.line}</div>}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="inline-flex items-center gap-2 bg-success/10 px-3 py-1.5 rounded-lg">
+                        <span className="text-sm font-bold text-success">{formatCurrency(member.credit)}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="inline-flex items-center gap-2 bg-info/10 px-3 py-1.5 rounded-lg">
+                        <span className="text-sm font-bold text-info">{formatCurrency(member.creditGame)}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="text-sm font-semibold text-success">{formatCurrency(member.totalDeposits)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="text-sm font-semibold text-error">{formatCurrency(member.totalWithdraws)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(member.status)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-xs text-brown-400">{formatDate(member.lastLogin)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleEdit(member)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          className="p-2 text-info hover:bg-info/20 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="แก้ไข"
                         >
                           <FiEdit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleAddCredit(member)}
-                          className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+                          className="p-2 text-success hover:bg-success/20 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="เพิ่มเครดิต"
                         >
                           <FiPlusCircle className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeductCredit(member)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          className="p-2 text-error hover:bg-error/20 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="ลดเครดิต"
                         >
                           <FiMinusCircle className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleViewHistory(member)}
-                          className="p-1.5 text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                          className="p-2 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="ประวัติเงิน"
                         >
                           <FiClock className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleViewGameHistory(member)}
-                          className="p-1.5 text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                          className="p-2 text-warning hover:bg-warning/20 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="ประวัติเกม"
                         >
                           <FiActivity className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleResetPassword(member)}
-                          className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded transition-colors"
+                          className="p-2 text-gold-500 hover:bg-gold-500/20 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="รีเซ็ตรหัสผ่าน"
                         >
                           <FiLock className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleSuspendToggle(member)}
-                          className={`p-1.5 rounded transition-colors ${
+                          className={`p-2 rounded-lg transition-all hover:scale-110 shadow-sm ${
                             member.status === 'banned'
-                              ? 'text-green-600 hover:bg-green-50'
-                              : 'text-red-600 hover:bg-red-50'
+                              ? 'text-success hover:bg-success/20'
+                              : 'text-error hover:bg-error/20'
                           }`}
                           title={member.status === 'banned' ? 'ปลดระงับ' : 'ระงับบัญชี'}
                         >
@@ -325,7 +370,7 @@ export default function MembersManagement() {
                         </button>
                         <button
                           onClick={() => window.open(`/admin/members/${member.id}`, '_blank')}
-                          className="p-1.5 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                          className="p-2 text-brown-300 hover:bg-admin-hover/50 rounded-lg transition-all hover:scale-110 shadow-sm"
                           title="ดูรายละเอียด"
                         >
                           <FiEye className="w-4 h-4" />
@@ -341,16 +386,16 @@ export default function MembersManagement() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+          <div className="px-6 py-4 border-t border-admin-border bg-admin-bg/50">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
-                แสดง {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, total)} จาก {total.toLocaleString()} รายการ
+              <div className="text-sm text-brown-300">
+                แสดง <span className="font-semibold text-brown-100">{(currentPage - 1) * pageSize + 1}</span> - <span className="font-semibold text-brown-100">{Math.min(currentPage * pageSize, total)}</span> จาก <span className="font-semibold text-brown-100">{total.toLocaleString()}</span> รายการ
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-admin-border rounded-lg hover:bg-admin-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all text-brown-200 font-medium"
                 >
                   ก่อนหน้า
                 </button>
@@ -370,10 +415,10 @@ export default function MembersManagement() {
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`px-3 py-1 border rounded ${
+                        className={`px-4 py-2 border rounded-lg font-medium transition-all ${
                           currentPage === pageNum
-                            ? 'bg-[#C4A962] text-white border-[#C4A962]'
-                            : 'border-gray-300 hover:bg-gray-100'
+                            ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white border-gold-500 shadow-lg'
+                            : 'border-admin-border hover:bg-admin-hover text-brown-200'
                         }`}
                       >
                         {pageNum}
@@ -384,7 +429,7 @@ export default function MembersManagement() {
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-admin-border rounded-lg hover:bg-admin-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all text-brown-200 font-medium"
                 >
                   ถัดไป
                 </button>

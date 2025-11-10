@@ -185,16 +185,16 @@ export default function ReferralManagement() {
   }
 
   const StatCard = ({ icon: Icon, label, value, color, subValue }: any) => (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-admin-card border border-admin-border rounded-lg shadow-lg p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 mb-1">{label}</p>
+          <p className="text-sm text-brown-400 mb-1">{label}</p>
           <p className={`text-2xl font-bold ${color}`}>
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
-          {subValue && <p className="text-xs text-gray-500 mt-1">{subValue}</p>}
+          {subValue && <p className="text-xs text-brown-300 mt-1">{subValue}</p>}
         </div>
-        <div className={`p-3 rounded-full ${color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+        <div className="p-3 rounded-full bg-admin-bg">
           <Icon className={`w-6 h-6 ${color}`} />
         </div>
       </div>
@@ -204,18 +204,18 @@ export default function ReferralManagement() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-admin-bg p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">จัดการระบบแนะนำเพื่อน</h1>
-          <p className="text-gray-600 mt-1">ระบบคอมมิชชั่นและการถอนเงิน</p>
+          <h1 className="text-2xl font-bold text-brown-100">จัดการระบบแนะนำเพื่อน</h1>
+          <p className="text-brown-400 mt-1">ระบบคอมมิชชั่นและการถอนเงิน</p>
         </div>
       </div>
 
@@ -225,35 +225,35 @@ export default function ReferralManagement() {
           icon={FiUsers}
           label="ผู้แนะนำทั้งหมด"
           value={stats.totalReferrers}
-          color="text-blue-600"
+          color="text-gold-500"
           subValue={`รวมผู้ถูกแนะนำ ${stats.totalReferrals} คน`}
         />
         <StatCard
           icon={FiDollarSign}
           label="คอมมิชชั่นจ่ายแล้ว"
           value={`฿${stats.totalCommissionPaid.toLocaleString()}`}
-          color="text-green-600"
+          color="text-green-400"
           subValue={`เดือนนี้ ฿${stats.thisMonthCommission.toLocaleString()}`}
         />
         <StatCard
           icon={FiClock}
           label="คอมมิชชั่นรอจ่าย"
           value={`฿${stats.pendingCommission.toLocaleString()}`}
-          color="text-orange-600"
+          color="text-orange-400"
           subValue={`วันนี้ ฿${stats.todayCommission.toLocaleString()}`}
         />
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="border-b border-gray-200">
+      <div className="bg-admin-card border border-admin-border rounded-lg shadow-lg">
+        <div className="border-b border-admin-border">
           <nav className="flex -mb-px">
             <button
               onClick={() => setActiveTab('users')}
               className={`py-4 px-6 text-sm font-medium border-b-2 ${
                 activeTab === 'users'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-gold-500 text-gold-500'
+                  : 'border-transparent text-brown-400 hover:text-brown-100 hover:border-brown-600'
               }`}
             >
               รายชื่อผู้แนะนำ
@@ -262,8 +262,8 @@ export default function ReferralManagement() {
               onClick={() => setActiveTab('withdrawals')}
               className={`py-4 px-6 text-sm font-medium border-b-2 ${
                 activeTab === 'withdrawals'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-gold-500 text-gold-500'
+                  : 'border-transparent text-brown-400 hover:text-brown-100 hover:border-brown-600'
               }`}
             >
               คำขอถอนคอมมิชชั่น
@@ -280,52 +280,52 @@ export default function ReferralManagement() {
           {activeTab === 'users' ? (
             /* Users List */
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-admin-border">
+                <thead className="bg-admin-bg">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ผู้ใช้</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">รหัสแนะนำ</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">จำนวนผู้แนะนำ</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">คอมมิชชั่นทั้งหมด</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">รอจ่าย</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">จ่ายแล้ว</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">วันที่สมัคร</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase">ผู้ใช้</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase">รหัสแนะนำ</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">จำนวนผู้แนะนำ</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">คอมมิชชั่นทั้งหมด</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">รอจ่าย</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">จ่ายแล้ว</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">วันที่สมัคร</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-admin-card divide-y divide-admin-border">
                   {referralUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user.id} className="hover:bg-admin-bg transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{user.username}</div>
-                          <div className="text-sm text-gray-500">{user.phone}</div>
+                          <div className="text-sm font-medium text-brown-100">{user.username}</div>
+                          <div className="text-sm text-brown-400">{user.phone}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs font-mono bg-blue-100 text-blue-800 rounded">
+                        <span className="px-2 py-1 text-xs font-mono bg-gold-500/20 text-gold-500 rounded">
                           {user.referralCode}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <div className="text-sm text-gray-900">{user.totalReferrals} คน</div>
-                        <div className="text-xs text-gray-500">ใช้งาน {user.activeReferrals} คน</div>
+                        <div className="text-sm text-brown-100">{user.totalReferrals} คน</div>
+                        <div className="text-xs text-brown-400">ใช้งาน {user.activeReferrals} คน</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-brown-100">
                           ฿{user.totalCommission.toLocaleString()}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm font-medium text-orange-600">
+                        <span className="text-sm font-medium text-orange-400">
                           ฿{user.pendingCommission.toLocaleString()}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm font-medium text-green-600">
+                        <span className="text-sm font-medium text-green-400">
                           ฿{user.withdrawnCommission.toLocaleString()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-brown-400">
                         {dayjs(user.createdAt).format('DD/MM/YYYY')}
                       </td>
                     </tr>
@@ -336,27 +336,27 @@ export default function ReferralManagement() {
           ) : (
             /* Withdrawals List */
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-admin-border">
+                <thead className="bg-admin-bg">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ผู้ใช้</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">จำนวนเงิน</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">สถานะ</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">วันที่ขอ</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">การจัดการ</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase">ผู้ใช้</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">จำนวนเงิน</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">สถานะ</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">วันที่ขอ</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">การจัดการ</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-admin-card divide-y divide-admin-border">
                   {withdrawals.map((withdrawal) => (
-                    <tr key={withdrawal.id} className="hover:bg-gray-50">
+                    <tr key={withdrawal.id} className="hover:bg-admin-bg transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{withdrawal.username}</div>
-                          <div className="text-sm text-gray-500">{withdrawal.phone}</div>
+                          <div className="text-sm font-medium text-brown-100">{withdrawal.username}</div>
+                          <div className="text-sm text-brown-400">{withdrawal.phone}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="text-sm font-bold text-gold-500">
                           ฿{withdrawal.amount.toLocaleString()}
                         </span>
                       </td>
@@ -377,7 +377,7 @@ export default function ReferralManagement() {
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-brown-400">
                         {dayjs(withdrawal.requestedAt).format('DD/MM/YYYY HH:mm')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -385,14 +385,14 @@ export default function ReferralManagement() {
                           <div className="flex justify-center gap-2">
                             <button
                               onClick={() => handleApproveWithdrawal(withdrawal)}
-                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-md transition-all"
                             >
                               <FiCheckCircle className="mr-1" />
                               อนุมัติ
                             </button>
                             <button
                               onClick={() => handleRejectWithdrawal(withdrawal)}
-                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-md transition-all"
                             >
                               <FiX className="mr-1" />
                               ปฏิเสธ
@@ -411,33 +411,33 @@ export default function ReferralManagement() {
 
       {/* Approval Modal */}
       {showApprovalModal && selectedWithdrawal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">ยืนยันการอนุมัติ</h3>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-admin-card border border-admin-border rounded-lg shadow-2xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-brown-100 mb-4">ยืนยันการอนุมัติ</h3>
             
             <div className="space-y-3 mb-6">
               <div className="flex justify-between">
-                <span className="text-gray-600">ผู้ใช้:</span>
-                <span className="font-medium">{selectedWithdrawal.username}</span>
+                <span className="text-brown-400">ผู้ใช้:</span>
+                <span className="font-medium text-brown-100">{selectedWithdrawal.username}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">เบอร์โทร:</span>
-                <span className="font-medium">{selectedWithdrawal.phone}</span>
+                <span className="text-brown-400">เบอร์โทร:</span>
+                <span className="font-medium text-brown-100">{selectedWithdrawal.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">จำนวนเงิน:</span>
-                <span className="font-bold text-green-600">฿{selectedWithdrawal.amount.toLocaleString()}</span>
+                <span className="text-brown-400">จำนวนเงิน:</span>
+                <span className="font-bold text-gold-500">฿{selectedWithdrawal.amount.toLocaleString()}</span>
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-brown-100 mb-2">
                 หมายเหตุ (ถ้ามี)
               </label>
               <textarea
                 value={approvalNote}
                 onChange={(e) => setApprovalNote(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
                 rows={3}
                 placeholder="เพิ่มหมายเหตุ..."
               />
@@ -450,13 +450,13 @@ export default function ReferralManagement() {
                   setSelectedWithdrawal(null)
                   setApprovalNote('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-admin-border rounded-lg text-brown-100 hover:bg-admin-bg transition-colors"
               >
                 ยกเลิก
               </button>
               <button
                 onClick={confirmApproval}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 shadow-md transition-all"
               >
                 ยืนยันอนุมัติ
               </button>

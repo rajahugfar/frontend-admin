@@ -27,6 +27,9 @@ import CashbackList from '@pages/admin/CashbackList';
 import MembersList from '@pages/admin/MembersList';
 import MembersManagement from '@pages/admin/MembersManagement';
 import TodayCustomers from '@pages/admin/TodayCustomers';
+import AdminMemberDetail from '@pages/admin/AdminMemberDetail';
+import AdminMemberPoys from '@pages/admin/AdminMemberPoys';
+import AdminPoyDetail from '@pages/admin/AdminPoyDetail';
 
 // Transfers
 import TransferLog from '@pages/admin/TransferLog';
@@ -42,10 +45,8 @@ import ProfitReport from '@pages/admin/ProfitReport';
 
 // Lottery Management
 import LotteryManagement from '@pages/admin/LotteryManagement';
-import LotteryPeriods from '@pages/admin/LotteryPeriods';
-import LotteryBets from '@pages/admin/LotteryBets';
-import LotteryConfigManagement from '@pages/admin/LotteryConfigManagement';
-import PayoutTierManagement from '@pages/admin/PayoutTierManagement';
+import LotteryBets from '@pages/admin/LotteryBets'; // Poy (โพยเกม)
+import LotteryBetsPage from '@pages/admin/LotteryBetsPage'; // Lottery Bets (หวย)
 import StockMasterList from '@pages/admin/StockMasterList';
 import LotteryDaily from '@pages/admin/LotteryDaily';
 import LotteryDailyDetail from '@pages/admin/LotteryDailyDetail';
@@ -58,8 +59,12 @@ import ReviewManagement from '@pages/admin/ReviewManagement';
 // Site Content
 import SiteImagesManagement from '@pages/admin/SiteImagesManagement';
 import PromotionsManagement from '@pages/admin/PromotionsManagement';
-import SiteSettingsManagement from '@pages/admin/SiteSettingsManagement';
+import SystemSettings from '@pages/admin/SystemSettings';
 import PromotionLogsPage from '@pages/admin/PromotionLogsPage';
+import PromotionSummary from '@pages/admin/PromotionSummary';
+import PromotionSettings from '@pages/admin/PromotionSettings';
+import Setup2FA from '@pages/admin/Setup2FA';
+import Verify2FA from '@pages/admin/Verify2FA';
 
 // Chat
 import ChatManagement from '@pages/admin/ChatManagement';
@@ -105,6 +110,7 @@ function App() {
       <Routes>
         {/* Public Admin Login Route */}
         <Route path="/login" element={<AdminLogin />} />
+        <Route path="/verify-2fa" element={<Verify2FA />} />
 
         {/* Protected Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -134,8 +140,16 @@ function App() {
 
           {/* Members */}
           <Route path="members">
-            <Route index element={<MembersList />} />
-            <Route path="management" element={<MembersManagement />} />
+            <Route index element={<MembersManagement />} />
+            <Route path="list" element={<MembersList />} />
+            <Route path="today" element={<TodayCustomers />} />
+            <Route path=":memberId" element={<AdminMemberDetail />} />
+            <Route path=":memberId/poys" element={<AdminMemberPoys />} />
+            <Route path=":memberId/poys/:poyId" element={<AdminPoyDetail />} />
+          </Route>
+
+          {/* Customers (alias for Members) */}
+          <Route path="customers">
             <Route path="today" element={<TodayCustomers />} />
           </Route>
 
@@ -159,14 +173,13 @@ function App() {
 
           {/* Lottery Management */}
           <Route path="lottery">
-            <Route index element={<Navigate to="/admin/lottery/daily" replace />} />
+            <Route index element={<LotteryManagement />} />
             <Route path="daily" element={<LotteryDaily />} />
             <Route path="daily/:lotteryId" element={<LotteryDailyDetail />} />
             <Route path="management" element={<LotteryManagement />} />
-            <Route path="periods" element={<LotteryPeriods />} />
-            <Route path="bets" element={<LotteryBets />} />
-            <Route path="config" element={<LotteryConfigManagement />} />
-            <Route path="payout-tiers" element={<PayoutTierManagement />} />
+            <Route path="bets" element={<LotteryBetsPage />} /> {/* หวย */}
+            <Route path="poys" element={<LotteryBets />} /> {/* โพยเกม */}
+            <Route path="poy/:poyId" element={<AdminPoyDetail />} />
             <Route path="stock-master" element={<StockMasterList />} />
           </Route>
 
@@ -180,8 +193,11 @@ function App() {
           {/* Site Content */}
           <Route path="site-images" element={<SiteImagesManagement />} />
           <Route path="promotions" element={<PromotionsManagement />} />
+          <Route path="promotion-settings" element={<PromotionSettings />} />
           <Route path="promotion-logs" element={<PromotionLogsPage />} />
-          <Route path="settings" element={<SiteSettingsManagement />} />
+          <Route path="promotion-summary" element={<PromotionSummary />} />
+          <Route path="settings" element={<SystemSettings />} />
+          <Route path="setup-2fa" element={<Setup2FA />} />
 
           {/* Chat */}
           <Route path="chat" element={<ChatManagement />} />

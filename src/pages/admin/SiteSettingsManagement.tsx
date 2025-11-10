@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { FaCog, FaSave, FaPalette, FaGlobe, FaPhone } from 'react-icons/fa'
 import { siteContentAPI } from '@api/siteContentAPI'
 import type { SiteSetting } from '@/types/siteContent'

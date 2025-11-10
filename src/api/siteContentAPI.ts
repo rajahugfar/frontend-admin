@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { apiClient, publicApiClient } from './client'
 import type {
   SiteImage,
   PromotionBanner,
@@ -16,20 +16,20 @@ export const siteContentAPI = {
    * Get active promotions for display
    */
   getPromotions: (location: 'home' | 'member' = 'home') =>
-    apiClient.get<{ data: PromotionBanner[] }>(`/public/promotions?location=${location}`),
+    publicApiClient.get<{ data: PromotionBanner[] }>(`/public/promotions?location=${location}`),
 
   /**
    * Get all active game categories
    */
   getGameCategories: () =>
-    apiClient.get<{ data: GameCategory[] }>('/public/game-categories'),
+    publicApiClient.get<{ data: GameCategory[] }>('/public/game-categories'),
 
   /**
    * Get game providers
    * @param featured - If true, only return featured providers
    */
   getGameProviders: (featured?: boolean) =>
-    apiClient.get<{ data: GameProvider[] }>(
+    publicApiClient.get<{ data: GameProvider[] }>(
       `/public/game-providers${featured ? '?featured=true' : ''}`
     ),
 
@@ -37,7 +37,7 @@ export const siteContentAPI = {
    * Get all public site settings
    */
   getSiteSettings: () =>
-    apiClient.get<{ data: SiteSettingsMap }>('/public/settings'),
+    publicApiClient.get<{ data: SiteSettingsMap }>('/public/settings'),
 
   // ==================== Admin APIs ====================
 
@@ -48,19 +48,19 @@ export const siteContentAPI = {
      * Get all site images
      */
     getSiteImages: (params?: { category_id?: string; is_active?: boolean }) =>
-      apiClient.get<{ data: SiteImage[] }>('/admin/site-images', { params }),
+      apiClient.get<{ data: SiteImage[] }>('/site-images', { params }),
 
     /**
      * Get site image by ID
      */
     getSiteImageByID: (id: string) =>
-      apiClient.get<{ data: SiteImage }>(`/admin/site-images/${id}`),
+      apiClient.get<{ data: SiteImage }>(`/site-images/${id}`),
 
     /**
      * Upload new image
      */
     uploadImage: (formData: FormData) =>
-      apiClient.post<{ data: SiteImage }>('/admin/site-images/upload', formData, {
+      apiClient.post<{ data: SiteImage }>('/site-images/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       }),
 
@@ -68,13 +68,19 @@ export const siteContentAPI = {
      * Update image metadata
      */
     updateImage: (id: string, data: Partial<SiteImage>) =>
-      apiClient.put<{ data: SiteImage }>(`/admin/site-images/${id}`, data),
+      apiClient.put<{ data: SiteImage }>(`/site-images/${id}`, data),
 
     /**
      * Delete image
      */
     deleteImage: (id: string) =>
-      apiClient.delete(`/admin/site-images/${id}`),
+      apiClient.delete(`/site-images/${id}`),
+
+    /**
+     * Get image categories
+     */
+    getImageCategories: () =>
+      apiClient.get<{ data: any[] }>('/site-images/categories'),
 
     // ---------- Promotion Banners ----------
 
@@ -83,32 +89,32 @@ export const siteContentAPI = {
      */
     getPromotionBanners: (location?: string) =>
       apiClient.get<{ data: PromotionBanner[] }>(
-        `/admin/promotion-banners${location ? `?location=${location}` : ''}`
+        `/promotion-banners${location ? `?location=${location}` : ''}`
       ),
 
     /**
      * Get promotion banner by ID
      */
     getPromotionBannerByID: (id: string) =>
-      apiClient.get<{ data: PromotionBanner }>(`/admin/promotion-banners/${id}`),
+      apiClient.get<{ data: PromotionBanner }>(`/promotion-banners/${id}`),
 
     /**
      * Create new promotion banner
      */
     createPromotionBanner: (data: Partial<PromotionBanner>) =>
-      apiClient.post<{ data: PromotionBanner }>('/admin/promotion-banners', data),
+      apiClient.post<{ data: PromotionBanner }>('/promotion-banners', data),
 
     /**
      * Update promotion banner
      */
     updatePromotionBanner: (id: string, data: Partial<PromotionBanner>) =>
-      apiClient.put<{ data: PromotionBanner }>(`/admin/promotion-banners/${id}`, data),
+      apiClient.put<{ data: PromotionBanner }>(`/promotion-banners/${id}`, data),
 
     /**
      * Delete promotion banner
      */
     deletePromotionBanner: (id: string) =>
-      apiClient.delete(`/admin/promotion-banners/${id}`),
+      apiClient.delete(`/promotion-banners/${id}`),
 
     // ---------- Game Categories ----------
 
@@ -117,32 +123,32 @@ export const siteContentAPI = {
      */
     getGameCategories: (isActive?: boolean) =>
       apiClient.get<{ data: GameCategory[] }>(
-        `/admin/game-categories${isActive !== undefined ? `?is_active=${isActive}` : ''}`
+        `/game-categories${isActive !== undefined ? `?is_active=${isActive}` : ''}`
       ),
 
     /**
      * Get game category by ID
      */
     getGameCategoryByID: (id: string) =>
-      apiClient.get<{ data: GameCategory }>(`/admin/game-categories/${id}`),
+      apiClient.get<{ data: GameCategory }>(`/game-categories/${id}`),
 
     /**
      * Create new game category
      */
     createGameCategory: (data: Partial<GameCategory>) =>
-      apiClient.post<{ data: GameCategory }>('/admin/game-categories', data),
+      apiClient.post<{ data: GameCategory }>('/game-categories', data),
 
     /**
      * Update game category
      */
     updateGameCategory: (id: string, data: Partial<GameCategory>) =>
-      apiClient.put<{ data: GameCategory }>(`/admin/game-categories/${id}`, data),
+      apiClient.put<{ data: GameCategory }>(`/game-categories/${id}`, data),
 
     /**
      * Delete game category
      */
     deleteGameCategory: (id: string) =>
-      apiClient.delete(`/admin/game-categories/${id}`),
+      apiClient.delete(`/game-categories/${id}`),
 
     // ---------- Game Providers ----------
 
@@ -150,31 +156,31 @@ export const siteContentAPI = {
      * Get all game providers (admin)
      */
     getGameProviders: (params?: { category_id?: string; is_active?: boolean; is_featured?: boolean }) =>
-      apiClient.get<{ data: GameProvider[] }>('/admin/game-providers', { params }),
+      apiClient.get<{ data: GameProvider[] }>('/game-providers', { params }),
 
     /**
      * Get game provider by ID
      */
     getGameProviderByID: (id: string) =>
-      apiClient.get<{ data: GameProvider }>(`/admin/game-providers/${id}`),
+      apiClient.get<{ data: GameProvider }>(`/game-providers/${id}`),
 
     /**
      * Create new game provider
      */
     createGameProvider: (data: Partial<GameProvider>) =>
-      apiClient.post<{ data: GameProvider }>('/admin/game-providers', data),
+      apiClient.post<{ data: GameProvider }>('/game-providers', data),
 
     /**
      * Update game provider
      */
     updateGameProvider: (id: string, data: Partial<GameProvider>) =>
-      apiClient.put<{ data: GameProvider }>(`/admin/game-providers/${id}`, data),
+      apiClient.put<{ data: GameProvider }>(`/game-providers/${id}`, data),
 
     /**
      * Delete game provider
      */
     deleteGameProvider: (id: string) =>
-      apiClient.delete(`/admin/game-providers/${id}`),
+      apiClient.delete(`/game-providers/${id}`),
 
     // ---------- Site Settings ----------
 
@@ -183,20 +189,20 @@ export const siteContentAPI = {
      */
     getSiteSettings: (groupName?: string) =>
       apiClient.get<{ data: SiteSetting[] }>(
-        `/admin/site-settings${groupName ? `?group_name=${groupName}` : ''}`
+        `/site-settings${groupName ? `?group_name=${groupName}` : ''}`
       ),
 
     /**
      * Get site setting by key
      */
     getSiteSettingByKey: (key: string) =>
-      apiClient.get<{ data: SiteSetting }>(`/admin/site-settings/${key}`),
+      apiClient.get<{ data: SiteSetting }>(`/site-settings/${key}`),
 
     /**
      * Update multiple site settings at once
      */
     updateSiteSettings: (request: BulkUpdateSettingsRequest) =>
-      apiClient.post<{ message: string }>('/admin/site-settings/bulk-update', request),
+      apiClient.post<{ message: string }>('/site-settings/bulk-update', request),
   },
 }
 

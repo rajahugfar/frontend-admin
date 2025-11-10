@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { adminLotteryDailyAPI, StockBetsResponse, BetNumberItem, BetDetailItem } from '../../api/adminLotteryDailyAPI';
+import { adminLotteryDailyAPI, StockBetsResponse, BetNumberItem, BetDetailItem } from '@/api/adminLotteryDailyAPI';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 
 interface BetDetailModalProps {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import {
   FiAlertTriangle,
   FiSearch,
@@ -176,96 +176,88 @@ const PendingTransfer: React.FC = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-              <FiAlertTriangle className="text-orange-500" />
-              เครดิตหาย - โยกเกมส์
-            </h1>
-            <p className="text-gray-600 mt-2">ตรวจสอบและแก้ไขปัญหาเครดิตหายจากการโยกเข้า-ออกเกม</p>
-          </div>
-          <button
-            onClick={fetchTransfers}
-            disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-lg"
-          >
-            <FiRefreshCw className={loading ? 'animate-spin' : ''} />
-            รีเฟรช
-          </button>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-display font-bold text-gold-500 flex items-center gap-3">
+            <FiAlertTriangle />
+            เครดิตหาย - โยกเกมส์
+          </h1>
+          <p className="text-brown-400 mt-1">ตรวจสอบและแก้ไขปัญหาเครดิตหายจากการโยกเข้า-ออกเกม</p>
         </div>
+        <button
+          onClick={fetchTransfers}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 disabled:opacity-50 transition-colors font-medium"
+        >
+          <FiRefreshCw className={loading ? 'animate-spin' : ''} />
+          รีเฟรช
+        </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-xl p-6 text-white">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-gradient-to-br from-error/20 to-error/30 border border-error/40 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-red-100 text-sm font-medium mb-1">รายการมีปัญหา</p>
-              <p className="text-4xl font-bold">{stats.totalProblem}</p>
-              <p className="text-red-100 text-sm mt-2">จากทั้งหมด {stats.totalTransfers} รายการ</p>
+              <p className="text-brown-400 text-sm font-medium mb-1">รายการมีปัญหา</p>
+              <p className="text-4xl font-bold text-error">{stats.totalProblem}</p>
+              <p className="text-brown-400 text-sm mt-2">จากทั้งหมด {stats.totalTransfers} รายการ</p>
             </div>
-            <div className="bg-white bg-opacity-20 p-4 rounded-lg">
-              <FiAlertTriangle className="text-5xl" />
-            </div>
+            <FiAlertTriangle className="text-5xl text-error/30" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-warning/20 to-warning/30 border border-warning/40 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100 text-sm font-medium mb-1">เครดิตหายรวม</p>
-              <p className="text-4xl font-bold">฿{formatCurrency(stats.totalMissingAmount)}</p>
-              <p className="text-orange-100 text-sm mt-2">ต้องตรวจสอบและแก้ไข</p>
+              <p className="text-brown-400 text-sm font-medium mb-1">เครดิตหายรวม</p>
+              <p className="text-4xl font-bold text-warning">฿{formatCurrency(stats.totalMissingAmount)}</p>
+              <p className="text-brown-400 text-sm mt-2">ต้องตรวจสอบและแก้ไข</p>
             </div>
-            <div className="bg-white bg-opacity-20 p-4 rounded-lg">
-              <FiDollarSign className="text-5xl" />
-            </div>
+            <FiDollarSign className="text-5xl text-warning/30" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-gold-500/20 to-gold-600/20 border border-gold-500/30 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium mb-1">รายการทั้งหมด</p>
-              <p className="text-4xl font-bold">{total}</p>
-              <p className="text-blue-100 text-sm mt-2">Transaction ที่ตรวจสอบได้</p>
+              <p className="text-brown-400 text-sm font-medium mb-1">รายการทั้งหมด</p>
+              <p className="text-4xl font-bold text-gold-500">{total}</p>
+              <p className="text-brown-400 text-sm mt-2">Transaction ที่ตรวจสอบได้</p>
             </div>
-            <div className="bg-white bg-opacity-20 p-4 rounded-lg">
-              <FiClock className="text-5xl" />
-            </div>
+            <FiClock className="text-5xl text-gold-500/30" />
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div className="bg-admin-card border border-admin-border rounded-xl shadow-lg p-6">
         <form onSubmit={handleSearch}>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">ค้นหา</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">ค้นหา</label>
               <div className="relative">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brown-400" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="เบอร์โทร, ชื่อ"
-                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2.5 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 placeholder-brown-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">ประเภท</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">ประเภท</label>
               <div className="relative">
-                <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brown-400" />
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as any)}
-                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                  className="w-full pl-10 pr-3 py-2.5 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 appearance-none"
                 >
                   <option value="PROBLEM">มีปัญหา</option>
                   <option value="OK">ปกติ</option>
@@ -275,29 +267,29 @@ const PendingTransfer: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">วันที่เริ่มต้น</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">วันที่สิ้นสุด</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500"
               />
             </div>
 
             <div className="flex items-end gap-2">
               <button
                 type="submit"
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 transition-colors font-medium"
               >
                 <FiSearch />
                 ค้นหา
@@ -305,7 +297,7 @@ const PendingTransfer: React.FC = () => {
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                className="px-4 py-2.5 bg-admin-hover text-brown-300 rounded-lg hover:bg-admin-card transition-colors font-medium"
               >
                 รีเซ็ต
               </button>
@@ -315,98 +307,98 @@ const PendingTransfer: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-admin-card border border-admin-border rounded-xl shadow-lg overflow-hidden">
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span className="ml-4 text-gray-600 font-medium">กำลังโหลด...</span>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+            <span className="ml-4 text-brown-300 font-medium">กำลังโหลด...</span>
           </div>
         ) : transfers.length === 0 ? (
           <div className="text-center py-20">
-            <FiCheckCircle className="mx-auto text-6xl text-green-500 mb-4" />
-            <p className="text-gray-500 text-lg">ไม่พบรายการที่มีปัญหา</p>
+            <FiCheckCircle className="mx-auto text-6xl text-success mb-4" />
+            <p className="text-brown-400 text-lg">ไม่พบรายการที่มีปัญหา</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-admin-border">
+              <thead className="bg-admin-hover">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-500 uppercase tracking-wider">
                     วันที่/เวลา
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-500 uppercase tracking-wider">
                     สมาชิก
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gold-500 uppercase tracking-wider">
                     ประเภท
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gold-500 uppercase tracking-wider">
                     จำนวนโยก
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gold-500 uppercase tracking-wider">
                     ยอดก่อนโยก
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gold-500 uppercase tracking-wider">
                     ยอดที่ควรเป็น
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gold-500 uppercase tracking-wider">
                     ยอดปัจจุบัน
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gold-500 uppercase tracking-wider">
                     เครดิตหาย
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gold-500 uppercase tracking-wider">
                     การจัดการ
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-admin-border">
                 {transfers.map((transfer) => (
                   <tr
                     key={transfer.id}
-                    className={`hover:bg-gray-50 transition-colors ${
-                      transfer.isProblem ? 'bg-red-50' : ''
+                    className={`hover:bg-admin-hover transition-colors ${
+                      transfer.isProblem ? 'bg-error/5' : ''
                     }`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brown-200">
                       {formatDate(transfer.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{transfer.memberName}</div>
-                      <div className="text-sm text-gray-500">{transfer.memberPhone}</div>
+                      <div className="text-sm font-medium text-brown-200">{transfer.memberName}</div>
+                      <div className="text-sm text-brown-400">{transfer.memberPhone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       {transfer.type === 'TRANSFER_IN' ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
                           <FiTrendingDown />
                           โยกเข้า
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-success/20 text-success border border-success/30">
                           <FiTrendingUp />
                           โยกออก
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-brown-200">
                       ฿{formatCurrency(transfer.amount)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-brown-300">
                       ฿{formatCurrency(transfer.balanceBefore)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-blue-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-blue-400">
                       ฿{formatCurrency(transfer.balanceAfter)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-brown-200">
                       ฿{formatCurrency(transfer.currentBalance)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                       {transfer.isProblem ? (
-                        <span className="font-bold text-red-600 text-base">
+                        <span className="font-bold text-error text-base">
                           -฿{formatCurrency(Math.abs(transfer.missingAmount))}
                         </span>
                       ) : (
-                        <span className="text-green-600 font-medium">ปกติ</span>
+                        <span className="text-success font-medium">ปกติ</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -416,7 +408,7 @@ const PendingTransfer: React.FC = () => {
                             setSelectedTransfer(transfer)
                             setShowReconcileModal(true)
                           }}
-                          className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                          className="px-3 py-1.5 bg-gold-500 text-brown-900 text-xs font-medium rounded-lg hover:bg-gold-600 transition-colors"
                         >
                           ตรวจสอบแล้ว
                         </button>
@@ -427,7 +419,7 @@ const PendingTransfer: React.FC = () => {
                               setRefundAmount(Math.abs(transfer.missingAmount).toString())
                               setShowRefundModal(true)
                             }}
-                            className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors"
+                            className="px-3 py-1.5 bg-success text-white text-xs font-medium rounded-lg hover:bg-success/80 transition-colors"
                           >
                             คืนเครดิต
                           </button>
@@ -443,26 +435,26 @@ const PendingTransfer: React.FC = () => {
 
         {/* Pagination */}
         {!loading && total > 0 && (
-          <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
+          <div className="bg-admin-hover px-6 py-4 flex items-center justify-between border-t border-admin-border">
             <div>
-              <p className="text-sm text-gray-700">
-                แสดง <span className="font-medium">{(page - 1) * pageSize + 1}</span> ถึง{' '}
-                <span className="font-medium">{Math.min(page * pageSize, total)}</span> จาก{' '}
-                <span className="font-medium">{total}</span> รายการ
+              <p className="text-sm text-brown-300">
+                แสดง <span className="font-medium text-gold-500">{(page - 1) * pageSize + 1}</span> ถึง{' '}
+                <span className="font-medium text-gold-500">{Math.min(page * pageSize, total)}</span> จาก{' '}
+                <span className="font-medium text-gold-500">{total}</span> รายการ
               </p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
-                className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-admin-border text-sm font-medium rounded-lg text-brown-300 bg-admin-card hover:bg-admin-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 ก่อนหน้า
               </button>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page * pageSize >= total}
-                className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-admin-border text-sm font-medium rounded-lg text-brown-300 bg-admin-card hover:bg-admin-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 ถัดไป
               </button>
@@ -473,27 +465,27 @@ const PendingTransfer: React.FC = () => {
 
       {/* Reconcile Modal */}
       {showReconcileModal && selectedTransfer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiCheckCircle className="text-blue-600" />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-admin-border rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-display font-bold text-gold-500 mb-4 flex items-center gap-2">
+              <FiCheckCircle />
               บันทึกการตรวจสอบ
             </h3>
 
-            <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600">สมาชิก</p>
-              <p className="font-medium text-gray-900">{selectedTransfer.memberName}</p>
-              <p className="text-sm text-gray-500">{selectedTransfer.memberPhone}</p>
+            <div className="mb-4 p-4 bg-gold-500/10 border border-gold-500/30 rounded-lg">
+              <p className="text-sm text-brown-400">สมาชิก</p>
+              <p className="font-medium text-brown-200">{selectedTransfer.memberName}</p>
+              <p className="text-sm text-brown-400">{selectedTransfer.memberPhone}</p>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">หมายเหตุ</label>
               <textarea
                 value={reconcileRemark}
                 onChange={(e) => setReconcileRemark(e.target.value)}
                 rows={3}
                 placeholder="บันทึกผลการตรวจสอบ..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold-500 placeholder-brown-500"
               />
             </div>
 
@@ -503,13 +495,13 @@ const PendingTransfer: React.FC = () => {
                   setShowReconcileModal(false)
                   setReconcileRemark('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                className="flex-1 px-4 py-2 border border-admin-border text-brown-300 rounded-lg hover:bg-admin-hover font-medium transition-colors"
               >
                 ยกเลิก
               </button>
               <button
                 onClick={handleReconcile}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                className="flex-1 px-4 py-2 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 font-medium transition-colors"
               >
                 บันทึก
               </button>
@@ -520,45 +512,45 @@ const PendingTransfer: React.FC = () => {
 
       {/* Refund Modal */}
       {showRefundModal && selectedTransfer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiDollarSign className="text-green-600" />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-admin-border rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-display font-bold text-gold-500 mb-4 flex items-center gap-2">
+              <FiDollarSign />
               คืนเครดิตให้ลูกค้า
             </h3>
 
-            <div className="mb-4 p-4 bg-red-50 rounded-lg border border-red-200">
+            <div className="mb-4 p-4 bg-error/10 border border-error/30 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <FiAlertTriangle className="text-red-600" />
-                <p className="font-semibold text-red-900">เครดิตหาย</p>
+                <FiAlertTriangle className="text-error" />
+                <p className="font-semibold text-error">เครดิตหาย</p>
               </div>
-              <p className="text-sm text-gray-600">สมาชิก: {selectedTransfer.memberName}</p>
-              <p className="text-sm text-gray-600">เบอร์: {selectedTransfer.memberPhone}</p>
-              <p className="text-2xl font-bold text-red-600 mt-2">
+              <p className="text-sm text-brown-300">สมาชิก: {selectedTransfer.memberName}</p>
+              <p className="text-sm text-brown-300">เบอร์: {selectedTransfer.memberPhone}</p>
+              <p className="text-2xl font-bold text-error mt-2">
                 ฿{formatCurrency(Math.abs(selectedTransfer.missingAmount))}
               </p>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">จำนวนเงินที่คืน</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">จำนวนเงินที่คืน</label>
               <input
                 type="number"
                 value={refundAmount}
                 onChange={(e) => setRefundAmount(e.target.value)}
                 step="0.01"
                 placeholder="0.00"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-success placeholder-brown-500"
               />
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">เหตุผล *</label>
+              <label className="block text-sm font-medium text-brown-300 mb-2">เหตุผล *</label>
               <textarea
                 value={refundReason}
                 onChange={(e) => setRefundReason(e.target.value)}
                 rows={3}
                 placeholder="ระบุเหตุผลในการคืนเครดิต..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-admin-bg border border-admin-border text-brown-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-success placeholder-brown-500"
               />
             </div>
 
@@ -569,13 +561,13 @@ const PendingTransfer: React.FC = () => {
                   setRefundAmount('')
                   setRefundReason('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                className="flex-1 px-4 py-2 border border-admin-border text-brown-300 rounded-lg hover:bg-admin-hover font-medium transition-colors"
               >
                 ยกเลิก
               </button>
               <button
                 onClick={handleRefund}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                className="flex-1 px-4 py-2 bg-success text-white rounded-lg hover:bg-success/80 font-medium transition-colors"
               >
                 คืนเครดิต
               </button>

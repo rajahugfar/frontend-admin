@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FiSave, FiRefreshCw } from 'react-icons/fi'
 import toast from 'react-hot-toast'
+import { apiClient } from '@/api/client'
 
 interface CommissionRate {
   id: number
@@ -25,21 +26,10 @@ export default function ReferralSettings() {
     try {
       setIsLoading(true)
       
-      const response = await fetch('/api/v1/admin/referral/settings', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_selector')}`,
-        },
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch settings')
-      }
-
-      const data = await response.json()
-      setRates(data.data || [])
+      const response = await apiClient.get('/referral/settings')
+      setRates(response.data.data || [])
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to fetch settings:', error)
       toast.error('ไม่สามารถโหลดการตั้งค่าได้')
       
@@ -96,7 +86,7 @@ export default function ReferralSettings() {
     }
   }
 
-  const handleRateChange = (id: number, field: keyof CommissionRate, value: any) => {
+  const handleRateChange = (id: number, field: keyof CommissionRate, value: string | number | boolean) => {
     setRates(rates.map(rate => 
       rate.id === id ? { ...rate, [field]: value } : rate
     ))
@@ -106,20 +96,7 @@ export default function ReferralSettings() {
     try {
       setIsSaving(true)
       
-      const response = await fetch('/api/v1/admin/referral/settings', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('admin_selector')}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({ rates })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to save settings')
-      }
-
+      await apiClient.put('/referral/settings', { rates })
       toast.success('บันทึกการตั้งค่าเรียบร้อย')
     } catch (error) {
       console.error('Failed to save settings:', error)
@@ -138,7 +115,7 @@ export default function ReferralSettings() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="spinner"></div>
       </div>
     )
   }
@@ -148,13 +125,13 @@ export default function ReferralSettings() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ตั้งค่าเรทคอมมิชชั่น</h1>
-          <p className="text-gray-600 mt-1">กำหนดเปอร์เซ็นต์คอมมิชชั่นสำหรับแต่ละประเภทเกม</p>
+          <h1 className="text-2xl font-bold text-gold-500">ตั้งค่าเรทคอมมิชชั่น</h1>
+          <p className="text-brown-300 mt-1">กำหนดเปอร์เซ็นต์คอมมิชชั่นสำหรับแต่ละประเภทเกม</p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={handleReset}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            className="inline-flex items-center px-4 py-2 border border-brown-700 rounded-md text-brown-100 bg-admin-dark hover:bg-brown-800 transition-colors"
           >
             <FiRefreshCw className="mr-2" />
             รีเซ็ต
@@ -162,7 +139,7 @@ export default function ReferralSettings() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-admin-dark bg-gold-500 hover:bg-gold-600 disabled:opacity-50 transition-colors"
           >
             <FiSave className="mr-2" />
             {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
@@ -171,15 +148,15 @@ export default function ReferralSettings() {
       </div>
 
       {/* Settings Card */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-admin-card rounded-lg border border-brown-700">
         <div className="p-6">
           <div className="space-y-6">
             {rates.map((rate) => (
-              <div key={rate.id} className="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
+              <div key={rate.id} className="border-b border-brown-700 pb-6 last:border-0 last:pb-0">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold text-gray-900">{rate.typeName}</h3>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    <h3 className="text-lg font-semibold text-gold-400">{rate.typeName}</h3>
+                    <span className="text-xs text-brown-300 bg-admin-dark px-2 py-1 rounded">
                       {rate.type}
                     </span>
                   </div>
@@ -190,8 +167,8 @@ export default function ReferralSettings() {
                       onChange={(e) => handleRateChange(rate.id, 'enabled', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    <span className="ml-3 text-sm font-medium text-gray-700">
+                    <div className="relative w-11 h-6 bg-brown-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gold-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-brown-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-500"></div>
+                    <span className="ml-3 text-sm font-medium text-brown-100">
                       {rate.enabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                     </span>
                   </label>
@@ -200,7 +177,7 @@ export default function ReferralSettings() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Rate */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-brown-200 mb-2">
                       เปอร์เซ็นต์คอมมิชชั่น (%)
                     </label>
                     <div className="relative">
@@ -212,15 +189,15 @@ export default function ReferralSettings() {
                         min="0"
                         max="100"
                         disabled={!rate.enabled}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                        className="input disabled:opacity-50"
                       />
-                      <span className="absolute right-3 top-2 text-gray-500">%</span>
+                      <span className="absolute right-3 top-2 text-brown-400">%</span>
                     </div>
                   </div>
 
                   {/* Max Daily */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-brown-200 mb-2">
                       จำนวนสูงสุดต่อวัน (บาท)
                     </label>
                     <div className="relative">
@@ -231,22 +208,22 @@ export default function ReferralSettings() {
                         step="100"
                         min="0"
                         disabled={!rate.enabled}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                        className="input disabled:opacity-50"
                       />
-                      <span className="absolute right-3 top-2 text-gray-500">฿</span>
+                      <span className="absolute right-3 top-2 text-brown-400">฿</span>
                     </div>
                   </div>
 
                   {/* Calculation Type */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-brown-200 mb-2">
                       คำนวณจาก
                     </label>
                     <select
                       value={rate.calculationType}
                       onChange={(e) => handleRateChange(rate.id, 'calculationType', e.target.value)}
                       disabled={!rate.enabled}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                      className="input disabled:opacity-50"
                     >
                       <option value="turnover">Turnover (ยอดเดิมพัน)</option>
                       <option value="profit">Profit (ยอดได้)</option>
@@ -256,13 +233,13 @@ export default function ReferralSettings() {
 
                 {/* Example Calculation */}
                 {rate.enabled && (
-                  <div className="mt-4 p-3 bg-blue-50 rounded-md">
-                    <p className="text-sm text-blue-800">
+                  <div className="mt-4 p-3 bg-gold-500/10 border border-gold-500/30 rounded-md">
+                    <p className="text-sm text-gold-200">
                       <strong>ตัวอย่าง:</strong> หากสมาชิกที่แนะนำมา
                       {rate.calculationType === 'turnover' ? 'เดิมพัน' : 'ได้กำไร'} 10,000 บาท 
                       คุณจะได้รับคอมมิชชั่น {(10000 * rate.rate / 100).toLocaleString()} บาท
                       {rate.maxDaily && (10000 * rate.rate / 100) > rate.maxDaily && (
-                        <span className="text-orange-600"> (จำกัดสูงสุด {rate.maxDaily.toLocaleString()} บาท/วัน)</span>
+                        <span className="text-yellow-400"> (จำกัดสูงสุด {rate.maxDaily.toLocaleString()} บาท/วัน)</span>
                       )}
                     </p>
                   </div>
@@ -274,15 +251,15 @@ export default function ReferralSettings() {
       </div>
 
       {/* Additional Settings */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-admin-card rounded-lg border border-brown-700">
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">เงื่อนไขเพิ่มเติม</h3>
+          <h3 className="text-lg font-semibold text-gold-400 mb-4">เงื่อนไขเพิ่มเติม</h3>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between p-4 border border-brown-700 rounded-lg bg-admin-dark/30">
               <div>
-                <h4 className="font-medium text-gray-900">ต้องมีการฝากเงินก่อนถอนคอมมิชชั่น</h4>
-                <p className="text-sm text-gray-600 mt-1">
+                <h4 className="font-medium text-brown-100">ต้องมีการฝากเงินก่อนถอนคอมมิชชั่น</h4>
+                <p className="text-sm text-brown-300 mt-1">
                   สมาชิกต้องมีรายการฝากเงินอย่างน้อย 1 ครั้งในเดือนที่ขอถอน
                 </p>
               </div>
@@ -292,14 +269,14 @@ export default function ReferralSettings() {
                   defaultChecked={true}
                   className="sr-only peer"
                 />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="relative w-11 h-6 bg-brown-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gold-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-brown-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-500"></div>
               </label>
             </div>
 
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between p-4 border border-brown-700 rounded-lg bg-admin-dark/30">
               <div>
-                <h4 className="font-medium text-gray-900">ตรวจสอบการทุจริต</h4>
-                <p className="text-sm text-gray-600 mt-1">
+                <h4 className="font-medium text-brown-100">ตรวจสอบการทุจริต</h4>
+                <p className="text-sm text-brown-300 mt-1">
                   ระบบจะตรวจสอบการเดิมพันผิดปกติและบัญชีซ้ำซ้อนอัตโนมัติ
                 </p>
               </div>
@@ -309,12 +286,12 @@ export default function ReferralSettings() {
                   defaultChecked={true}
                   className="sr-only peer"
                 />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="relative w-11 h-6 bg-brown-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gold-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-brown-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-500"></div>
               </label>
             </div>
 
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
+            <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+              <p className="text-sm text-yellow-200">
                 <strong>หมายเหตุ:</strong> การเปลี่ยนแปลงการตั้งค่าจะมีผลทันทีกับการคำนวณคอมมิชชั่นใหม่ 
                 แต่จะไม่ส่งผลกับคอมมิชชั่นที่คำนวณไว้แล้ว
               </p>

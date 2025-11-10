@@ -1,24 +1,34 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
-import { useAuthStore } from '@store/authStore'
 import toast from 'react-hot-toast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const API_BASE_PATH = import.meta.env.VITE_API_BASE_PATH || '/api/v1'
 
 export const apiClient = axios.create({
+  baseURL: `${API_URL}${API_BASE_PATH}/admin`,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true, // Important for admin_session cookie
+})
+
+// Public API client (no /admin prefix)
+export const publicApiClient = axios.create({
   baseURL: `${API_URL}${API_BASE_PATH}`,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
-// Request interceptor - Add auth token
+// Request interceptor - Add admin selector (admin ใช้ selector ไม่ใช่ accessToken)
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const { accessToken } = useAuthStore.getState()
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`
+    const adminSelector = localStorage.getItem('admin_selector')
+    if (adminSelector && config.headers) {
+      config.headers.Authorization = `Bearer ${adminSelector}`
     }
     return config
   },
@@ -27,33 +37,27 @@ apiClient.interceptors.request.use(
   }
 )
 
-// Response interceptor - Handle errors and token refresh
+// Response interceptor - Handle errors
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<{ message: string }>) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
+    // If error is 401 (Unauthorized), clear session and redirect to login
+    if (error.response?.status === 401) {
+      // Clear all admin session data
+      localStorage.removeItem('admin_token')
+      localStorage.removeItem('admin_selector')
+      localStorage.removeItem('admin_user')
+      localStorage.removeItem('admin-storage') // Clear Zustand persist storage
 
-    // If error is 401 and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+      // Show toast notification
+      toast.error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่')
 
-      try {
-        // Try to refresh token
-        await useAuthStore.getState().refreshAccessToken()
+      // Force redirect to login page (replace to prevent back button)
+      setTimeout(() => {
+        window.location.replace('/login')
+      }, 500)
 
-        // Retry original request with new token
-        const { accessToken } = useAuthStore.getState()
-        if (originalRequest.headers && accessToken) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`
-        }
-
-        return apiClient(originalRequest)
-      } catch (refreshError) {
-        // If refresh fails, logout user
-        useAuthStore.getState().logout()
-        toast.error('กรุณาเข้าสู่ระบบอีกครั้ง')
-        return Promise.reject(refreshError)
-      }
+      return Promise.reject(error)
     }
 
     // Handle other errors

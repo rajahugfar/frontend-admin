@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import {
   FiSearch,
   FiRefreshCw,
@@ -8,7 +8,7 @@ import {
   FiLink,
   FiX,
 } from 'react-icons/fi'
-import { adminTransferAPI } from '../../api/adminAPI'
+import { adminTransferAPI } from '@/api/adminAPI'
 
 interface BankStatement {
   id: string
@@ -128,13 +128,13 @@ const PendingTrueWallet: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-brown-900">จับคู่รายการฝาก TrueWallet</h1>
-          <p className="text-brown-600 mt-1">จับคู่รายการโอนเงินจากธนาคารกับรายการฝากที่รอดำเนินการ</p>
+          <h1 className="text-3xl font-display font-bold text-gold-500">จับคู่รายการฝาก TrueWallet</h1>
+          <p className="text-brown-400 mt-1">จับคู่รายการโอนเงินจากธนาคารกับรายการฝากที่รอดำเนินการ</p>
         </div>
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 disabled:opacity-50 transition-colors font-medium"
         >
           <FiRefreshCw className={loading ? 'animate-spin' : ''} />
           รีเฟรช
@@ -143,111 +143,111 @@ const PendingTrueWallet: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-gold-500/20 to-gold-600/20 border border-gold-500/30 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium">รายการธนาคารที่ยังไม่จับคู่</p>
-              <p className="text-4xl font-bold mt-2">{statements.filter((s) => !s.matched).length}</p>
+              <p className="text-brown-400 text-sm font-medium">รายการธนาคารที่ยังไม่จับคู่</p>
+              <p className="text-4xl font-bold text-gold-500 mt-2">{statements.filter((s) => !s.matched).length}</p>
             </div>
-            <FiAlertCircle className="text-5xl text-blue-200 opacity-50" />
+            <FiAlertCircle className="text-5xl text-gold-500/30" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 border border-green-500/30 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm font-medium">รายการฝากที่รออนุมัติ</p>
-              <p className="text-4xl font-bold mt-2">{deposits.length}</p>
+              <p className="text-brown-400 text-sm font-medium">รายการฝากที่รออนุมัติ</p>
+              <p className="text-4xl font-bold text-success mt-2">{deposits.length}</p>
             </div>
-            <FiCheckCircle className="text-5xl text-green-200 opacity-50" />
+            <FiCheckCircle className="text-5xl text-green-500/30" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm font-medium">ยอดรวมที่ยังไม่จับคู่</p>
-              <p className="text-4xl font-bold mt-2">
+              <p className="text-brown-400 text-sm font-medium">ยอดรวมที่ยังไม่จับคู่</p>
+              <p className="text-4xl font-bold text-purple-400 mt-2">
                 ฿{formatCurrency(statements.filter((s) => !s.matched).reduce((sum, s) => sum + s.amount, 0))}
               </p>
             </div>
-            <FiAlertCircle className="text-5xl text-purple-200 opacity-50" />
+            <FiAlertCircle className="text-5xl text-purple-500/30" />
           </div>
         </div>
       </div>
 
       {/* Bank Statements Table */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">รายการโอนเงินจากธนาคาร TrueWallet</h2>
+      <div className="bg-admin-card border border-admin-border rounded-xl shadow-lg overflow-hidden">
+        <div className="p-6 border-b border-admin-border">
+          <h2 className="text-xl font-display font-bold text-gold-500">รายการโอนเงินจากธนาคาร TrueWallet</h2>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span className="ml-4 text-gray-600 font-medium">กำลังโหลด...</span>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500"></div>
+            <span className="ml-4 text-brown-300 font-medium">กำลังโหลด...</span>
           </div>
         ) : statements.length === 0 ? (
           <div className="text-center py-20">
-            <FiCheckCircle className="mx-auto text-6xl text-green-500 mb-4" />
-            <p className="text-gray-500 text-lg">ไม่พบรายการที่ยังไม่จับคู่</p>
+            <FiCheckCircle className="mx-auto text-6xl text-success mb-4" />
+            <p className="text-brown-400 text-lg">ไม่พบรายการที่ยังไม่จับคู่</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-admin-border">
+              <thead className="bg-admin-hover">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-500 uppercase tracking-wider">
                     วันที่/เวลา
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-500 uppercase tracking-wider">
                     จาก
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gold-500 uppercase tracking-wider">
                     จำนวนเงิน
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-500 uppercase tracking-wider">
                     Reference
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gold-500 uppercase tracking-wider">
                     สถานะ
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gold-500 uppercase tracking-wider">
                     การจัดการ
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-admin-border">
                 {statements.map((statement) => (
                   <tr
                     key={statement.id}
-                    className={`hover:bg-gray-50 transition-colors ${
-                      statement.matched ? 'bg-green-50' : ''
+                    className={`hover:bg-admin-hover transition-colors ${
+                      statement.matched ? 'bg-green-500/10' : ''
                     }`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brown-200">
                       {formatDate(statement.transactionDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{statement.fromName}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm font-medium text-brown-200">{statement.fromName}</div>
+                      <div className="text-sm text-brown-400">
                         {statement.fromAccount} ({statement.fromBank})
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-blue-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gold-500">
                       ฿{formatCurrency(statement.amount)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-brown-300">
                       {statement.referenceCode}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       {statement.matched ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-success/20 text-success border border-success/30">
                           <FiCheckCircle />
                           จับคู่แล้ว
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-warning/20 text-warning border border-warning/30">
                           <FiAlertCircle />
                           รอจับคู่
                         </span>
@@ -257,7 +257,7 @@ const PendingTrueWallet: React.FC = () => {
                       {statement.matched ? (
                         <button
                           onClick={() => handleUnmatch(statement.id)}
-                          className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition-colors"
+                          className="px-3 py-1.5 bg-error text-white text-xs font-medium rounded-lg hover:bg-error/80 transition-colors"
                         >
                           ยกเลิกการจับคู่
                         </button>
@@ -267,7 +267,7 @@ const PendingTrueWallet: React.FC = () => {
                             setSelectedStatement(statement)
                             setShowMatchModal(true)
                           }}
-                          className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 mx-auto"
+                          className="px-3 py-1.5 bg-gold-500 text-brown-900 text-xs font-medium rounded-lg hover:bg-gold-600 transition-colors flex items-center gap-1 mx-auto"
                         >
                           <FiLink />
                           จับคู่
@@ -283,26 +283,26 @@ const PendingTrueWallet: React.FC = () => {
 
         {/* Pagination */}
         {!loading && total > 0 && (
-          <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
+          <div className="bg-admin-hover px-6 py-4 flex items-center justify-between border-t border-admin-border">
             <div>
-              <p className="text-sm text-gray-700">
-                แสดง <span className="font-medium">{(page - 1) * pageSize + 1}</span> ถึง{' '}
-                <span className="font-medium">{Math.min(page * pageSize, total)}</span> จาก{' '}
-                <span className="font-medium">{total}</span> รายการ
+              <p className="text-sm text-brown-300">
+                แสดง <span className="font-medium text-gold-500">{(page - 1) * pageSize + 1}</span> ถึง{' '}
+                <span className="font-medium text-gold-500">{Math.min(page * pageSize, total)}</span> จาก{' '}
+                <span className="font-medium text-gold-500">{total}</span> รายการ
               </p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
-                className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-admin-border text-sm font-medium rounded-lg text-brown-300 bg-admin-card hover:bg-admin-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 ก่อนหน้า
               </button>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page * pageSize >= total}
-                className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-admin-border text-sm font-medium rounded-lg text-brown-300 bg-admin-card hover:bg-admin-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 ถัดไป
               </button>
@@ -313,17 +313,17 @@ const PendingTrueWallet: React.FC = () => {
 
       {/* Match Modal */}
       {showMatchModal && selectedStatement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">จับคู่รายการฝาก</h3>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-admin-border rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="bg-gradient-to-r from-gold-500 to-gold-600 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-xl font-display font-bold text-brown-900">จับคู่รายการฝาก</h3>
               <button
                 onClick={() => {
                   setShowMatchModal(false)
                   setSelectedStatement(null)
                   setSelectedDeposit('')
                 }}
-                className="text-white hover:text-gray-200 transition-colors"
+                className="text-brown-900 hover:text-brown-700 transition-colors"
               >
                 <FiX className="text-2xl" />
               </button>
@@ -331,33 +331,33 @@ const PendingTrueWallet: React.FC = () => {
 
             <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-200px)]">
               {/* Selected Statement Info */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-bold text-blue-900 mb-2">ข้อมูลการโอนเงิน</h4>
+              <div className="bg-gold-500/10 border border-gold-500/30 rounded-lg p-4">
+                <h4 className="font-bold text-gold-500 mb-2">ข้อมูลการโอนเงิน</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-blue-700">จาก:</span>
-                    <span className="ml-2 font-medium">{selectedStatement.fromName}</span>
+                    <span className="text-brown-400">จาก:</span>
+                    <span className="ml-2 font-medium text-brown-200">{selectedStatement.fromName}</span>
                   </div>
                   <div>
-                    <span className="text-blue-700">จำนวน:</span>
-                    <span className="ml-2 font-bold text-blue-900">
+                    <span className="text-brown-400">จำนวน:</span>
+                    <span className="ml-2 font-bold text-gold-500">
                       ฿{formatCurrency(selectedStatement.amount)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-blue-700">บัญชี:</span>
-                    <span className="ml-2">{selectedStatement.fromAccount}</span>
+                    <span className="text-brown-400">บัญชี:</span>
+                    <span className="ml-2 text-brown-200">{selectedStatement.fromAccount}</span>
                   </div>
                   <div>
-                    <span className="text-blue-700">ธนาคาร:</span>
-                    <span className="ml-2">{selectedStatement.fromBank}</span>
+                    <span className="text-brown-400">ธนาคาร:</span>
+                    <span className="ml-2 text-brown-200">{selectedStatement.fromBank}</span>
                   </div>
                 </div>
               </div>
 
               {/* Pending Deposits List */}
               <div>
-                <h4 className="font-bold text-gray-900 mb-3">เลือกรายการฝากที่ต้องการจับคู่</h4>
+                <h4 className="font-bold text-brown-200 mb-3">เลือกรายการฝากที่ต้องการจับคู่</h4>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {deposits
                     .filter((d) => Math.abs(d.amount - selectedStatement.amount) <= 5)
@@ -366,8 +366,8 @@ const PendingTrueWallet: React.FC = () => {
                         key={deposit.id}
                         className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
                           selectedDeposit === deposit.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                            ? 'border-gold-500 bg-gold-500/10'
+                            : 'border-admin-border hover:border-gold-500/50 hover:bg-admin-hover'
                         }`}
                       >
                         <input
@@ -376,21 +376,21 @@ const PendingTrueWallet: React.FC = () => {
                           value={deposit.id}
                           checked={selectedDeposit === deposit.id}
                           onChange={(e) => setSelectedDeposit(e.target.value)}
-                          className="mr-3"
+                          className="mr-3 accent-gold-500"
                         />
                         <div className="inline-block">
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-brown-200">
                             {deposit.memberName} ({deposit.memberPhone})
                           </div>
-                          <div className="text-sm text-gray-600">
-                            จำนวน: ฿{formatCurrency(deposit.amount)} • สถานะ: {deposit.status}
+                          <div className="text-sm text-brown-400">
+                            จำนวน: <span className="text-gold-500 font-semibold">฿{formatCurrency(deposit.amount)}</span> • สถานะ: {deposit.status}
                           </div>
                         </div>
                       </label>
                     ))}
 
                   {deposits.filter((d) => Math.abs(d.amount - selectedStatement.amount) <= 5).length === 0 && (
-                    <p className="text-center text-gray-500 py-8">
+                    <p className="text-center text-brown-400 py-8">
                       ไม่พบรายการฝากที่ตรงกับจำนวนเงินนี้ (±5 บาท)
                     </p>
                   )}
@@ -398,21 +398,21 @@ const PendingTrueWallet: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+            <div className="bg-admin-hover px-6 py-4 flex justify-end gap-3 border-t border-admin-border">
               <button
                 onClick={() => {
                   setShowMatchModal(false)
                   setSelectedStatement(null)
                   setSelectedDeposit('')
                 }}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                className="px-6 py-2 border border-admin-border rounded-lg text-brown-300 font-medium hover:bg-admin-card transition-colors"
               >
                 ยกเลิก
               </button>
               <button
                 onClick={handleMatch}
                 disabled={!selectedDeposit}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2 bg-gold-500 text-brown-900 rounded-lg font-medium hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 จับคู่รายการ
               </button>

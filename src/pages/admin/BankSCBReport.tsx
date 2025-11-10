@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { FiDollarSign, FiTrendingUp, FiTrendingDown, FiCheckCircle, FiXCircle, FiRefreshCw } from 'react-icons/fi'
-import { adminReportAPI } from '../../api/adminAPI'
+import { adminReportAPI } from '@/api/adminAPI'
 
 interface BankSCBTransaction {
   id: string
