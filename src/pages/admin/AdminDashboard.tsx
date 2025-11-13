@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { adminDashboardAPI } from '@/api/adminAPI'
+import { siteContentAPI } from '@/api/siteContentAPI'
 import { DashboardStats, RecentTransaction } from '@/types/admin'
 import { FiDollarSign, FiTrendingUp, FiTrendingDown, FiUsers, FiClock, FiCheckCircle } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
@@ -13,6 +14,22 @@ export default function AdminDashboard() {
   const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([])
   const [period, setPeriod] = useState<'today' | 'week' | 'month'>('today')
   const [isLoading, setIsLoading] = useState(true)
+  const [siteName, setSiteName] = useState('bicycle678')
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await siteContentAPI.getSiteSettings()
+        const settings = response.data.data
+        if (settings.site_name) {
+          setSiteName(settings.site_name)
+        }
+      } catch (error) {
+        console.error('Failed to load site settings:', error)
+      }
+    }
+    loadSettings()
+  }, [])
 
   useEffect(() => {
     fetchDashboardData()
@@ -134,7 +151,7 @@ export default function AdminDashboard() {
                 แดชบอร์ด
               </h1>
               <p className="text-brown-300">
-                ภาพรวมระบบ bicycle789
+                ภาพรวมระบบ {siteName}
               </p>
             </div>
 
