@@ -162,7 +162,7 @@ const PayoutRatesModal: React.FC<PayoutRatesModalProps> = ({
               <h3 className="text-lg font-bold text-gold-400 mb-4">
                 {editingId === -1 ? 'เพิ่มอัตราจ่าย' : 'แก้ไขอัตราจ่าย'}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 text-sm mb-2">ประเภทหวย</label>
                   <select
@@ -187,6 +187,20 @@ const PayoutRatesModal: React.FC<PayoutRatesModalProps> = ({
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 text-sm mb-2">
+                    เลขที่กำหนดราคา
+                    <span className="text-xs text-gray-400 ml-2">(ถ้าต้องการกำหนดเฉพาะเลข เช่น 123,456,789)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.poyNumber || ''}
+                    onChange={(e) => setFormData({ ...formData, poyNumber: e.target.value })}
+                    className="input w-full"
+                    placeholder="123,456,789 (คั่นด้วยจุลภาค)"
+                  />
                 </div>
 
                 <div>
@@ -224,22 +238,22 @@ const PayoutRatesModal: React.FC<PayoutRatesModalProps> = ({
                     <option value={0}>ปิดใช้งาน</option>
                   </select>
                 </div>
+              </div>
 
-                <div className="flex items-end gap-2">
-                  <button
-                    onClick={handleSave}
-                    className="flex-1 px-4 py-2 bg-success hover:bg-green-600 text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-2"
-                  >
-                    <FaSave />
-                    บันทึก
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all shadow-lg"
-                  >
-                    ยกเลิก
-                  </button>
-                </div>
+              <div className="flex items-center gap-2 mt-4">
+                <button
+                  onClick={handleSave}
+                  className="flex-1 px-4 py-2 bg-success hover:bg-green-600 text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-2"
+                >
+                  <FaSave />
+                  บันทึก
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all shadow-lg"
+                >
+                  ยกเลิก
+                </button>
               </div>
             </div>
           )}
