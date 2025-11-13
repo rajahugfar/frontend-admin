@@ -14,7 +14,11 @@ const LotteryDaily: React.FC = () => {
   const [lotteries, setLotteries] = useState<DailyLotteryItem[]>([]);
 
   // Filters
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    // Get current date in Asia/Bangkok timezone
+    const bangkokDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' });
+    return new Date(bangkokDate).toISOString().split('T')[0];
+  });
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
