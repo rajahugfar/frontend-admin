@@ -1,132 +1,170 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { FaImage, FaUpload, FaTrash, FaEdit, FaSearch, FaTimes } from 'react-icons/fa'
-import { siteContentAPI } from '@api/siteContentAPI'
-import type { SiteImage, ImageCategory } from '@/types/siteContent'
+import { FaImage, FaUpload, FaTrash, FaSearch, FaTimes, FaTh, FaList, FaFolder } from 'react-icons/fa'
+import ConfirmModal from '@/components/admin/ConfirmModal'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_BASE_PATH = import.meta.env.VITE_API_BASE_PATH || '/api/v1'
+
+interface UploadedImage {
+  id: string
+  url: string
+  filename?: string
+  size?: number
+  uploadedAt?: string
+}
 
 const SiteImagesManagement = () => {
-  const [images, setImages] = useState<SiteImage[]>([])
-  const [categories, setCategories] = useState<ImageCategory[]>([])
+  const [images, setImages] = useState<UploadedImage[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [selectedFolder, setSelectedFolder] = useState<string>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
-  const [editingImage, setEditingImage] = useState<SiteImage | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // Upload form state
-  const [uploadForm, setUploadForm] = useState({
-    category_id: '',
-    code: '',
-    title: '',
-    alt_text: '',
-  })
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [imageToDelete, setImageToDelete] = useState<string>('')
 
   useEffect(() => {
-    loadData()
+    loadImages()
   }, [])
 
-  const loadData = async () => {
+  const loadImages = async () => {
+    setLoading(true)
     try {
-      setLoading(true)
-      const [imagesRes, categoriesRes] = await Promise.all([
-        siteContentAPI.admin.getSiteImages(),
-        siteContentAPI.admin.getImageCategories(),
-      ])
-      setImages(imagesRes.data.data || [])
-      setCategories(categoriesRes.data.data || [])
+      const adminSelector = localStorage.getItem('admin_selector')
+      const response = await fetch(`${API_URL}${API_BASE_PATH}/admin/images?category=promotions`, {
+        headers: {
+          'Authorization': `Bearer ${adminSelector}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        const imagesData = Array.isArray(data.data) ? data.data : []
+        setImages(imagesData)
+      } else {
+        setImages([])
+      }
     } catch (error) {
-      console.error('Failed to load data:', error)
-      toast.error('ไม่สามารถโหลดข้อมูลได้')
+      console.error('Error loading images:', error)
+      toast.error('ไม่สามารถโหลดรูปภาพได้')
+      setImages([])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if (!allowedTypes.includes(file.type)) {
-      toast.error('รองรับเฉพาะไฟล์รูปภาพ (JPEG, PNG, WebP, GIF)')
+    if (!file.type.startsWith('image/')) {
+      toast.error('กรุณาเลือกไฟล์รูปภาพเท่านั้น')
       return
     }
 
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('ขนาดไฟล์ต้องไม่เกิน 10MB')
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('ขนาดไฟล์ต้องไม่เกิน 5MB')
       return
     }
 
     setUploading(true)
-
-    const formData = new FormData()
-    formData.append('image', file)
-    formData.append('category_id', uploadForm.category_id || '00000000-0000-0000-0000-000000000000')
-    formData.append('code', uploadForm.code || `img-${Date.now()}`)
-    formData.append('title', uploadForm.title || file.name)
-    if (uploadForm.alt_text) {
-      formData.append('alt_text', uploadForm.alt_text)
-    }
-
     try {
-      await siteContentAPI.admin.uploadImage(formData)
-      toast.success('อัปโหลดรูปภาพสำเร็จ')
-      setShowUploadModal(false)
-      setUploadForm({ category_id: '', code: '', title: '', alt_text: '' })
-      loadData()
-    } catch (error: any) {
-      console.error('Upload failed:', error)
-      toast.error(error.response?.data?.error || 'ไม่สามารถอัปโหลดรูปภาพได้')
+      const formData = new FormData()
+      formData.append('image', file)
+      formData.append('category', 'promotions')
+
+      const adminSelector = localStorage.getItem('admin_selector')
+      const response = await fetch(`${API_URL}${API_BASE_PATH}/admin/images/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminSelector}`
+        },
+        credentials: 'include',
+        body: formData
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('อัพโหลดรูปภาพสำเร็จ')
+        setShowUploadModal(false)
+        loadImages()
+      } else {
+        toast.error(data.message || 'เกิดข้อผิดพลาด')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('เกิดข้อผิดพลาดในการอัพโหลด')
     } finally {
       setUploading(false)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
     }
   }
 
-  const handleUpdateImage = async () => {
-    if (!editingImage) return
+  const handleDeleteClick = (imageUrl: string) => {
+    setImageToDelete(imageUrl)
+    setShowConfirmDelete(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!imageToDelete) return
 
     try {
-      await siteContentAPI.admin.updateImage(editingImage.id, {
-        title: editingImage.title,
-        alt_text: editingImage.alt_text,
-        code: editingImage.code,
-        is_active: editingImage.is_active,
+      const adminSelector = localStorage.getItem('admin_selector')
+      const response = await fetch(`${API_URL}${API_BASE_PATH}/admin/images?url=${encodeURIComponent(imageToDelete)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminSelector}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       })
-      toast.success('อัปเดตข้อมูลสำเร็จ')
-      setEditingImage(null)
-      loadData()
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('ลบรูปภาพสำเร็จ')
+        loadImages()
+      } else {
+        toast.error(data.message || 'ไม่สามารถลบรูปภาพได้')
+      }
     } catch (error) {
-      console.error('Update failed:', error)
-      toast.error('ไม่สามารถอัปเดตข้อมูลได้')
+      console.error('Error deleting image:', error)
+      toast.error('เกิดข้อผิดพลาดในการลบรูปภาพ')
+    } finally {
+      setImageToDelete('')
+      setShowConfirmDelete(false)
     }
   }
 
-  const handleDeleteImage = async (id: string, title: string) => {
-    if (!confirm(`ต้องการลบรูปภาพ "${title}" ใช่หรือไม่?`)) return
+  // Get unique folders from images
+  const folders = ['all', ...new Set(images.map(img => {
+    const parts = img.url.split('/')
+    // Get folder name (e.g., /uploads/promotions/banners/ -> banners)
+    return parts[parts.length - 2] || 'root'
+  }))]
 
-    try {
-      await siteContentAPI.admin.deleteImage(id)
-      toast.success('ลบรูปภาพสำเร็จ')
-      loadData()
-    } catch (error) {
-      console.error('Delete failed:', error)
-      toast.error('ไม่สามารถลบรูปภาพได้')
+  // Filter images by folder and search term
+  const filteredImages = images.filter(img => {
+    // Filter by folder
+    if (selectedFolder !== 'all') {
+      const parts = img.url.split('/')
+      const folder = parts[parts.length - 2] || 'root'
+      if (folder !== selectedFolder) return false
     }
-  }
 
-  // Filter images
-  const filteredImages = images.filter((image) => {
-    const matchesSearch = image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         image.code.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || image.category_id === selectedCategory
-    return matchesSearch && matchesCategory
+    // Filter by search term
+    if (searchTerm) {
+      const filename = img.filename?.toLowerCase() || ''
+      return filename.includes(searchTerm.toLowerCase())
+    }
+
+    return true
   })
 
   if (loading) {
@@ -146,7 +184,7 @@ const SiteImagesManagement = () => {
             <div>
               <h1 className="text-3xl font-display font-bold text-gold-500 mb-2 flex items-center gap-2">
                 <FaImage />
-                จัดการรูปภาพ
+                จัดการรูปภาพโปรโมชั่น
               </h1>
               <p className="text-brown-300">
                 รูปภาพทั้งหมด {images.length} รูป
@@ -154,106 +192,162 @@ const SiteImagesManagement = () => {
             </div>
             <button
               onClick={() => setShowUploadModal(true)}
-              className="px-6 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-all flex items-center gap-2"
+              className="px-6 py-2 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 transition-all flex items-center gap-2 font-medium"
             >
               <FaUpload />
-              อัปโหลดรูป
+              อัพโหลดรูป
             </button>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Filters */}
+        {/* Filters and Toolbar */}
         <div className="bg-admin-card border border-admin-border rounded-xl p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
             {/* Search */}
-            <div className="relative">
+            <div className="relative flex-1 w-full">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brown-400" />
               <input
                 type="text"
-                placeholder="ค้นหาด้วยชื่อหรือ code..."
+                placeholder="ค้นหาด้วยชื่อไฟล์..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
               />
             </div>
 
-            {/* Category Filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-            >
-              <option value="all">ทุกหมวดหมู่</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            {/* Folder Filter */}
+            <div className="flex items-center gap-2">
+              <FaFolder className="text-brown-400" />
+              <select
+                value={selectedFolder}
+                onChange={(e) => setSelectedFolder(e.target.value)}
+                className="px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
+              >
+                {folders.map(folder => (
+                  <option key={folder} value={folder}>
+                    {folder === 'all' ? 'ทั้งหมด' : folder}
+                  </option>
+                ))}
+              </select>
+              <span className="text-brown-500 text-sm">
+                ({filteredImages.length} รูป)
+              </span>
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-gold-500 text-brown-900'
+                    : 'bg-admin-hover text-brown-400 hover:text-gold-500'
+                }`}
+                title="แสดงแบบ Grid"
+              >
+                <FaTh size={18} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-gold-500 text-brown-900'
+                    : 'bg-admin-hover text-brown-400 hover:text-gold-500'
+                }`}
+                title="แสดงแบบ List"
+              >
+                <FaList size={18} />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Images Grid */}
+        {/* Images Display */}
         {filteredImages.length === 0 ? (
           <div className="bg-admin-card border border-admin-border rounded-xl p-12 text-center">
             <FaImage className="text-6xl text-brown-600 mx-auto mb-4" />
-            <p className="text-brown-400">ไม่พบรูปภาพ</p>
+            <p className="text-brown-400 mb-4">
+              {searchTerm || selectedFolder !== 'all' ? 'ไม่พบรูปภาพที่ค้นหา' : 'ยังไม่มีรูปภาพ'}
+            </p>
+            {!searchTerm && selectedFolder === 'all' && (
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="px-6 py-3 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 transition-colors font-medium"
+              >
+                อัพโหลดรูปแรก
+              </button>
+            )}
           </div>
-        ) : (
+        ) : viewMode === 'grid' ? (
+          /* Grid View */
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {filteredImages.map((image) => (
-              <div key={image.id} className="bg-admin-card border border-admin-border rounded-xl p-3 hover:border-gold-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] transition-all duration-300">
+              <div
+                key={image.id}
+                className="group bg-admin-card border border-admin-border rounded-xl overflow-hidden hover:border-gold-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] transition-all duration-300"
+              >
                 {/* Image */}
-                <div className="relative aspect-square mb-2 rounded overflow-hidden bg-admin-bg">
+                <div className="relative aspect-square bg-admin-bg p-2">
                   <img
-                    src={image.file_url}
-                    alt={image.alt_text || image.title}
-                    className="w-full h-full object-cover"
+                    src={`${API_URL}${image.url}`}
+                    alt={image.filename}
+                    className="w-full h-full object-cover rounded"
                     loading="lazy"
                   />
-                  {!image.is_active && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="bg-error text-white px-2 py-1 rounded text-xs">
-                        ปิดใช้งาน
-                      </span>
-                    </div>
-                  )}
+                  <button
+                    onClick={() => handleDeleteClick(image.url)}
+                    className="absolute top-3 left-3 bg-error/80 hover:bg-error text-white rounded-full p-1.5 transition-colors opacity-0 group-hover:opacity-100"
+                    title="ลบรูปภาพ"
+                  >
+                    <FaTrash size={14} />
+                  </button>
                 </div>
 
                 {/* Info */}
-                <div className="space-y-1">
-                  <p className="font-semibold text-sm truncate text-brown-200" title={image.title}>
-                    {image.title}
+                <div className="p-3 space-y-1">
+                  <p className="font-semibold text-sm truncate text-brown-200" title={image.filename}>
+                    {image.filename}
                   </p>
-                  <p className="text-xs text-brown-400 truncate" title={image.code}>
-                    {image.code}
-                  </p>
-                  {image.width && image.height && (
+                  {image.size && (
                     <p className="text-xs text-brown-500">
-                      {image.width} × {image.height}
+                      {(image.size / 1024).toFixed(1)} KB
                     </p>
                   )}
                 </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => setEditingImage(image)}
-                    className="flex-1 px-2 py-1 bg-info/10 hover:bg-info/20 text-info rounded-lg transition-all flex items-center justify-center gap-1 text-sm"
-                    title="แก้ไข"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteImage(image.id, image.title)}
-                    className="flex-1 px-2 py-1 bg-error/10 hover:bg-error/20 text-error rounded-lg transition-all flex items-center justify-center gap-1 text-sm"
-                    title="ลบ"
-                  >
-                    <FaTrash />
-                  </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* List View */
+          <div className="space-y-2">
+            {filteredImages.map((image) => (
+              <div
+                key={image.id}
+                className="flex items-center gap-4 p-3 rounded-lg border-2 border-admin-border bg-admin-card hover:border-gold-500/50 transition-all"
+              >
+                <div className="flex-shrink-0 w-24 h-16 bg-admin-hover rounded overflow-hidden">
+                  <img
+                    src={`${API_URL}${image.url}`}
+                    alt={image.filename}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-brown-200 font-medium truncate">{image.filename}</p>
+                  <p className="text-xs text-brown-500">
+                    {image.size && `${(image.size / 1024).toFixed(1)} KB`}
+                    {image.uploadedAt && ` • ${new Date(image.uploadedAt).toLocaleDateString('th-TH')}`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDeleteClick(image.url)}
+                  className="flex-shrink-0 bg-error/80 hover:bg-error text-white rounded-lg p-2 transition-colors"
+                  title="ลบรูปภาพ"
+                >
+                  <FaTrash size={16} />
+                </button>
               </div>
             ))}
           </div>
@@ -265,7 +359,7 @@ const SiteImagesManagement = () => {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-admin-card border border-admin-border rounded-xl max-w-md w-full p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-display font-bold text-gold-500">อัปโหลดรูปภาพ</h2>
+              <h2 className="text-2xl font-display font-bold text-gold-500">อัพโหลดรูปภาพ</h2>
               <button
                 onClick={() => setShowUploadModal(false)}
                 className="text-brown-400 hover:text-gold-500 transition-colors"
@@ -274,166 +368,61 @@ const SiteImagesManagement = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">หมวดหมู่</label>
-                <select
-                  value={uploadForm.category_id}
-                  onChange={(e) => setUploadForm({ ...uploadForm, category_id: e.target.value })}
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                >
-                  <option value="">เลือกหมวดหมู่</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">Code</label>
-                <input
-                  type="text"
-                  value={uploadForm.code}
-                  onChange={(e) => setUploadForm({ ...uploadForm, code: e.target.value })}
-                  placeholder="เช่น logo, btn-main-play"
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">ชื่อรูป</label>
-                <input
-                  type="text"
-                  value={uploadForm.title}
-                  onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                  placeholder="ชื่อรูปภาพ"
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">Alt Text (SEO)</label>
-                <input
-                  type="text"
-                  value={uploadForm.alt_text}
-                  onChange={(e) => setUploadForm({ ...uploadForm, alt_text: e.target.value })}
-                  placeholder="คำอธิบายรูปภาพ"
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 placeholder-brown-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">เลือกไฟล์</label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={handleUpload}
-                  disabled={uploading}
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gold-500 file:text-white hover:file:bg-gold-600 file:cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-                <p className="text-xs text-brown-400 mt-1">
-                  รองรับ JPEG, PNG, WebP, GIF (สูงสุด 10MB)
+            <div className="text-center py-12">
+              <div className="border-2 border-dashed border-admin-border rounded-xl p-12 hover:border-gold-500 transition-colors">
+                <FaUpload className="mx-auto text-6xl text-brown-500 mb-4" />
+                <p className="text-brown-300 mb-4">
+                  คลิกเพื่อเลือกไฟล์หรือลากไฟล์มาวางที่นี่
                 </p>
-              </div>
-
-              {uploading && (
-                <div className="text-center py-4">
-                  <div className="text-gold-500">กำลังอัปโหลด...</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {editingImage && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-admin-card border border-admin-border rounded-xl max-w-md w-full p-6 shadow-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-display font-bold text-gold-500">แก้ไขรูปภาพ</h2>
-              <button
-                onClick={() => setEditingImage(null)}
-                className="text-brown-400 hover:text-gold-500 transition-colors"
-              >
-                <FaTimes size={24} />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Preview */}
-              <div className="relative aspect-video rounded overflow-hidden bg-admin-bg border border-admin-border">
-                <img
-                  src={editingImage.file_url}
-                  alt={editingImage.alt_text || editingImage.title}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">Code</label>
+                <p className="text-brown-500 text-sm mb-4">
+                  รองรับ: JPG, PNG, GIF (ขนาดไม่เกิน 5MB)
+                </p>
                 <input
-                  type="text"
-                  value={editingImage.code}
-                  onChange={(e) => setEditingImage({ ...editingImage, code: e.target.value })}
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="hidden"
+                  id="image-upload"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">ชื่อรูป</label>
-                <input
-                  type="text"
-                  value={editingImage.title}
-                  onChange={(e) => setEditingImage({ ...editingImage, title: e.target.value })}
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-brown-300 mb-2">Alt Text</label>
-                <input
-                  type="text"
-                  value={editingImage.alt_text || ''}
-                  onChange={(e) => setEditingImage({ ...editingImage, alt_text: e.target.value })}
-                  className="w-full px-4 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  checked={editingImage.is_active}
-                  onChange={(e) => setEditingImage({ ...editingImage, is_active: e.target.checked })}
-                  className="w-4 h-4 text-gold-500 bg-admin-bg border-admin-border rounded focus:ring-gold-500"
-                />
-                <label htmlFor="is_active" className="text-sm text-brown-300 cursor-pointer">
-                  เปิดใช้งาน
+                <label
+                  htmlFor="image-upload"
+                  className={`inline-flex items-center gap-2 px-6 py-3 bg-gold-500 text-brown-900 rounded-lg hover:bg-gold-600 transition-colors font-medium cursor-pointer ${
+                    uploading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brown-900"></div>
+                      <span>กำลังอัพโหลด...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaUpload />
+                      <span>เลือกไฟล์</span>
+                    </>
+                  )}
                 </label>
               </div>
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={handleUpdateImage}
-                  className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 transition-all"
-                >
-                  บันทึก
-                </button>
-                <button
-                  onClick={() => setEditingImage(null)}
-                  className="flex-1 px-4 py-2 bg-admin-bg hover:bg-admin-hover text-brown-300 border border-admin-border rounded-lg transition-all"
-                >
-                  ยกเลิก
-                </button>
-              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={showConfirmDelete}
+        onClose={() => {
+          setShowConfirmDelete(false)
+          setImageToDelete('')
+        }}
+        onConfirm={handleConfirmDelete}
+        title="ยืนยันการลบรูปภาพ"
+        message="คุณต้องการลบรูปภาพนี้ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้"
+        confirmText="ลบรูปภาพ"
+        cancelText="ยกเลิก"
+        type="danger"
+      />
     </div>
   )
 }

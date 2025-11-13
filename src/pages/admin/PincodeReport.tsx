@@ -1,7 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { FiFileText, FiCheckCircle, FiXCircle, FiUsers, FiRefreshCw, FiFilter } from 'react-icons/fi'
-import { adminReportAPI } from '../../api/adminAPI'
+import {
+  FaKey,
+  FaFileAlt,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaUserShield,
+  FaSearch,
+  FaCalendarAlt,
+  FaFilter,
+  FaClock
+} from 'react-icons/fa'
+import { adminReportAPI } from '@/api/adminAPI'
 
 interface PincodeLog {
   id: string
@@ -30,7 +40,7 @@ interface PincodeReportResponse {
   total: number
 }
 
-const PincodeReport: React.FC = () => {
+const PincodeReport = () => {
   const [report, setReport] = useState<PincodeReportResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [startDate, setStartDate] = useState(() => {
@@ -90,16 +100,16 @@ const PincodeReport: React.FC = () => {
     switch (action.toLowerCase()) {
       case 'request':
       case 'created':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-info/20 text-info'
       case 'verify':
       case 'verified':
-        return 'bg-green-100 text-green-800'
+        return 'bg-success/20 text-success'
       case 'expired':
-        return 'bg-red-100 text-red-800'
+        return 'bg-error/20 text-error'
       case 'failed':
-        return 'bg-orange-100 text-orange-800'
+        return 'bg-warning/20 text-warning'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-brown-500/20 text-brown-400'
     }
   }
 
@@ -107,70 +117,90 @@ const PincodeReport: React.FC = () => {
     title,
     value,
     icon: Icon,
-    color,
+    colorClass,
+    bgClass,
   }: {
     title: string
     value: string
     icon: any
-    color: string
+    colorClass: string
+    bgClass: string
   }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="bg-admin-card border border-admin-border rounded-lg p-6 hover:border-gold-500/50 transition-all">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className={`text-2xl font-bold ${color}`}>{value}</p>
+          <p className="text-sm font-medium text-brown-400 mb-2">{title}</p>
+          <p className={`text-2xl font-bold ${colorClass}`}>{value}</p>
         </div>
-        <div className={`p-3 rounded-lg ${color.includes('green') ? 'bg-green-100' : color.includes('red') ? 'bg-red-100' : color.includes('blue') ? 'bg-blue-100' : 'bg-purple-100'}`}>
-          <Icon className={`w-6 h-6 ${color}`} />
+        <div className={`p-3 rounded-lg ${bgClass}`}>
+          <Icon className={`w-6 h-6 ${colorClass}`} />
         </div>
       </div>
     </div>
   )
 
+  if (loading && !report) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-admin-bg">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500" />
+      </div>
+    )
+  }
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-admin-bg p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">รายงาน Pincode</h1>
-        <p className="text-gray-600">ประวัติการใช้ Pincode ของ Admin</p>
+        <h1 className="text-3xl font-bold text-brown-100 flex items-center gap-3">
+          <FaKey className="text-gold-500" />
+          รายงาน Pincode
+        </h1>
+        <p className="text-brown-400 mt-1">
+          ประวัติการใช้งาน Pincode และการยืนยันตัวตนของ Admin
+        </p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="bg-admin-card border border-admin-border rounded-lg p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <FaFilter className="text-gold-500" />
+          <h2 className="text-lg font-semibold text-brown-100">ตัวกรอง</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-brown-200 mb-2">
+              <FaCalendarAlt className="inline w-4 h-4 mr-1" />
               วันที่เริ่มต้น
             </label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
             />
           </div>
 
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div>
+            <label className="block text-sm font-medium text-brown-200 mb-2">
+              <FaCalendarAlt className="inline w-4 h-4 mr-1" />
               วันที่สิ้นสุด
             </label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
             />
           </div>
 
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <FiFilter className="inline w-4 h-4 mr-1" />
+          <div>
+            <label className="block text-sm font-medium text-brown-200 mb-2">
               Action
             </label>
             <select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
             >
               <option value="">ทั้งหมด</option>
               <option value="request">Request</option>
@@ -180,23 +210,16 @@ const PincodeReport: React.FC = () => {
             </select>
           </div>
 
-          <button
-            onClick={handleSearch}
-            disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-          >
-            {loading ? (
-              <>
-                <FiRefreshCw className="w-5 h-5 animate-spin" />
-                <span>กำลังโหลด...</span>
-              </>
-            ) : (
-              <>
-                <FiRefreshCw className="w-5 h-5" />
-                <span>ค้นหา</span>
-              </>
-            )}
-          </button>
+          <div className="flex items-end">
+            <button
+              onClick={handleSearch}
+              disabled={loading}
+              className="w-full px-6 py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 font-semibold"
+            >
+              <FaSearch className="w-4 h-4" />
+              <span>ค้นหา</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -207,97 +230,105 @@ const PincodeReport: React.FC = () => {
             <StatCard
               title="รายการทั้งหมด"
               value={`${report.stats.totalLogs}`}
-              icon={FiFileText}
-              color="text-blue-600"
+              icon={FaFileAlt}
+              colorClass="text-info"
+              bgClass="bg-info/20"
             />
             <StatCard
-              title="สำเร็จ"
+              title="สำเร็จ (Success)"
               value={`${report.stats.successCount}`}
-              icon={FiCheckCircle}
-              color="text-green-600"
+              icon={FaCheckCircle}
+              colorClass="text-success"
+              bgClass="bg-success/20"
             />
             <StatCard
-              title="ไม่สำเร็จ"
+              title="ล้มเหลว (Failed)"
               value={`${report.stats.failCount}`}
-              icon={FiXCircle}
-              color="text-red-600"
+              icon={FaTimesCircle}
+              colorClass="text-error"
+              bgClass="bg-error/20"
             />
             <StatCard
               title="Admin ที่ใช้งาน"
               value={`${report.stats.uniqueAdmins}`}
-              icon={FiUsers}
-              color="text-purple-600"
+              icon={FaUserShield}
+              colorClass="text-warning"
+              bgClass="bg-warning/20"
             />
           </div>
 
           {/* Logs Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">รายการ Pincode Log</h2>
-              <p className="text-sm text-gray-600 mt-1">ทั้งหมด {report.total} รายการ</p>
+          <div className="bg-admin-card border border-admin-border rounded-lg overflow-hidden">
+            <div className="p-6 border-b border-admin-border">
+              <div className="flex items-center gap-2">
+                <FaClock className="text-gold-500" />
+                <h2 className="text-lg font-semibold text-brown-100">รายการ Pincode Log</h2>
+              </div>
+              <p className="text-sm text-brown-400 mt-1">ทั้งหมด {report.total} รายการ</p>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-admin-bg">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      วันที่
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-300 uppercase tracking-wider">
+                      วันที่-เวลา
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-300 uppercase tracking-wider">
                       Action
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-300 uppercase tracking-wider">
                       Admin
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-brown-300 uppercase tracking-wider">
                       ข้อความ
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-brown-300 uppercase tracking-wider">
                       สถานะ
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-admin-border">
                   {report.logs.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                        ไม่พบข้อมูล Pincode Log
+                      <td colSpan={5} className="px-6 py-12 text-center">
+                        <FaKey className="text-5xl text-brown-600 mx-auto mb-3" />
+                        <p className="text-brown-400">ไม่พบข้อมูล Pincode Log</p>
                       </td>
                     </tr>
                   ) : (
                     report.logs.map((log) => (
-                      <tr key={log.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <tr key={log.id} className="hover:bg-admin-hover transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-brown-200">
                           {formatDateTime(log.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionBadgeColor(log.action)}`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getActionBadgeColor(log.action)}`}>
                             {log.action}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
-                          <div>{log.username || '-'}</div>
+                        <td className="px-6 py-4 text-sm text-brown-200">
+                          <div className="font-medium">{log.username || '-'}</div>
                           {log.createdBy && (
-                            <div className="text-xs text-gray-500">โดย: {log.createdBy}</div>
+                            <div className="text-xs text-brown-400">โดย: {log.createdBy}</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
+                        <td className="px-6 py-4 text-sm text-brown-200">
                           {log.msg || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           {log.status === null ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brown-500/20 text-brown-400">
                               -
                             </span>
                           ) : log.status ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              <FiCheckCircle className="w-3 h-3 mr-1" />
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-success/20 text-success">
+                              <FaCheckCircle className="w-3 h-3 mr-1" />
                               สำเร็จ
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              <FiXCircle className="w-3 h-3 mr-1" />
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-error/20 text-error">
+                              <FaTimesCircle className="w-3 h-3 mr-1" />
                               ล้มเหลว
                             </span>
                           )}
@@ -310,16 +341,6 @@ const PincodeReport: React.FC = () => {
             </div>
           </div>
         </>
-      )}
-
-      {/* Loading State */}
-      {loading && !report && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <FiRefreshCw className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">กำลังโหลดข้อมูล...</p>
-          </div>
-        </div>
       )}
     </div>
   )
