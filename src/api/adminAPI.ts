@@ -14,11 +14,13 @@ export const adminAPIClient = axios.create({
   withCredentials: true, // Important for admin session cookies
 })
 
-// Request interceptor - Add admin selector from localStorage (admin ใช้ selector ไม่ใช่ token)
+// Request interceptor - Add admin session (selector:token format)
 adminAPIClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const adminSelector = localStorage.getItem('admin_selector')
-    if (adminSelector && config.headers) {
+    const adminToken = localStorage.getItem('admin_token')
+    if (adminSelector && adminToken && config.headers) {
+      // Backend expects "selector:token" format
       config.headers.Authorization = `Bearer ${adminSelector}`
     }
     return config

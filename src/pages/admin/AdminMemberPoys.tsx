@@ -70,11 +70,54 @@ const AdminMemberPoys: React.FC = () => {
 
       const response = await adminAPIClient.get(`/members/${memberId}/poys`, { params });
       if (response.data.status === 'success' && response.data.data) {
-        setData(response.data.data);
+        // Ensure we have default values for statistics
+        const responseData = response.data.data;
+        setData({
+          poys: responseData.poys || [],
+          statistics: responseData.statistics || {
+            totalPoys: 0,
+            totalBets: 0,
+            totalWins: 0,
+            netProfit: 0,
+            activePoys: 0,
+            cancelledPoys: 0,
+            completedPoys: 0
+          },
+          pagination: responseData.pagination || { limit: 50, offset: 0 }
+        });
+      } else {
+        // Set empty data if no response
+        setData({
+          poys: [],
+          statistics: {
+            totalPoys: 0,
+            totalBets: 0,
+            totalWins: 0,
+            netProfit: 0,
+            activePoys: 0,
+            cancelledPoys: 0,
+            completedPoys: 0
+          },
+          pagination: { limit: 50, offset: 0 }
+        });
       }
     } catch (error: any) {
       console.error('Failed to load member poys:', error);
       toast.error('ไม่สามารถโหลดข้อมูลโพยหวยได้');
+      // Set empty data on error to prevent crashes
+      setData({
+        poys: [],
+        statistics: {
+          totalPoys: 0,
+          totalBets: 0,
+          totalWins: 0,
+          netProfit: 0,
+          activePoys: 0,
+          cancelledPoys: 0,
+          completedPoys: 0
+        },
+        pagination: { limit: 50, offset: 0 }
+      });
     } finally {
       setLoading(false);
     }
