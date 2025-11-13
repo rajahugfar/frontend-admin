@@ -417,9 +417,9 @@ const AdminPoyDetail: React.FC = () => {
                           <p className="text-info font-bold text-sm">x{item.multiply}</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-gray-400 text-xs mb-1">ผลได้เสีย</p>
-                          <p className={`font-bold text-sm ${item.winAmount > 0 ? 'text-warning' : 'text-gray-300'}`}>
-                            {item.winAmount > 0 ? '+' : ''}{item.winAmount.toFixed(0)}
+                          <p className="text-gray-400 text-xs mb-1">ยอดเงินที่จะได้</p>
+                          <p className={`font-bold text-sm ${item.isWin ? 'text-success' : 'text-white'}`}>
+                            {payout.toFixed(0)}
                           </p>
                         </div>
                       </div>
