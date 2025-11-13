@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminLotteryDailyAPI, StockBetsResponse, BetNumberItem, BetDetailItem } from '@/api/adminLotteryDailyAPI';
-import { FaArrowLeft, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaTimes, FaChartLine, FaCoins } from 'react-icons/fa';
 
 interface BetDetailModalProps {
   isOpen: boolean;
@@ -58,73 +58,79 @@ const BetDetailModal: React.FC<BetDetailModalProps> = memo(({ isOpen, onClose, s
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border w-full max-w-5xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border w-full max-w-6xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 p-6 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold text-brown-900">รายละเอียดการแทง</h2>
             <p className="text-brown-700 mt-1">
-              {betTypeName} | เลข: <span className="font-bold text-2xl">{number}</span>
+              {betTypeName} | เลข: <span className="font-bold text-3xl ml-2">{number}</span>
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-brown-900/20 rounded-lg transition-all"
+            className="p-3 hover:bg-brown-900/20 rounded-xl transition-all"
           >
             <FaTimes className="text-2xl text-brown-900" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-150px)]">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
           {loading ? (
-            <div className="text-center py-12 text-gray-400">กำลังโหลดข้อมูล...</div>
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gold-500 mb-4"></div>
+              <p className="text-gray-400">กำลังโหลดข้อมูล...</p>
+            </div>
           ) : betDetails.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">ไม่พบข้อมูลการแทง</div>
+            <div className="text-center py-20">
+              <FaCoins className="text-6xl text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-400 text-xl">ไม่พบข้อมูลการแทง</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
-                  <tr className="bg-admin-darker border-b border-admin-border">
-                    <th className="px-4 py-3 text-left text-sm font-bold text-gray-300">ลำดับ</th>
-                    <th className="px-4 py-3 text-left text-sm font-bold text-gray-300">ชื่อสมาชิก</th>
-                    <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">ยอดแทง</th>
-                    <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">ยอดถูก</th>
-                    <th className="px-4 py-3 text-center text-sm font-bold text-gray-300">สถานะ</th>
-                    <th className="px-4 py-3 text-center text-sm font-bold text-gray-300">เวลาแทง</th>
-                    <th className="px-4 py-3 text-center text-sm font-bold text-gray-300">ดูโพย</th>
+                <thead className="sticky top-0 z-10">
+                  <tr className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker border-b-2 border-gold-500">
+                    <th className="px-4 py-4 text-left text-sm font-bold text-gold-400">ลำดับ</th>
+                    <th className="px-4 py-4 text-left text-sm font-bold text-gold-400">ชื่อสมาชิก</th>
+                    <th className="px-4 py-4 text-right text-sm font-bold text-gold-400">ยอดแทง</th>
+                    <th className="px-4 py-4 text-right text-sm font-bold text-gold-400">ยอดถูก</th>
+                    <th className="px-4 py-4 text-center text-sm font-bold text-gold-400">สถานะ</th>
+                    <th className="px-4 py-4 text-center text-sm font-bold text-gold-400">เวลาแทง</th>
+                    <th className="px-4 py-4 text-center text-sm font-bold text-gold-400">ดูโพย</th>
                   </tr>
                 </thead>
                 <tbody>
                   {betDetails.map((detail, index) => (
-                    <tr key={detail.betId} className="border-b border-admin-border/50 hover:bg-admin-darker/50 transition-all">
-                      <td className="px-4 py-3 text-gray-300">{index + 1}</td>
-                      <td className="px-4 py-3 text-white">{detail.memberName}</td>
+                    <tr key={detail.betId} className="border-b border-admin-border/30 hover:bg-admin-darker/50 transition-all">
+                      <td className="px-4 py-3 text-gray-300 font-medium">{index + 1}</td>
+                      <td className="px-4 py-3 text-white font-medium">{detail.memberName}</td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-blue-400 font-medium">{formatCurrency(detail.amount)}</span>
+                        <span className="text-blue-400 font-bold">{formatCurrency(detail.amount)}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-warning font-medium">
+                        <span className="text-warning font-bold">
                           {detail.winAmount > 0 ? formatCurrency(detail.winAmount) : '-'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         {detail.status === 1 ? (
-                          <span className="px-3 py-1 bg-success/20 text-success rounded-full text-xs font-medium">รอผล</span>
+                          <span className="px-3 py-1 bg-success/20 text-success rounded-full text-xs font-bold border border-success/30">รอผล</span>
                         ) : detail.status === 2 ? (
-                          <span className="px-3 py-1 bg-info/20 text-info rounded-full text-xs font-medium">ถูกรางวัล</span>
+                          <span className="px-3 py-1 bg-info/20 text-info rounded-full text-xs font-bold border border-info/30">ถูกรางวัล</span>
                         ) : (
-                          <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-medium">อื่นๆ</span>
+                          <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-bold border border-gray-500/30">อื่นๆ</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center text-gray-400 text-sm">{formatDateTime(detail.createdAt)}</td>
                       <td className="px-4 py-3 text-center">
                         <a
-                          href={`/admin/poy/${detail.poyId}`}
+                          href={`/admin/lottery/poy/${detail.poyId}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-1 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 rounded-lg text-xs font-medium transition-all inline-block"
+                          className="px-3 py-1 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 rounded-lg text-xs font-bold transition-all inline-block border border-gold-500/30"
                         >
                           ดูโพย
                         </a>
@@ -132,16 +138,18 @@ const BetDetailModal: React.FC<BetDetailModalProps> = memo(({ isOpen, onClose, s
                     </tr>
                   ))}
                 </tbody>
-                <tfoot>
-                  <tr className="bg-admin-darker font-bold">
-                    <td colSpan={2} className="px-4 py-3 text-right text-gold-400">รวม:</td>
-                    <td className="px-4 py-3 text-right text-blue-400">
+                <tfoot className="sticky bottom-0">
+                  <tr className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker border-t-2 border-gold-500 font-bold">
+                    <td colSpan={2} className="px-4 py-4 text-right text-gold-400 text-lg">รวมทั้งหมด:</td>
+                    <td className="px-4 py-4 text-right text-blue-400 text-lg">
                       {formatCurrency(totalAmount)}
                     </td>
-                    <td className="px-4 py-3 text-right text-warning">
+                    <td className="px-4 py-4 text-right text-warning text-lg">
                       {formatCurrency(totalWinAmount)}
                     </td>
-                    <td colSpan={3}></td>
+                    <td colSpan={3} className="px-4 py-4 text-left text-gray-400 text-sm">
+                      ({betDetails.length} รายการ)
+                    </td>
                   </tr>
                 </tfoot>
               </table>
@@ -153,7 +161,7 @@ const BetDetailModal: React.FC<BetDetailModalProps> = memo(({ isOpen, onClose, s
         <div className="bg-admin-darker p-4 flex justify-end border-t border-admin-border">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-all"
+            className="px-6 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold rounded-lg transition-all shadow-lg"
           >
             ปิด
           </button>
@@ -166,7 +174,8 @@ const BetDetailModal: React.FC<BetDetailModalProps> = memo(({ isOpen, onClose, s
 BetDetailModal.displayName = 'BetDetailModal';
 
 const LotteryDailyDetail: React.FC = () => {
-  const { stockId } = useParams<{ stockId: string }>();
+  const { lotteryId } = useParams<{ lotteryId: string }>();
+  const stockId = lotteryId;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [stockData, setStockData] = useState<StockBetsResponse | null>(null);
@@ -206,27 +215,26 @@ const LotteryDailyDetail: React.FC = () => {
 
   const getBetTypeName = useCallback((betType: string): string => {
     const typeNames: { [key: string]: string } = {
-      'teng_bon_4': '4 บน',
-      'tode_4': '4 โต๊ด',
-      'teng_bon_3': '3 บน',
-      'tode_3': '3 โต๊ด',
-      'teng_lang_nha_3': '3 หน้า',
-      'teng_lang_3': '3 ล่าง',
-      'teng_bon_2': '2 บน',
-      'teng_lang_2': '2 ล่าง',
+      'teng_bon_4': '4 ตัวบน',
+      'tode_4': '4 ตัวโต๊ด',
+      'teng_bon_3': '3 ตัวบน',
+      'tode_3': '3 ตัวโต๊ด',
+      'teng_lang_nha_3': '3 ตัวหน้า',
+      'teng_lang_3': '3 ตัวล่าง',
+      'teng_bon_2': '2 ตัวบน',
+      'teng_lang_2': '2 ตัวล่าง',
       'teng_bon_1': 'วิ่งบน',
       'teng_lang_1': 'วิ่งล่าง',
     };
     return typeNames[betType] || betType;
   }, []);
 
-  // Prepare table data - create rows where each row contains data from all bet types
-  const { columns, rows, totals } = useMemo(() => {
-    if (!stockData) return { columns: [], rows: [], totals: {} };
+  // Prepare table data with virtual scrolling support
+  const { columns, rows, totals, grandTotal } = useMemo(() => {
+    if (!stockData) return { columns: [], rows: [], totals: {}, grandTotal: { totalCount: 0, totalAmount: 0 } };
 
     const isGLO = stockData.huayCode === 'GLO' || stockData.has4d;
 
-    // Define column order based on lottery type
     const columns = isGLO ? [
       'teng_bon_4', 'tode_4', 'teng_bon_3', 'tode_3',
       'teng_lang_nha_3', 'teng_lang_3', 'teng_bon_2', 'teng_lang_2',
@@ -236,7 +244,6 @@ const LotteryDailyDetail: React.FC = () => {
       'teng_bon_1', 'teng_lang_1'
     ];
 
-    // Find max rows needed
     let maxRows = 0;
     const betArrays: { [key: string]: BetNumberItem[] } = {};
 
@@ -248,7 +255,6 @@ const LotteryDailyDetail: React.FC = () => {
       }
     });
 
-    // Create rows
     const rows: any[] = [];
     for (let i = 0; i < maxRows; i++) {
       const row: any = { index: i };
@@ -258,17 +264,27 @@ const LotteryDailyDetail: React.FC = () => {
       rows.push(row);
     }
 
-    // Calculate totals
     const totals: any = {};
+    let grandTotalCount = 0;
+    let grandTotalAmount = 0;
+
     columns.forEach(col => {
       const bets = betArrays[col];
+      const sum = bets.reduce((sum, bet) => sum + bet.amount, 0);
       totals[col] = {
         count: bets.length,
-        sum: bets.reduce((sum, bet) => sum + bet.amount, 0)
+        sum: sum
       };
+      grandTotalCount += bets.length;
+      grandTotalAmount += sum;
     });
 
-    return { columns, rows, totals };
+    return {
+      columns,
+      rows,
+      totals,
+      grandTotal: { totalCount: grandTotalCount, totalAmount: grandTotalAmount }
+    };
   }, [stockData]);
 
   return (
@@ -278,89 +294,147 @@ const LotteryDailyDetail: React.FC = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/admin/lottery/daily')}
-            className="p-3 bg-brown-900/20 hover:bg-brown-900/40 rounded-lg transition-all"
+            className="p-3 bg-brown-900/20 hover:bg-brown-900/40 rounded-xl transition-all shadow-lg"
           >
             <FaArrowLeft className="text-2xl text-brown-900" />
           </button>
-          <div>
-            <h1 className="text-3xl font-bold text-brown-900">{stockData?.stockName || 'รายละเอียดโพย'}</h1>
-            <p className="text-brown-700 text-lg mt-1">
-              รหัสหวย: <span className="font-bold">{stockData?.huayCode}</span>
-              {stockData?.has4d && <span className="ml-3 text-sm bg-brown-900/20 px-3 py-1 rounded-full">มี 4 ตัว</span>}
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-brown-900 flex items-center gap-3">
+              <FaChartLine />
+              {stockData?.stockName || 'รายละเอียดโพย'}
+            </h1>
+            <p className="text-brown-700 text-lg mt-2 flex items-center gap-3">
+              <span>รหัสหวย: <span className="font-bold">{stockData?.huayCode}</span></span>
+              {stockData?.has4d && (
+                <span className="bg-brown-900/30 px-4 py-1 rounded-full font-bold text-sm border border-brown-900/50">
+                  มี 4 ตัว
+                </span>
+              )}
             </p>
+          </div>
+          {/* Summary Stats */}
+          <div className="flex gap-4">
+            <div className="bg-brown-900/20 px-6 py-3 rounded-xl border border-brown-900/30">
+              <p className="text-brown-700 text-sm">รวมเลข</p>
+              <p className="text-2xl font-bold text-brown-900">{formatCurrency(grandTotal.totalCount)}</p>
+            </div>
+            <div className="bg-brown-900/20 px-6 py-3 rounded-xl border border-brown-900/30">
+              <p className="text-brown-700 text-sm">ยอดรวม</p>
+              <p className="text-2xl font-bold text-brown-900">{formatCurrency(grandTotal.totalAmount)}</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bet Table */}
       {loading ? (
-        <div className="text-center py-20 text-gray-400 text-xl">กำลังโหลดข้อมูล...</div>
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-gold-500 mb-6"></div>
+          <p className="text-gray-400 text-xl">กำลังโหลดข้อมูล...</p>
+        </div>
       ) : !stockData ? (
-        <div className="text-center py-20 text-gray-400 text-xl">ไม่พบข้อมูลหวย</div>
+        <div className="text-center py-20">
+          <FaChartLine className="text-6xl text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-400 text-xl">ไม่พบข้อมูลหวย</p>
+        </div>
       ) : rows.length === 0 ? (
-        <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border p-8">
-          <div className="text-center py-20 text-gray-400 text-xl">ยังไม่มีการแทง</div>
+        <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border p-12">
+          <div className="text-center py-20">
+            <FaCoins className="text-8xl text-gray-600 mx-auto mb-6" />
+            <p className="text-gray-400 text-2xl font-bold">ยังไม่มีการแทง</p>
+          </div>
         </div>
       ) : (
-        <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border p-6 overflow-x-auto">
-          <table className="w-full text-sm" style={{ minWidth: '1200px' }}>
-            <thead>
-              <tr className="bg-admin-darker border-b-2 border-gold-500">
-                {columns.map(col => (
-                  <React.Fragment key={col}>
-                    <th className="px-3 py-3 text-center text-gold-400 font-bold border-r border-admin-border">
-                      {getBetTypeName(col)}
-                    </th>
-                    <th className="px-3 py-3 text-center text-gold-400 font-bold border-r border-admin-border">
-                      จำนวน
-                    </th>
-                  </React.Fragment>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, rowIndex) => (
-                <tr key={rowIndex} className="border-b border-admin-border/30 hover:bg-admin-darker/50 transition-all">
-                  {columns.map(col => {
-                    const bet = row[col];
-                    return (
-                      <React.Fragment key={`${rowIndex}-${col}`}>
-                        <td className="px-3 py-2 text-center border-r border-admin-border/30">
-                          {bet ? (
-                            <button
-                              onClick={() => openBetDetail(col, bet.number, getBetTypeName(col))}
-                              className="text-white font-mono text-base hover:text-gold-400 hover:underline cursor-pointer font-medium"
-                            >
-                              {bet.number}
-                            </button>
-                          ) : (
-                            <span className="text-gray-600">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2 text-center text-blue-400 border-r border-admin-border/30">
-                          {bet ? formatCurrency(bet.amount) : '-'}
-                        </td>
-                      </React.Fragment>
-                    );
-                  })}
+        <div className="bg-admin-card rounded-2xl shadow-2xl border border-gold-500/30 overflow-hidden">
+          {/* Table Header Info */}
+          <div className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker p-4 border-b border-gold-500/30">
+            <p className="text-gray-300 text-sm">
+              แสดงข้อมูลทั้งหมด <span className="text-gold-400 font-bold">{rows.length}</span> แถว
+            </p>
+          </div>
+
+          {/* Virtual Scroll Container */}
+          <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+            <table className="w-full text-sm" style={{ minWidth: '1400px' }}>
+              <thead className="sticky top-0 z-20 shadow-lg">
+                <tr className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker border-b-2 border-gold-500">
+                  {columns.map(col => (
+                    <React.Fragment key={col}>
+                      <th className="px-4 py-4 text-center text-gold-400 font-bold border-r border-admin-border/50 min-w-[100px]">
+                        <div className="flex flex-col items-center">
+                          <span className="text-base">{getBetTypeName(col)}</span>
+                          <span className="text-xs text-gray-400 mt-1">
+                            ({totals[col]?.count || 0} เลข)
+                          </span>
+                        </div>
+                      </th>
+                      <th className="px-4 py-4 text-center text-gold-400 font-bold border-r border-admin-border/50 min-w-[120px]">
+                        <div className="flex flex-col items-center">
+                          <span className="text-base">ยอดเงิน</span>
+                          <span className="text-xs text-success mt-1">
+                            {formatCurrency(totals[col]?.sum || 0)}
+                          </span>
+                        </div>
+                      </th>
+                    </React.Fragment>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="bg-gradient-to-r from-admin-darker via-admin-dark to-admin-darker border-t-2 border-gold-500 font-bold">
-                {columns.map(col => (
-                  <React.Fragment key={`total-${col}`}>
-                    <td className="px-3 py-3 text-center text-warning border-r border-admin-border">
-                      {totals[col].count}
-                    </td>
-                    <td className="px-3 py-3 text-center text-success border-r border-admin-border">
-                      {formatCurrency(totals[col].sum)}
-                    </td>
-                  </React.Fragment>
+              </thead>
+              <tbody>
+                {rows.map((row, rowIndex) => (
+                  <tr
+                    key={rowIndex}
+                    className={`border-b border-admin-border/20 hover:bg-gold-500/5 transition-all ${
+                      rowIndex % 2 === 0 ? 'bg-admin-darker/30' : ''
+                    }`}
+                  >
+                    {columns.map(col => {
+                      const bet = row[col];
+                      return (
+                        <React.Fragment key={`${rowIndex}-${col}`}>
+                          <td className="px-4 py-3 text-center border-r border-admin-border/20">
+                            {bet ? (
+                              <button
+                                onClick={() => openBetDetail(col, bet.number, getBetTypeName(col))}
+                                className="text-white font-mono text-lg font-bold hover:text-gold-400 hover:scale-110 transition-all cursor-pointer px-3 py-1 rounded hover:bg-gold-500/10"
+                              >
+                                {bet.number}
+                              </button>
+                            ) : (
+                              <span className="text-gray-700 text-sm">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center border-r border-admin-border/20">
+                            {bet ? (
+                              <span className="text-blue-400 font-bold text-base">
+                                {formatCurrency(bet.amount)}
+                              </span>
+                            ) : (
+                              <span className="text-gray-700 text-sm">-</span>
+                            )}
+                          </td>
+                        </React.Fragment>
+                      );
+                    })}
+                  </tr>
                 ))}
-              </tr>
-            </tfoot>
-          </table>
+              </tbody>
+              <tfoot className="sticky bottom-0 z-10 shadow-lg">
+                <tr className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker border-t-2 border-gold-500 font-bold">
+                  {columns.map(col => (
+                    <React.Fragment key={`total-${col}`}>
+                      <td className="px-4 py-4 text-center text-warning border-r border-admin-border/50 text-lg">
+                        {totals[col].count}
+                      </td>
+                      <td className="px-4 py-4 text-center text-success border-r border-admin-border/50 text-lg">
+                        {formatCurrency(totals[col].sum)}
+                      </td>
+                    </React.Fragment>
+                  ))}
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       )}
 
