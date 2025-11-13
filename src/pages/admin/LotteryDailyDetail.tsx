@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminLotteryDailyAPI, StockBetsResponse, BetNumberItem, BetDetailItem } from '@/api/adminLotteryDailyAPI';
 import { FaArrowLeft, FaTimes } from 'react-icons/fa';
@@ -12,17 +12,11 @@ interface BetDetailModalProps {
   betTypeName: string;
 }
 
-const BetDetailModal: React.FC<BetDetailModalProps> = ({ isOpen, onClose, stockId, betType, number, betTypeName }) => {
+const BetDetailModal: React.FC<BetDetailModalProps> = memo(({ isOpen, onClose, stockId, betType, number, betTypeName }) => {
   const [loading, setLoading] = useState(false);
   const [betDetails, setBetDetails] = useState<BetDetailItem[]>([]);
 
-  useEffect(() => {
-    if (isOpen && stockId && betType && number) {
-      fetchBetDetail();
-    }
-  }, [isOpen, stockId, betType, number]);
-
-  const fetchBetDetail = async () => {
+  const fetchBetDetail = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminLotteryDailyAPI.getBetDetail(stockId, betType, number);
@@ -34,13 +28,19 @@ const BetDetailModal: React.FC<BetDetailModalProps> = ({ isOpen, onClose, stockI
     } finally {
       setLoading(false);
     }
-  };
+  }, [stockId, betType, number]);
 
-  const formatCurrency = (amount: number) => {
+  useEffect(() => {
+    if (isOpen && stockId && betType && number) {
+      fetchBetDetail();
+    }
+  }, [isOpen, fetchBetDetail]);
+
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-  };
+  }, []);
 
-  const formatDateTime = (dateString: string) => {
+  const formatDateTime = useCallback((dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('th-TH', {
       year: 'numeric',
@@ -50,7 +50,10 @@ const BetDetailModal: React.FC<BetDetailModalProps> = ({ isOpen, onClose, stockI
       minute: '2-digit',
       second: '2-digit',
     }).format(date);
-  };
+  }, []);
+
+  const totalAmount = useMemo(() => betDetails.reduce((sum, d) => sum + d.amount, 0), [betDetails]);
+  const totalWinAmount = useMemo(() => betDetails.reduce((sum, d) => sum + d.winAmount, 0), [betDetails]);
 
   if (!isOpen) return null;
 
@@ -133,10 +136,10 @@ const BetDetailModal: React.FC<BetDetailModalProps> = ({ isOpen, onClose, stockI
                   <tr className="bg-admin-darker font-bold">
                     <td colSpan={2} className="px-4 py-3 text-right text-gold-400">รวม:</td>
                     <td className="px-4 py-3 text-right text-blue-400">
-                      {formatCurrency(betDetails.reduce((sum, d) => sum + d.amount, 0))}
+                      {formatCurrency(totalAmount)}
                     </td>
                     <td className="px-4 py-3 text-right text-warning">
-                      {formatCurrency(betDetails.reduce((sum, d) => sum + d.winAmount, 0))}
+                      {formatCurrency(totalWinAmount)}
                     </td>
                     <td colSpan={3}></td>
                   </tr>
@@ -158,7 +161,9 @@ const BetDetailModal: React.FC<BetDetailModalProps> = ({ isOpen, onClose, stockI
       </div>
     </div>
   );
-};
+});
+
+BetDetailModal.displayName = 'BetDetailModal';
 
 const LotteryDailyDetail: React.FC = () => {
   const { stockId } = useParams<{ stockId: string }>();
@@ -170,13 +175,7 @@ const LotteryDailyDetail: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBet, setSelectedBet] = useState<{ type: string; number: string; typeName: string } | null>(null);
 
-  useEffect(() => {
-    if (stockId) {
-      fetchStockBets();
-    }
-  }, [stockId]);
-
-  const fetchStockBets = async () => {
+  const fetchStockBets = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminLotteryDailyAPI.getStockBets(parseInt(stockId!));
@@ -188,18 +187,24 @@ const LotteryDailyDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [stockId]);
 
-  const formatCurrency = (amount: number) => {
+  useEffect(() => {
+    if (stockId) {
+      fetchStockBets();
+    }
+  }, [fetchStockBets]);
+
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
-  };
+  }, []);
 
-  const openBetDetail = (betType: string, number: string, typeName: string) => {
+  const openBetDetail = useCallback((betType: string, number: string, typeName: string) => {
     setSelectedBet({ type: betType, number, typeName });
     setModalOpen(true);
-  };
+  }, []);
 
-  const getBetTypeName = (betType: string): string => {
+  const getBetTypeName = useCallback((betType: string): string => {
     const typeNames: { [key: string]: string } = {
       'teng_bon_4': '4 บน',
       'tode_4': '4 โต๊ด',
@@ -213,10 +218,10 @@ const LotteryDailyDetail: React.FC = () => {
       'teng_lang_1': 'วิ่งล่าง',
     };
     return typeNames[betType] || betType;
-  };
+  }, []);
 
   // Prepare table data - create rows where each row contains data from all bet types
-  const prepareTableData = () => {
+  const { columns, rows, totals } = useMemo(() => {
     if (!stockData) return { columns: [], rows: [], totals: {} };
 
     const isGLO = stockData.huayCode === 'GLO' || stockData.has4d;
@@ -264,9 +269,7 @@ const LotteryDailyDetail: React.FC = () => {
     });
 
     return { columns, rows, totals };
-  };
-
-  const { columns, rows, totals } = prepareTableData();
+  }, [stockData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-admin-dark via-admin-darker to-black p-6">

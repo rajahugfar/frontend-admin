@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLotteryDailyAPI, DailyLotteryItem, DailyListStatistics } from '@/api/adminLotteryDailyAPI';
 import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit, FaPercentage } from 'react-icons/fa';
 import LotteryResultModal from '../../components/admin/modals/LotteryResultModal';
 import NumberLimitsModal from '../../components/admin/modals/NumberLimitsModal';
+import ConfirmModal from '../../components/admin/ConfirmModal';
+import toast from 'react-hot-toast';
 
 const LotteryDaily: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +34,20 @@ const LotteryDaily: React.FC = () => {
     lotteryId: number;
     lotteryName: string;
   } | null>(null);
+
+  // Confirm Modal
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    type?: 'danger' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   // Group lotteries by group
   const groupedLotteries = React.useMemo(() => {
@@ -70,7 +86,7 @@ const LotteryDaily: React.FC = () => {
       .map(([groupId, data]) => ({ groupId: parseInt(groupId), ...data }));
   }, [lotteries]);
 
-  const getFlagEmoji = (iconCode: string) => {
+  const getFlagEmoji = useCallback((iconCode: string) => {
     const flags: { [key: string]: string } = {
       'th': '🇹🇭',
       'la': '🇱🇦',
@@ -87,13 +103,13 @@ const LotteryDaily: React.FC = () => {
       'us': '🇺🇸',
     };
     return flags[iconCode?.toLowerCase()] || '🏳️';
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [selectedDate, statusFilter]);
+  }, [fetchData]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const params: any = { date: selectedDate };
@@ -107,64 +123,62 @@ const LotteryDaily: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch daily list:', error);
+      toast.error('ไม่สามารถโหลดข้อมูลได้');
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, statusFilter, searchQuery]);
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     fetchData();
-  };
+  }, [fetchData]);
 
-  const handleOpenLottery = async (lotteryId: number) => {
-    if (!confirm('ต้องการเปิดรับแทงหวยนี้หรือไม่?')) return;
+  const handleOpenLottery = useCallback(async (lotteryId: number) => {
     try {
       const response = await adminLotteryDailyAPI.openLottery(lotteryId);
       if (response.status === 'success') {
-        alert(response.message || 'เปิดรับแทงเรียบร้อย');
+        toast.success(response.message || 'เปิดรับแทงเรียบร้อย');
         fetchData();
       } else {
-        alert(response.message || 'เกิดข้อผิดพลาด');
+        toast.error(response.message || 'เกิดข้อผิดพลาด');
       }
     } catch (error: any) {
       console.error('Failed to open lottery:', error);
-      alert(error.response?.data?.message || 'เกิดข้อผิดพลาด');
+      toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด');
     }
-  };
+  }, [fetchData]);
 
-  const handleCloseLottery = async (lotteryId: number) => {
-    if (!confirm('ต้องการปิดรับแทงหวยนี้หรือไม่?')) return;
+  const handleCloseLottery = useCallback(async (lotteryId: number) => {
     try {
       const response = await adminLotteryDailyAPI.closeLottery(lotteryId);
       if (response.status === 'success') {
-        alert(response.message || 'ปิดรับแทงเรียบร้อย');
+        toast.success(response.message || 'ปิดรับแทงเรียบร้อย');
         fetchData();
       } else {
-        alert(response.message || 'เกิดข้อผิดพลาด');
+        toast.error(response.message || 'เกิดข้อผิดพลาด');
       }
     } catch (error: any) {
       console.error('Failed to close lottery:', error);
-      alert(error.response?.data?.message || 'เกิดข้อผิดพลาด');
+      toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด');
     }
-  };
+  }, [fetchData]);
 
-  const handleCancelLottery = async (lotteryId: number) => {
-    if (!confirm('ต้องการยกเลิกหวยนี้หรือไม่? การยกเลิกจะคืนเงินให้สมาชิกทั้งหมด')) return;
+  const handleCancelLottery = useCallback(async (lotteryId: number) => {
     try {
       const response = await adminLotteryDailyAPI.cancelLottery(lotteryId);
       if (response.status === 'success') {
-        alert(response.message || 'ยกเลิกหวยเรียบร้อย');
+        toast.success(response.message || 'ยกเลิกหวยเรียบร้อย');
         fetchData();
       } else {
-        alert(response.message || 'เกิดข้อผิดพลาด');
+        toast.error(response.message || 'เกิดข้อผิดพลาด');
       }
     } catch (error: any) {
       console.error('Failed to cancel lottery:', error);
-      alert(error.response?.data?.message || 'เกิดข้อผิดพลาด');
+      toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด');
     }
-  };
+  }, [fetchData]);
 
-  const getStatusBadge = (status: number) => {
+  const getStatusBadge = useCallback((status: number) => {
     switch (status) {
       case 1:
         return <span className="px-3 py-1 bg-success/20 text-success rounded-full text-sm font-medium flex items-center gap-1">
@@ -185,13 +199,13 @@ const LotteryDaily: React.FC = () => {
       default:
         return <span className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">-</span>;
     }
-  };
+  }, []);
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-  };
+  }, []);
 
-  const formatDateTime = (dateString: string) => {
+  const formatDateTime = useCallback((dateString: string) => {
     // API sends time in format "2025-11-07T20:10:00Z" where the time is already in Bangkok timezone
     // but marked as UTC (Z). We need to treat it as local Bangkok time.
     const localDateString = dateString.replace('Z', '+07:00');
@@ -204,7 +218,7 @@ const LotteryDaily: React.FC = () => {
       minute: '2-digit',
       timeZone: 'Asia/Bangkok',
     }).format(date);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-admin-dark via-admin-darker to-black p-6">
@@ -487,7 +501,15 @@ const LotteryDaily: React.FC = () => {
                             {/* ปุ่มเปิด/ปิดแทง - แสดงเมื่อสถานะเปิดหรือปิดแทง */}
                             {lottery.status === 1 && (
                               <button
-                                onClick={() => handleCloseLottery(lottery.id)}
+                                onClick={() => {
+                                  setConfirmModal({
+                                    isOpen: true,
+                                    title: 'ปิดรับแทงหวย',
+                                    message: 'ต้องการปิดรับแทงหวยนี้หรือไม่?',
+                                    onConfirm: () => handleCloseLottery(lottery.id),
+                                    type: 'warning'
+                                  });
+                                }}
                                 className="px-3 py-2 bg-warning hover:bg-warning/80 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
                                 title="ปิดรับแทง"
                               >
@@ -497,7 +519,15 @@ const LotteryDaily: React.FC = () => {
                             )}
                             {lottery.status === 4 && (
                               <button
-                                onClick={() => handleOpenLottery(lottery.id)}
+                                onClick={() => {
+                                  setConfirmModal({
+                                    isOpen: true,
+                                    title: 'เปิดรับแทงหวย',
+                                    message: 'ต้องการเปิดรับแทงหวยนี้หรือไม่?',
+                                    onConfirm: () => handleOpenLottery(lottery.id),
+                                    type: 'info'
+                                  });
+                                }}
                                 className="px-3 py-2 bg-success hover:bg-success/80 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
                                 title="เปิดรับแทง"
                               >
@@ -530,7 +560,15 @@ const LotteryDaily: React.FC = () => {
                             {/* ปุ่มยกเลิก - แสดงเมื่อยังไม่ประกาศผล */}
                             {lottery.status !== 2 && lottery.status !== 0 && (
                               <button
-                                onClick={() => handleCancelLottery(lottery.id)}
+                                onClick={() => {
+                                  setConfirmModal({
+                                    isOpen: true,
+                                    title: 'ยกเลิกหวย',
+                                    message: 'ต้องการยกเลิกหวยนี้หรือไม่? การยกเลิกจะคืนเงินให้สมาชิกทั้งหมด',
+                                    onConfirm: () => handleCancelLottery(lottery.id),
+                                    type: 'danger'
+                                  });
+                                }}
                                 className="px-3 py-2 bg-error hover:bg-error/80 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
                                 title="ยกเลิกหวย"
                               >
@@ -577,6 +615,19 @@ const LotteryDaily: React.FC = () => {
           lotteryName={selectedPayoutLottery.lotteryName}
         />
       )}
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal({ ...confirmModal, isOpen: false });
+        }}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        type={confirmModal.type}
+      />
     </div>
   );
 };
