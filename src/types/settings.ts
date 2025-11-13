@@ -18,6 +18,8 @@ export interface SystemSettings {
   siteAffType: number;
   siteAffMinWithdraw: number;
   siteAffPromotion: boolean;
+  depositBankTransferEnabled: boolean;
+  depositGatewayEnabled: boolean;
 }
 
 export interface LimitSettings {

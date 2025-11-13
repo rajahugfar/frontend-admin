@@ -23,12 +23,14 @@ export const publicApiClient = axios.create({
   withCredentials: true,
 })
 
-// Request interceptor - Add admin selector (admin ใช้ selector ไม่ใช่ accessToken)
+// Request interceptor - Add admin selector:token (backend expects both)
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const adminSelector = localStorage.getItem('admin_selector')
-    if (adminSelector && config.headers) {
-      config.headers.Authorization = `Bearer ${adminSelector}`
+    const adminToken = localStorage.getItem('admin_token')
+    if (adminSelector && adminToken && config.headers) {
+      // Backend expects "selector:token" format
+      config.headers.Authorization = `Bearer ${adminSelector}:${adminToken}`
     }
     return config
   },

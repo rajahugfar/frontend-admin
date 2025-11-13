@@ -34,6 +34,8 @@ const SystemTab: React.FC = () => {
     siteAffType: 1,
     siteAffMinWithdraw: 100,
     siteAffPromotion: false,
+    depositBankTransferEnabled: true,
+    depositGatewayEnabled: true,
   });
 
   useEffect(() => {
@@ -78,6 +80,8 @@ const SystemTab: React.FC = () => {
           siteAffType: grouped.referral?.site_aff_type || 'turnover',
           siteAffMinWithdraw: grouped.referral?.site_aff_min_withdraw || 100,
           siteAffPromotion: grouped.referral?.site_aff_promotion || false,
+          depositBankTransferEnabled: grouped.payment?.deposit_bank_transfer_enabled ?? true,
+          depositGatewayEnabled: grouped.payment?.deposit_gateway_enabled ?? true,
         });
       }
     } catch (error) {
@@ -110,6 +114,8 @@ const SystemTab: React.FC = () => {
         site_aff_type: settings.siteAffType,
         site_aff_min_withdraw: settings.siteAffMinWithdraw.toString(),
         site_aff_promotion: settings.siteAffPromotion ? 'true' : 'false',
+        deposit_bank_transfer_enabled: settings.depositBankTransferEnabled ? 'true' : 'false',
+        deposit_gateway_enabled: settings.depositGatewayEnabled ? 'true' : 'false',
       };
       
       const response = await apiClient.put('/settings', updates);
@@ -440,7 +446,7 @@ const SystemTab: React.FC = () => {
         {/* Referral Settings */}
         <div className="bg-admin-card rounded-lg p-6">
           <h2 className="text-xl font-bold text-gold-500 mb-4">ตั้งค่าชวนเพื่อน</h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-brown-100 mb-2">จำนวนชั้น</label>
@@ -496,6 +502,51 @@ const SystemTab: React.FC = () => {
                 className="w-5 h-5 rounded border-brown-700 text-gold-500 focus:ring-gold-500"
               />
               <label htmlFor="affPromotion" className="text-brown-100">ถอนค่าแนะนำแบบติดโปร</label>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Method Settings */}
+        <div className="bg-admin-card rounded-lg p-6">
+          <h2 className="text-xl font-bold text-gold-500 mb-4">ตั้งค่าช่องทางฝากเงิน</h2>
+
+          <div className="space-y-4">
+            <div className="bg-admin-dark/50 rounded-lg p-4 border border-brown-700">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="depositBankTransfer"
+                  checked={settings.depositBankTransferEnabled}
+                  onChange={(e) => setSettings({ ...settings, depositBankTransferEnabled: e.target.checked })}
+                  className="w-5 h-5 rounded border-brown-700 text-gold-500 focus:ring-gold-500"
+                />
+                <label htmlFor="depositBankTransfer" className="text-brown-100 flex-1">
+                  <div className="font-medium">เปิดใช้งานโอนเงินผ่านบัญชีธนาคาร</div>
+                  <div className="text-xs text-brown-400 mt-1">ให้สมาชิกสามารถโอนเงินผ่านบัญชีธนาคารที่ตั้งค่าไว้</div>
+                </label>
+              </div>
+            </div>
+
+            <div className="bg-admin-dark/50 rounded-lg p-4 border border-brown-700">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="depositGateway"
+                  checked={settings.depositGatewayEnabled}
+                  onChange={(e) => setSettings({ ...settings, depositGatewayEnabled: e.target.checked })}
+                  className="w-5 h-5 rounded border-brown-700 text-gold-500 focus:ring-gold-500"
+                />
+                <label htmlFor="depositGateway" className="text-brown-100 flex-1">
+                  <div className="font-medium">เปิดใช้งานโอนเงินผ่าน Gateway (QR)</div>
+                  <div className="text-xs text-brown-400 mt-1">ให้สมาชิกสามารถโอนเงินผ่าน Payment Gateway และ QR Code</div>
+                </label>
+              </div>
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+              <p className="text-blue-200 text-sm">
+                ℹ️ การปิดช่องทางฝากเงินจะทำให้สมาชิกไม่สามารถเห็นหรือใช้งานช่องทางนั้นได้
+              </p>
             </div>
           </div>
         </div>

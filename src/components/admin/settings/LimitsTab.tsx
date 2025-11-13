@@ -121,7 +121,7 @@ const LimitsTab: React.FC = () => {
                 step="0.1"
                 value={settings.turnOver}
                 onChange={(e) => setSettings({ ...settings, turnOver: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               />
             </div>
 
@@ -131,7 +131,7 @@ const LimitsTab: React.FC = () => {
                 type="number"
                 value={settings.perdayWithdraw}
                 onChange={(e) => setSettings({ ...settings, perdayWithdraw: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               />
             </div>
 
@@ -141,7 +141,7 @@ const LimitsTab: React.FC = () => {
                 type="number"
                 value={settings.maxWithdraw}
                 onChange={(e) => setSettings({ ...settings, maxWithdraw: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               />
             </div>
 
@@ -151,7 +151,7 @@ const LimitsTab: React.FC = () => {
                 type="number"
                 value={settings.maxAutoWithdraw}
                 onChange={(e) => setSettings({ ...settings, maxAutoWithdraw: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               />
             </div>
 
@@ -194,7 +194,8 @@ const LimitsTab: React.FC = () => {
                 type="text"
                 value={settings.notifyAdminWithdraw}
                 onChange={(e) => setSettings({ ...settings, notifyAdminWithdraw: e.target.value })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
+                placeholder="Line Notify Token"
               />
             </div>
           </div>
@@ -223,7 +224,7 @@ const LimitsTab: React.FC = () => {
                 step="0.1"
                 value={settings.cashbackPercent}
                 onChange={(e) => setSettings({ ...settings, cashbackPercent: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               />
             </div>
 
@@ -232,7 +233,7 @@ const LimitsTab: React.FC = () => {
               <select
                 value={settings.cashbackTimeStart}
                 onChange={(e) => setSettings({ ...settings, cashbackTimeStart: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               >
                 {Array.from({ length: 24 }, (_, i) => (
                   <option key={i} value={i}>{i}:00</option>
@@ -245,7 +246,7 @@ const LimitsTab: React.FC = () => {
               <select
                 value={settings.cashbackTimeEnd}
                 onChange={(e) => setSettings({ ...settings, cashbackTimeEnd: Number(e.target.value) })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
               >
                 {Array.from({ length: 24 }, (_, i) => (
                   <option key={i} value={i}>{i}:00</option>
@@ -277,7 +278,8 @@ const LimitsTab: React.FC = () => {
                 type="text"
                 value={settings.ambAuthToken}
                 onChange={(e) => setSettings({ ...settings, ambAuthToken: e.target.value })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
+                placeholder="AMB Transfer Token"
               />
             </div>
 
@@ -287,7 +289,8 @@ const LimitsTab: React.FC = () => {
                 type="text"
                 value={settings.ambAuthTokenSeamless}
                 onChange={(e) => setSettings({ ...settings, ambAuthTokenSeamless: e.target.value })}
-                className="w-full bg-admin-dark border border-brown-700 rounded-lg px-4 py-2 text-brown-100 focus:border-gold-500 focus:outline-none"
+                className="input"
+                placeholder="AMB Seamless Token"
               />
             </div>
           </div>
