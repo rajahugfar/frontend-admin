@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAdminStore } from '@/store/adminStore'
+import { siteContentAPI } from '@/api/siteContentAPI'
 import AdminChatNotification from '@components/admin/AdminChatNotification'
 import {
   FiHome,
@@ -38,6 +39,22 @@ export default function AdminLayout() {
   const { admin, logout } = useAdminStore()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null)
+  const [siteName, setSiteName] = useState('bicycle678')
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await siteContentAPI.getSiteSettings()
+        const settings = response.data.data
+        if (settings.site_name) {
+          setSiteName(settings.site_name)
+        }
+      } catch (error) {
+        console.error('Failed to load site settings:', error)
+      }
+    }
+    loadSettings()
+  }, [])
 
   const menuItems: MenuItem[] = [
     {
@@ -181,7 +198,7 @@ export default function AdminLayout() {
                   <span className="text-white font-bold text-xl">B</span>
                 </div>
                 <div>
-                  <h1 className="text-gold-500 font-display font-bold text-lg">bicycle789</h1>
+                  <h1 className="text-gold-500 font-display font-bold text-lg">{siteName}</h1>
                   <p className="text-brown-400 text-xs">Admin Panel</p>
                 </div>
               </div>
