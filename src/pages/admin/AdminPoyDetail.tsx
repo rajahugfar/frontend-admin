@@ -400,7 +400,7 @@ const AdminPoyDetail: React.FC = () => {
                         {/* Right: ยอดเงินที่จะได้ */}
                         <div className="flex-1 text-right">
                           <p className="text-gray-400 text-xs mb-1">ยอดเงินที่จะได้</p>
-                          <p className="text-4xl font-bold text-success">
+                          <p className={`text-4xl font-bold ${item.isWin ? 'text-success' : 'text-white'}`}>
                             {payout.toFixed(0)}
                           </p>
                         </div>
