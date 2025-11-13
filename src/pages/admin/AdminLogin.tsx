@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAdminStore } from '@/store/adminStore'
+import { siteContentAPI } from '@/api/siteContentAPI'
 import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
@@ -12,6 +13,22 @@ export default function AdminLogin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [siteName, setSiteName] = useState('bicycle678')
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await siteContentAPI.getSiteSettings()
+        const settings = response.data.data
+        if (settings.site_name) {
+          setSiteName(settings.site_name)
+        }
+      } catch (error) {
+        console.error('Failed to load site settings:', error)
+      }
+    }
+    loadSettings()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +66,7 @@ export default function AdminLogin() {
               Admin Portal
             </h1>
             <p className="text-brown-300 text-sm">
-              ระบบจัดการ bicycle789
+              ระบบจัดการ {siteName}
             </p>
           </div>
 
@@ -134,7 +151,7 @@ export default function AdminLogin() {
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-admin-border text-center">
             <p className="text-sm text-brown-400">
-              © 2024 bicycle789. All rights reserved.
+              © 2024 {siteName}. All rights reserved.
             </p>
           </div>
         </div>
