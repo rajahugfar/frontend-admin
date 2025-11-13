@@ -397,11 +397,11 @@ const AdminPoyDetail: React.FC = () => {
                         {/* Divider */}
                         <div className="w-px h-16 bg-gradient-to-b from-transparent via-gold-500/30 to-transparent"></div>
 
-                        {/* Right: ยอดเงินที่จะได้ */}
+                        {/* Right: ผลได้เสีย */}
                         <div className="flex-1 text-right">
-                          <p className="text-gray-400 text-xs mb-1">ยอดเงินที่จะได้</p>
-                          <p className={`text-4xl font-bold ${item.isWin ? 'text-success' : 'text-white'}`}>
-                            {payout.toFixed(0)}
+                          <p className="text-gray-400 text-xs mb-1">ผลได้เสีย</p>
+                          <p className={`text-4xl font-bold ${item.winAmount > 0 ? 'text-success' : item.winAmount < 0 ? 'text-error' : 'text-white'}`}>
+                            {item.winAmount > 0 ? '+' : ''}{item.winAmount.toFixed(0)}
                           </p>
                         </div>
                       </div>
