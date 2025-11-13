@@ -1,29 +1,37 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { FaGamepad, FaPlus, FaEdit, FaTrash, FaStar, FaTimes } from 'react-icons/fa'
+import { FaGamepad, FaPlus, FaEdit, FaTrash, FaStar, FaTimes, FaImage, FaTh, FaList, FaGripVertical } from 'react-icons/fa'
 import { siteContentAPI } from '@api/siteContentAPI'
 import type { GameProvider, GameCategory } from '@/types/siteContent'
 import ConfirmModal from '@/components/admin/ConfirmModal'
+import ImageUploadModal from '@/components/admin/ImageUploadModal'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+type ViewMode = 'grid' | 'list'
 
 const GameProvidersManagement = () => {
   const [providers, setProviders] = useState<GameProvider[]>([])
   const [categories, setCategories] = useState<GameCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [showImageModal, setShowImageModal] = useState(false)
   const [editingProvider, setEditingProvider] = useState<GameProvider | null>(null)
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [filterFeatured, setFilterFeatured] = useState<string>('all')
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [providerToDelete, setProviderToDelete] = useState<{ id: string; name: string } | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
   const [formData, setFormData] = useState<Partial<GameProvider>>({
     code: '',
     name: '',
     description: '',
-    logo_image_id: '',
-    thumbnail_image_id: '',
-    category_id: '',
-    is_active: true,
+    image_path: '',
+    game_type: '',
+    category: '',
+    status: 1,
     is_featured: false,
     sort_order: 0,
   })
@@ -58,10 +66,10 @@ const GameProvidersManagement = () => {
         code: provider.code,
         name: provider.name,
         description: provider.description,
-        logo_image_id: provider.logo_image_id,
-        thumbnail_image_id: provider.thumbnail_image_id,
-        category_id: provider.category_id,
-        is_active: provider.is_active,
+        image_path: provider.image_path,
+        game_type: provider.game_type,
+        category: provider.category,
+        status: provider.status,
         is_featured: provider.is_featured,
         sort_order: provider.sort_order,
       })
@@ -71,10 +79,10 @@ const GameProvidersManagement = () => {
         code: '',
         name: '',
         description: '',
-        logo_image_id: '',
-        thumbnail_image_id: '',
-        category_id: '',
-        is_active: true,
+        image_path: '',
+        game_type: '',
+        category: '',
+        status: 1,
         is_featured: false,
         sort_order: 0,
       })
@@ -148,9 +156,56 @@ const GameProvidersManagement = () => {
     }
   }
 
+  // Drag & Drop handlers
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index)
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === index) return
+
+    const items = [...filteredProviders]
+    const draggedItem = items[draggedIndex]
+    items.splice(draggedIndex, 1)
+    items.splice(index, 0, draggedItem)
+
+    // Update providers with new order
+    const reordered = items.map((item, idx) => ({
+      ...item,
+      sort_order: idx
+    }))
+
+    setProviders(reordered)
+    setDraggedIndex(index)
+  }
+
+  const handleDragEnd = async () => {
+    if (draggedIndex === null) return
+
+    try {
+      // Update sort_order for all providers
+      await Promise.all(
+        filteredProviders.map((provider, index) =>
+          siteContentAPI.admin.updateGameProvider(provider.id, {
+            sort_order: index
+          })
+        )
+      )
+      toast.success('จัดเรียงลำดับสำเร็จ')
+      loadData()
+    } catch (error) {
+      console.error('Reorder failed:', error)
+      toast.error('ไม่สามารถจัดเรียงลำดับได้')
+      loadData() // Reload to reset
+    } finally {
+      setDraggedIndex(null)
+    }
+  }
+
   // Filter providers
   const filteredProviders = providers.filter((provider) => {
-    const matchesCategory = filterCategory === 'all' || provider.category_id === filterCategory
+    const matchesCategory = filterCategory === 'all' || provider.category === filterCategory
     const matchesFeatured = filterFeatured === 'all' ||
       (filterFeatured === 'featured' && provider.is_featured) ||
       (filterFeatured === 'not-featured' && !provider.is_featured)
@@ -198,9 +253,9 @@ const GameProvidersManagement = () => {
               className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
             >
               <option value="all">ทุกหมวดหมู่</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
+              {[...new Set(providers.map(p => p.category))].sort().map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
@@ -240,16 +295,21 @@ const GameProvidersManagement = () => {
 
               {/* Logo */}
               <div className="relative aspect-square mb-3 rounded overflow-hidden bg-admin-bg flex items-center justify-center">
-                {provider.logo_image ? (
+                {provider.image_path ? (
                   <img
-                    src={provider.logo_image.file_url}
+                    src={`${API_URL}${provider.image_path}`}
                     alt={provider.name}
                     className="w-full h-full object-contain p-2"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      target.parentElement?.classList.add('flex', 'items-center', 'justify-center')
+                    }}
                   />
                 ) : (
                   <FaGamepad className="text-4xl text-brown-600" />
                 )}
-                {!provider.is_active && (
+                {provider.status === 0 && (
                   <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
                     <span className="bg-error text-white px-2 py-1 rounded text-xs font-semibold">
                       ปิดใช้งาน
@@ -268,7 +328,7 @@ const GameProvidersManagement = () => {
                 </p>
                 {provider.category && (
                   <p className="text-xs text-brown-500">
-                    {provider.category.name}
+                    {provider.category}
                   </p>
                 )}
               </div>
@@ -366,48 +426,70 @@ const GameProvidersManagement = () => {
                   />
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-brown-200 mb-2">
-                    ID รูปโลโก้
+                    รูปโลโก้ค่ายเกม
                   </label>
-                  <input
-                    type="text"
-                    value={formData.logo_image_id || ''}
-                    onChange={(e) => setFormData({ ...formData, logo_image_id: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                    placeholder="UUID ของรูปโลโก้"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-brown-200 mb-2">
-                    ID รูป Thumbnail
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.thumbnail_image_id || ''}
-                    onChange={(e) => setFormData({ ...formData, thumbnail_image_id: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                    placeholder="UUID ของรูป thumbnail"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-brown-200 mb-2">
-                    หมวดหมู่
-                  </label>
-                  <select
-                    value={formData.category_id || ''}
-                    onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  <button
+                    type="button"
+                    onClick={() => setShowImageModal(true)}
+                    className="w-full px-4 py-3 border-2 border-dashed border-admin-border rounded-lg hover:border-gold-500 transition-colors flex items-center justify-center gap-2 text-brown-400 hover:text-gold-500"
                   >
-                    <option value="">เลือกหมวดหมู่</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
+                    <FaImage />
+                    <span>{formData.image_path ? 'เปลี่ยนรูปภาพ' : 'เลือกรูปภาพ'}</span>
+                  </button>
+                  {formData.image_path && (
+                    <div className="mt-2 relative">
+                      <img
+                        src={`${API_URL}${formData.image_path}`}
+                        alt="Provider logo"
+                        className="w-full h-32 object-contain rounded-lg border border-admin-border bg-admin-bg p-2"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, image_path: '' })}
+                        className="absolute top-2 right-2 bg-error text-white p-1 rounded-full hover:bg-error/80"
+                      >
+                        <FaTimes size={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-200 mb-2">
+                    ประเภทเกม (Game Type)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.game_type || ''}
+                    onChange={(e) => setFormData({ ...formData, game_type: e.target.value })}
+                    className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
+                    placeholder="Slots, Casino, etc."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-200 mb-2">
+                    หมวดหมู่ (Category)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.category || ''}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-3 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
+                    placeholder="Slot, Casino, Fishing, etc."
+                    list="category-suggestions"
+                  />
+                  <datalist id="category-suggestions">
+                    {[...new Set(providers.map(p => p.category))].map((cat) => (
+                      <option key={cat} value={cat} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
 
                 <div>
@@ -427,11 +509,11 @@ const GameProvidersManagement = () => {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.is_active || false}
-                      onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                      checked={formData.status === 1}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 1 : 0 })}
                       className="w-4 h-4 text-gold-500 bg-admin-bg border-admin-border rounded focus:ring-gold-500"
                     />
-                    <span className="text-sm text-brown-200">เปิดใช้งาน</span>
+                    <span className="text-sm text-brown-200">เปิดใช้งาน (Status = 1)</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -465,6 +547,17 @@ const GameProvidersManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Image Upload Modal */}
+      <ImageUploadModal
+        isOpen={showImageModal}
+        onClose={() => setShowImageModal(false)}
+        onSelect={(image) => {
+          setFormData({ ...formData, image_path: image.url })
+          setShowImageModal(false)
+        }}
+        currentImage={formData.image_path}
+      />
 
       {/* Confirm Delete Modal */}
       <ConfirmModal
