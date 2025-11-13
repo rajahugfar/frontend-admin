@@ -105,10 +105,6 @@ const LotteryDaily: React.FC = () => {
     return flags[iconCode?.toLowerCase()] || '🏳️';
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -128,6 +124,10 @@ const LotteryDaily: React.FC = () => {
       setLoading(false);
     }
   }, [selectedDate, statusFilter, searchQuery]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSearch = useCallback(() => {
     fetchData();
