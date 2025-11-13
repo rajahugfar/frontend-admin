@@ -472,7 +472,7 @@ const LotteryDaily: React.FC = () => {
                             <button
                               onClick={() => {
                                 setSelectedPayoutLottery({
-                                  lotteryId: lottery.lotteryId,
+                                  lotteryId: lottery.stockType,
                                   lotteryName: lottery.name
                                 });
                                 setShowPayoutModal(true);
