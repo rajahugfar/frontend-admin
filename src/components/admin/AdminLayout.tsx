@@ -125,6 +125,7 @@ export default function AdminLayout() {
         { name: 'รูปภาพ', path: '/admin/site-images', icon: null },
         { name: 'แบนเนอร์โปรโมชั่น', path: '/admin/promotions', icon: null },
         { name: 'ค่ายเกม', path: '/admin/games/providers', icon: null },
+        { name: 'จัดการเกมส์', path: '/admin/games', icon: null },
         { name: 'ตั้งค่าเว็บไซต์', path: '/admin/settings', icon: null },
       ],
     },
@@ -160,7 +161,6 @@ export default function AdminLayout() {
             icon: <FiShield className="w-5 h-5" />,
             children: [
               { name: 'พนักงาน', path: '/admin/staff', icon: null },
-              { name: 'จัดการเกมส์', path: '/admin/games', icon: null },
               { name: 'ประวัติการทำรายการ', path: '/admin/logs', icon: null },
             ],
           },

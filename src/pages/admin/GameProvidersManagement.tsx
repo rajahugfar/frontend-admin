@@ -233,13 +233,40 @@ const GameProvidersManagement = () => {
             ค่ายเกมทั้งหมด {providers.length} ค่าย
           </p>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold flex items-center gap-2"
-        >
-          <FaPlus />
-          เพิ่มค่ายเกม
-        </button>
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex bg-admin-card border border-admin-border rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-2 rounded transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-gold-500 text-white'
+                  : 'text-brown-400 hover:text-gold-500'
+              }`}
+              title="Grid View"
+            >
+              <FaTh size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-2 rounded transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-gold-500 text-white'
+                  : 'text-brown-400 hover:text-gold-500'
+              }`}
+              title="List View"
+            >
+              <FaList size={16} />
+            </button>
+          </div>
+          <button
+            onClick={() => handleOpenModal()}
+            className="px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold flex items-center gap-2"
+          >
+            <FaPlus />
+            เพิ่มค่ายเกม
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -276,16 +303,26 @@ const GameProvidersManagement = () => {
         </div>
       </div>
 
-      {/* Providers Grid */}
+      {/* Providers Display */}
       {filteredProviders.length === 0 ? (
         <div className="bg-admin-card border border-admin-border rounded-lg p-12 text-center">
           <FaGamepad className="text-6xl text-brown-600 mx-auto mb-4" />
           <p className="text-brown-400">ไม่พบค่ายเกม</p>
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
+        /* Grid View */
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {filteredProviders.map((provider) => (
-            <div key={provider.id} className="bg-admin-card border border-admin-border rounded-lg p-4 relative hover:border-gold-500/50 transition-colors">
+          {filteredProviders.map((provider, index) => (
+            <div
+              key={provider.id}
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`bg-admin-card border border-admin-border rounded-lg p-4 relative hover:border-gold-500/50 transition-colors cursor-move ${
+                draggedIndex === index ? 'opacity-50' : ''
+              }`}
+            >
               {/* Featured Badge */}
               {provider.is_featured && (
                 <div className="absolute top-2 right-2 z-10">
@@ -357,6 +394,97 @@ const GameProvidersManagement = () => {
                   <button
                     onClick={() => handleDeleteClick(provider.id, provider.name)}
                     className="flex-1 px-3 py-2 bg-error/20 text-error hover:bg-error/30 rounded-lg transition-colors"
+                    title="ลบ"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* List View */
+        <div className="space-y-2">
+          {filteredProviders.map((provider, index) => (
+            <div
+              key={provider.id}
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`bg-admin-card border border-admin-border rounded-lg p-4 hover:border-gold-500/50 transition-colors cursor-move ${
+                draggedIndex === index ? 'opacity-50' : ''
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                {/* Drag Handle */}
+                <div className="text-brown-600 cursor-grab active:cursor-grabbing">
+                  <FaGripVertical size={20} />
+                </div>
+
+                {/* Logo */}
+                <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-admin-bg flex items-center justify-center">
+                  {provider.image_path ? (
+                    <img
+                      src={`${API_URL}${provider.image_path}`}
+                      alt={provider.name}
+                      className="w-full h-full object-contain p-1"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.style.display = 'none'
+                      }}
+                    />
+                  ) : (
+                    <FaGamepad className="text-2xl text-brown-600" />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-brown-100">{provider.name}</h3>
+                    {provider.is_featured && (
+                      <FaStar className="text-yellow-400" title="ค่ายเด่น" />
+                    )}
+                    {provider.status === 0 && (
+                      <span className="bg-error text-white text-xs px-2 py-0.5 rounded">
+                        ปิดใช้งาน
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-brown-400">
+                    <span>Code: {provider.code}</span>
+                    <span>•</span>
+                    <span>Category: {provider.category}</span>
+                    <span>•</span>
+                    <span>Order: {provider.sort_order}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleFeatured(provider)}
+                    className={`px-3 py-2 rounded-lg transition-colors ${
+                      provider.is_featured
+                        ? 'bg-warning/20 text-warning hover:bg-warning/30'
+                        : 'bg-admin-hover text-brown-300 hover:bg-admin-border'
+                    }`}
+                    title={provider.is_featured ? 'ยกเลิกค่ายเด่น' : 'ตั้งเป็นค่ายเด่น'}
+                  >
+                    <FaStar />
+                  </button>
+                  <button
+                    onClick={() => handleOpenModal(provider)}
+                    className="px-3 py-2 bg-info/20 text-info hover:bg-info/30 rounded-lg transition-colors"
+                    title="แก้ไข"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(provider.id, provider.name)}
+                    className="px-3 py-2 bg-error/20 text-error hover:bg-error/30 rounded-lg transition-colors"
                     title="ลบ"
                   >
                     <FaTrash />
