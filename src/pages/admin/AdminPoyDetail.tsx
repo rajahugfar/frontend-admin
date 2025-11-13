@@ -376,42 +376,51 @@ const AdminPoyDetail: React.FC = () => {
                     className="bg-gradient-to-br from-admin-card via-admin-darker to-admin-card backdrop-blur-xl rounded-xl border border-gold-500/20 overflow-hidden hover:border-gold-400/40 transition-all shadow-lg"
                   >
                     {/* Header */}
-                    <div className="flex items-center justify-between px-3 py-2 border-b border-gold-500/20 bg-black/20">
-                      <span className="text-sm font-bold text-gold-400">#{index + 1}</span>
+                    <div className="flex items-center justify-between px-4 py-2 border-b border-gold-500/20 bg-black/20">
+                      <span className="text-xs font-medium text-gray-400">{getBetTypeName(item.betType)}</span>
                       <span className={`px-2 py-0.5 rounded-lg border text-xs font-semibold ${status.style}`}>
                         {status.label}
                       </span>
                     </div>
 
-                    {/* Content */}
-                    <div className="p-3">
-                      {/* Number and Type */}
-                      <div className="text-center mb-3">
-                        <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 mb-1">
-                          {item.numberBet}
-                        </p>
-                        <p className="text-gray-400 text-xs">{getBetTypeName(item.betType)}</p>
+                    {/* Main Content - 2 Columns */}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between gap-4 mb-3">
+                        {/* Left: เลขที่แทง */}
+                        <div className="flex-1">
+                          <p className="text-gray-400 text-xs mb-1">เลขที่แทง</p>
+                          <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500">
+                            {item.numberBet}
+                          </p>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="w-px h-16 bg-gradient-to-b from-transparent via-gold-500/30 to-transparent"></div>
+
+                        {/* Right: ยอดเงินที่จะได้ */}
+                        <div className="flex-1 text-right">
+                          <p className="text-gray-400 text-xs mb-1">ยอดเงินที่จะได้</p>
+                          <p className="text-4xl font-bold text-success">
+                            {payout.toFixed(0)}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Details */}
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-gray-400">ราคาจ่าย</span>
-                          <span className="text-info font-semibold">{payout.toFixed(0)}</span>
+                      {/* Additional Info */}
+                      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gold-500/20">
+                        <div className="text-center">
+                          <p className="text-gray-400 text-xs mb-1">ราคาแทง</p>
+                          <p className="text-white font-bold text-sm">{item.price.toFixed(0)}</p>
                         </div>
-                        <div className="flex justify-between items-center text-xs pt-1.5 border-t border-gold-500/20">
-                          <span className="text-gray-400">ราคาแทง</span>
-                          <span className="text-white font-semibold">{item.price.toFixed(0)}</span>
+                        <div className="text-center">
+                          <p className="text-gray-400 text-xs mb-1">อัตราจ่าย</p>
+                          <p className="text-info font-bold text-sm">x{item.multiply}</p>
                         </div>
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-gray-400">อัตราจ่าย</span>
-                          <span className="text-gray-300">x {item.multiply}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-xs pt-1.5 border-t border-gold-500/20">
-                          <span className="text-gray-400">ผลได้เสีย</span>
-                          <span className={`font-bold ${item.winAmount > 0 ? 'text-warning' : 'text-gray-300'}`}>
+                        <div className="text-center">
+                          <p className="text-gray-400 text-xs mb-1">ผลได้เสีย</p>
+                          <p className={`font-bold text-sm ${item.winAmount > 0 ? 'text-warning' : 'text-gray-300'}`}>
                             {item.winAmount > 0 ? '+' : ''}{item.winAmount.toFixed(0)}
-                          </span>
+                          </p>
                         </div>
                       </div>
                     </div>

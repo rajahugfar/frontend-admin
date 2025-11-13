@@ -359,24 +359,19 @@ const LotteryDailyDetail: React.FC = () => {
               <thead className="sticky top-0 z-20 shadow-lg">
                 <tr className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker border-b-2 border-gold-500">
                   {columns.map(col => (
-                    <React.Fragment key={col}>
-                      <th className="px-4 py-4 text-center text-gold-400 font-bold border-r border-admin-border/50 min-w-[100px]">
-                        <div className="flex flex-col items-center">
-                          <span className="text-base">{getBetTypeName(col)}</span>
-                          <span className="text-xs text-gray-400 mt-1">
-                            ({totals[col]?.count || 0} เลข)
+                    <th key={col} className="px-3 py-4 text-center text-gold-400 font-bold border-r border-admin-border/50 min-w-[180px]">
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-base font-bold">{getBetTypeName(col)}</span>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="text-gray-400">
+                            {totals[col]?.count || 0} เลข
                           </span>
-                        </div>
-                      </th>
-                      <th className="px-4 py-4 text-center text-gold-400 font-bold border-r border-admin-border/50 min-w-[120px]">
-                        <div className="flex flex-col items-center">
-                          <span className="text-base">ยอดเงิน</span>
-                          <span className="text-xs text-success mt-1">
+                          <span className="text-success font-bold">
                             {formatCurrency(totals[col]?.sum || 0)}
                           </span>
                         </div>
-                      </th>
-                    </React.Fragment>
+                      </div>
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -391,29 +386,26 @@ const LotteryDailyDetail: React.FC = () => {
                     {columns.map(col => {
                       const bet = row[col];
                       return (
-                        <React.Fragment key={`${rowIndex}-${col}`}>
-                          <td className="px-4 py-3 text-center border-r border-admin-border/20">
-                            {bet ? (
-                              <button
-                                onClick={() => openBetDetail(col, bet.number, getBetTypeName(col))}
-                                className="text-white font-mono text-lg font-bold hover:text-gold-400 hover:scale-110 transition-all cursor-pointer px-3 py-1 rounded hover:bg-gold-500/10"
-                              >
+                        <td key={`${rowIndex}-${col}`} className="px-3 py-2 border-r border-admin-border/20">
+                          {bet ? (
+                            <button
+                              type="button"
+                              onClick={() => openBetDetail(col, bet.number, getBetTypeName(col))}
+                              className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-gradient-to-r from-admin-darker/50 to-brown-900/30 hover:from-gold-500/10 hover:to-gold-600/10 rounded-lg transition-all border border-admin-border/30 hover:border-gold-500/50"
+                            >
+                              <span className="text-white font-mono text-xl font-bold">
                                 {bet.number}
-                              </button>
-                            ) : (
-                              <span className="text-gray-700 text-sm">-</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center border-r border-admin-border/20">
-                            {bet ? (
+                              </span>
                               <span className="text-blue-400 font-bold text-base">
                                 {formatCurrency(bet.amount)}
                               </span>
-                            ) : (
+                            </button>
+                          ) : (
+                            <div className="py-3 text-center">
                               <span className="text-gray-700 text-sm">-</span>
-                            )}
-                          </td>
-                        </React.Fragment>
+                            </div>
+                          )}
+                        </td>
                       );
                     })}
                   </tr>
@@ -422,14 +414,16 @@ const LotteryDailyDetail: React.FC = () => {
               <tfoot className="sticky bottom-0 z-10 shadow-lg">
                 <tr className="bg-gradient-to-r from-admin-darker via-brown-900 to-admin-darker border-t-2 border-gold-500 font-bold">
                   {columns.map(col => (
-                    <React.Fragment key={`total-${col}`}>
-                      <td className="px-4 py-4 text-center text-warning border-r border-admin-border/50 text-lg">
-                        {totals[col].count}
-                      </td>
-                      <td className="px-4 py-4 text-center text-success border-r border-admin-border/50 text-lg">
-                        {formatCurrency(totals[col].sum)}
-                      </td>
-                    </React.Fragment>
+                    <td key={`total-${col}`} className="px-3 py-4 text-center border-r border-admin-border/50">
+                      <div className="flex items-center justify-between px-4">
+                        <span className="text-warning text-lg">
+                          {totals[col].count} เลข
+                        </span>
+                        <span className="text-success text-lg">
+                          {formatCurrency(totals[col].sum)}
+                        </span>
+                      </div>
+                    </td>
                   ))}
                 </tr>
               </tfoot>
