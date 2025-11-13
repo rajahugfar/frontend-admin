@@ -321,8 +321,11 @@ export const adminMemberAPI = {
   }) => {
     const params: Record<string, any> = {}
 
-    if (filters.page) params.page = filters.page
-    if (filters.pageSize) params.pageSize = filters.pageSize
+    // Convert page/pageSize to limit/offset for backend
+    if (filters.page && filters.pageSize) {
+      params.limit = filters.pageSize
+      params.offset = (filters.page - 1) * filters.pageSize
+    }
     if (filters.search) params.search = filters.search
     if (filters.status) params.status = filters.status
     if (filters.startDate) params.startDate = filters.startDate

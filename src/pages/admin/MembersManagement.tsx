@@ -35,7 +35,7 @@ export default function MembersManagement() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize] = useState(20)
+  const [pageSize] = useState(10)
   const [total, setTotal] = useState(0)
 
   // Modals

@@ -43,13 +43,13 @@ export default function AdminLogin() {
           {/* Logo/Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gold-500 to-gold-600 rounded-full mb-4 shadow-lg">
-              <span className="text-3xl font-bold text-white">P</span>
+              <span className="text-3xl font-bold text-white">B</span>
             </div>
             <h1 className="text-3xl font-display font-bold text-gold-500 mb-2">
               Admin Portal
             </h1>
             <p className="text-brown-300 text-sm">
-              ระบบจัดการ Permchok V2
+              ระบบจัดการ bicycle789
             </p>
           </div>
 
@@ -134,7 +134,7 @@ export default function AdminLogin() {
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-admin-border text-center">
             <p className="text-sm text-brown-400">
-              © 2024 Permchok. All rights reserved.
+              © 2024 bicycle789. All rights reserved.
             </p>
           </div>
         </div>

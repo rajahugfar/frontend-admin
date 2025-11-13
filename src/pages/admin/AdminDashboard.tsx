@@ -134,7 +134,7 @@ export default function AdminDashboard() {
                 แดชบอร์ด
               </h1>
               <p className="text-brown-300">
-                ภาพรวมระบบ Permchok V2
+                ภาพรวมระบบ bicycle789
               </p>
             </div>
 
