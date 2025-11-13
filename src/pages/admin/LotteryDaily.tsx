@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { adminLotteryDailyAPI, DailyLotteryItem, DailyListStatistics } from '@/api/adminLotteryDailyAPI';
 import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit, FaPercentage } from 'react-icons/fa';
 import LotteryResultModal from '../../components/admin/modals/LotteryResultModal';
-import PayoutRatesModal from '../../components/admin/modals/PayoutRatesModal';
+import NumberLimitsModal from '../../components/admin/modals/NumberLimitsModal';
 
 const LotteryDaily: React.FC = () => {
   const navigate = useNavigate();
@@ -468,7 +468,7 @@ const LotteryDaily: React.FC = () => {
                               โพย
                             </button>
 
-                            {/* ปุ่มกำหนดอัตราจ่าย */}
+                            {/* ปุ่มกำหนดหวยอั๋น */}
                             <button
                               onClick={() => {
                                 setSelectedPayoutLottery({
@@ -478,10 +478,10 @@ const LotteryDaily: React.FC = () => {
                                 setShowPayoutModal(true);
                               }}
                               className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
-                              title="กำหนดอัตราจ่าย"
+                              title="กำหนดหวยอั๋น"
                             >
                               <FaPercentage />
-                              อัตราจ่าย
+                              หวยอั๋น
                             </button>
 
                             {/* ปุ่มเปิด/ปิดแทง - แสดงเมื่อสถานะเปิดหรือปิดแทง */}
@@ -567,7 +567,7 @@ const LotteryDaily: React.FC = () => {
 
       {/* Payout Rates Modal */}
       {selectedPayoutLottery && (
-        <PayoutRatesModal
+        <NumberLimitsModal
           isOpen={showPayoutModal}
           onClose={() => {
             setShowPayoutModal(false);
