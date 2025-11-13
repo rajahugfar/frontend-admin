@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLotteryDailyAPI, DailyLotteryItem, DailyListStatistics } from '@/api/adminLotteryDailyAPI';
-import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit } from 'react-icons/fa';
+import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit, FaPercentage } from 'react-icons/fa';
 import LotteryResultModal from '../../components/admin/modals/LotteryResultModal';
+import PayoutRatesModal from '../../components/admin/modals/PayoutRatesModal';
 
 const LotteryDaily: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,13 @@ const LotteryDaily: React.FC = () => {
     lotteryGroup: number;
     huayCode: string;
     has4d: boolean;
+  } | null>(null);
+
+  // Payout Rates Modal
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [selectedPayoutLottery, setSelectedPayoutLottery] = useState<{
+    lotteryId: number;
+    lotteryName: string;
   } | null>(null);
 
   // Group lotteries by group
@@ -460,6 +468,22 @@ const LotteryDaily: React.FC = () => {
                               โพย
                             </button>
 
+                            {/* ปุ่มกำหนดอัตราจ่าย */}
+                            <button
+                              onClick={() => {
+                                setSelectedPayoutLottery({
+                                  lotteryId: lottery.lotteryId,
+                                  lotteryName: lottery.name
+                                });
+                                setShowPayoutModal(true);
+                              }}
+                              className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
+                              title="กำหนดอัตราจ่าย"
+                            >
+                              <FaPercentage />
+                              อัตราจ่าย
+                            </button>
+
                             {/* ปุ่มเปิด/ปิดแทง - แสดงเมื่อสถานะเปิดหรือปิดแทง */}
                             {lottery.status === 1 && (
                               <button
@@ -540,6 +564,19 @@ const LotteryDaily: React.FC = () => {
           fetchData(); // Reload lottery list
         }}
       />
+
+      {/* Payout Rates Modal */}
+      {selectedPayoutLottery && (
+        <PayoutRatesModal
+          isOpen={showPayoutModal}
+          onClose={() => {
+            setShowPayoutModal(false);
+            setSelectedPayoutLottery(null);
+          }}
+          lotteryId={selectedPayoutLottery.lotteryId}
+          lotteryName={selectedPayoutLottery.lotteryName}
+        />
+      )}
     </div>
   );
 };
