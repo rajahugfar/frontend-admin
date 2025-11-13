@@ -81,7 +81,12 @@ import AdminLogs from '@pages/admin/AdminLogs';
 
 function App() {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <Toaster
         position="top-right"
         toastOptions={{
