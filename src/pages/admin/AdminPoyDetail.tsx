@@ -50,11 +50,18 @@ const AdminPoyDetail: React.FC = () => {
       setLoading(true);
       const response = await adminPoyAPI.getPoyDetail(poyId!);
       if (response.status === 'success' && response.data) {
-        setPoy(response.data as any);
+        // API returns { header: {...}, items: [...] }
+        // Merge them into flat structure for component
+        const apiData = response.data as any;
+        const poyData = {
+          ...apiData.header,
+          items: apiData.items || []
+        };
+        setPoy(poyData);
 
         // Load member info
-        if ((response.data as any).memberId) {
-          loadMemberInfo((response.data as any).memberId);
+        if (poyData.memberId) {
+          loadMemberInfo(poyData.memberId);
         }
       }
     } catch (error: any) {
