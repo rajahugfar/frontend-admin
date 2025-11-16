@@ -64,25 +64,25 @@ const AdminLogs: React.FC = () => {
 
   const getActionBadge = (action: string) => {
     const badges: Record<string, string> = {
-      LOGIN: 'bg-blue-100 text-blue-800',
-      LOGOUT: 'bg-gray-100 text-gray-800',
-      APPROVE_DEPOSIT: 'bg-green-100 text-green-800',
-      REJECT_DEPOSIT: 'bg-red-100 text-red-800',
-      APPROVE_WITHDRAWAL: 'bg-green-100 text-green-800',
-      REJECT_WITHDRAWAL: 'bg-red-100 text-red-800',
-      APPROVE_CASHBACK: 'bg-green-100 text-green-800',
-      REJECT_CASHBACK: 'bg-red-100 text-red-800',
-      CREATE_MEMBER: 'bg-purple-100 text-purple-800',
-      UPDATE_MEMBER: 'bg-yellow-100 text-yellow-800',
-      DELETE_MEMBER: 'bg-red-100 text-red-800',
-      CREDIT_ADJUSTMENT: 'bg-orange-100 text-orange-800',
-      CREATE_STAFF: 'bg-purple-100 text-purple-800',
-      UPDATE_STAFF: 'bg-yellow-100 text-yellow-800',
-      DELETE_STAFF: 'bg-red-100 text-red-800',
-      APPROVE_REVIEW: 'bg-green-100 text-green-800',
-      REJECT_REVIEW: 'bg-red-100 text-red-800',
+      LOGIN: 'bg-primary-500/20 text-primary-400 border border-primary-500/30',
+      LOGOUT: 'bg-admin-card text-gray-400 border border-admin-border',
+      APPROVE_DEPOSIT: 'bg-green-500/20 text-green-400 border border-green-500/30',
+      REJECT_DEPOSIT: 'bg-error/20 text-red-400 border border-error/30',
+      APPROVE_WITHDRAWAL: 'bg-green-500/20 text-green-400 border border-green-500/30',
+      REJECT_WITHDRAWAL: 'bg-error/20 text-red-400 border border-error/30',
+      APPROVE_CASHBACK: 'bg-green-500/20 text-green-400 border border-green-500/30',
+      REJECT_CASHBACK: 'bg-error/20 text-red-400 border border-error/30',
+      CREATE_MEMBER: 'bg-primary-500/20 text-primary-400 border border-primary-500/30',
+      UPDATE_MEMBER: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
+      DELETE_MEMBER: 'bg-error/20 text-red-400 border border-error/30',
+      CREDIT_ADJUSTMENT: 'bg-primary-500/20 text-primary-400 border border-primary-500/30',
+      CREATE_STAFF: 'bg-primary-500/20 text-primary-400 border border-primary-500/30',
+      UPDATE_STAFF: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
+      DELETE_STAFF: 'bg-error/20 text-red-400 border border-error/30',
+      APPROVE_REVIEW: 'bg-green-500/20 text-green-400 border border-green-500/30',
+      REJECT_REVIEW: 'bg-error/20 text-red-400 border border-error/30',
     }
-    return badges[action] || 'bg-gray-100 text-gray-800'
+    return badges[action] || 'bg-admin-card text-gray-400 border border-admin-border'
   }
 
   const formatAction = (action: string) => {
@@ -137,216 +137,229 @@ const AdminLogs: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">ประวัติการทำรายการ</h1>
+    <div className="min-h-screen bg-admin-bg p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6 text-primary-500 font-display">ประวัติการทำรายการ</h1>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              วันที่เริ่มต้น
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                setStartDate(e.target.value)
-                setOffset(0)
-              }}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        {/* Filters */}
+        <div className="bg-admin-card border border-admin-border rounded-lg shadow-lg p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-primary-400 mb-2">
+                วันที่เริ่มต้น
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value)
+                  setOffset(0)
+                }}
+                title="วันที่เริ่มต้น"
+                className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary-400 mb-2">
+                วันที่สิ้นสุด
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value)
+                  setOffset(0)
+                }}
+                title="วันที่สิ้นสุด"
+                className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary-400 mb-2">
+                การกระทำ
+              </label>
+              <select
+                value={actionFilter}
+                onChange={(e) => {
+                  setActionFilter(e.target.value)
+                  setOffset(0)
+                }}
+                title="การกระทำ"
+                className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              >
+                <option value="">ทั้งหมด</option>
+                <option value="LOGIN">LOGIN</option>
+                <option value="LOGOUT">LOGOUT</option>
+                <option value="APPROVE_DEPOSIT">APPROVE_DEPOSIT</option>
+                <option value="REJECT_DEPOSIT">REJECT_DEPOSIT</option>
+                <option value="APPROVE_WITHDRAWAL">APPROVE_WITHDRAWAL</option>
+                <option value="REJECT_WITHDRAWAL">REJECT_WITHDRAWAL</option>
+                <option value="APPROVE_CASHBACK">APPROVE_CASHBACK</option>
+                <option value="REJECT_CASHBACK">REJECT_CASHBACK</option>
+                <option value="CREDIT_ADJUSTMENT">CREDIT_ADJUSTMENT</option>
+                <option value="CREATE_MEMBER">CREATE_MEMBER</option>
+                <option value="UPDATE_MEMBER">UPDATE_MEMBER</option>
+                <option value="DELETE_MEMBER">DELETE_MEMBER</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-primary-400 mb-2">
+                ประเภททรัพยากร
+              </label>
+              <select
+                value={resourceTypeFilter}
+                onChange={(e) => {
+                  setResourceTypeFilter(e.target.value)
+                  setOffset(0)
+                }}
+                title="ประเภททรัพยากร"
+                className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              >
+                <option value="">ทั้งหมด</option>
+                <option value="DEPOSIT">DEPOSIT</option>
+                <option value="WITHDRAWAL">WITHDRAWAL</option>
+                <option value="CASHBACK">CASHBACK</option>
+                <option value="MEMBER">MEMBER</option>
+                <option value="STAFF">STAFF</option>
+                <option value="REVIEW">REVIEW</option>
+                <option value="PROMOTION">PROMOTION</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              วันที่สิ้นสุด
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => {
-                setEndDate(e.target.value)
-                setOffset(0)
-              }}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              การกระทำ
-            </label>
-            <select
-              value={actionFilter}
-              onChange={(e) => {
-                setActionFilter(e.target.value)
-                setOffset(0)
-              }}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">ทั้งหมด</option>
-              <option value="LOGIN">LOGIN</option>
-              <option value="LOGOUT">LOGOUT</option>
-              <option value="APPROVE_DEPOSIT">APPROVE_DEPOSIT</option>
-              <option value="REJECT_DEPOSIT">REJECT_DEPOSIT</option>
-              <option value="APPROVE_WITHDRAWAL">APPROVE_WITHDRAWAL</option>
-              <option value="REJECT_WITHDRAWAL">REJECT_WITHDRAWAL</option>
-              <option value="APPROVE_CASHBACK">APPROVE_CASHBACK</option>
-              <option value="REJECT_CASHBACK">REJECT_CASHBACK</option>
-              <option value="CREDIT_ADJUSTMENT">CREDIT_ADJUSTMENT</option>
-              <option value="CREATE_MEMBER">CREATE_MEMBER</option>
-              <option value="UPDATE_MEMBER">UPDATE_MEMBER</option>
-              <option value="DELETE_MEMBER">DELETE_MEMBER</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              ประเภททรัพยากร
-            </label>
-            <select
-              value={resourceTypeFilter}
-              onChange={(e) => {
-                setResourceTypeFilter(e.target.value)
-                setOffset(0)
-              }}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">ทั้งหมด</option>
-              <option value="DEPOSIT">DEPOSIT</option>
-              <option value="WITHDRAWAL">WITHDRAWAL</option>
-              <option value="CASHBACK">CASHBACK</option>
-              <option value="MEMBER">MEMBER</option>
-              <option value="STAFF">STAFF</option>
-              <option value="REVIEW">REVIEW</option>
-              <option value="PROMOTION">PROMOTION</option>
-            </select>
+          <div className="flex items-center justify-between mt-6">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-5 py-2.5 text-sm text-gray-400 hover:text-primary-400 hover:bg-admin-hover border border-admin-border rounded-lg transition-all"
+              >
+                รีเซ็ตตัวกรอง
+              </button>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={loading || logs.length === 0}
+                className="px-5 py-2.5 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-admin-border disabled:text-gray-600 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-glow"
+              >
+                📥 Export CSV
+              </button>
+            </div>
+            <div className="text-sm text-primary-400 font-medium">
+              ทั้งหมด <span className="text-primary-500 font-bold">{total}</span> รายการ
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex gap-2">
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-            >
-              รีเซ็ตตัวกรอง
-            </button>
-            <button
-              onClick={handleExport}
-              disabled={loading || logs.length === 0}
-              className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              📥 Export CSV
-            </button>
+        {/* Logs Table */}
+        {loading ? (
+          <div className="bg-admin-card border border-admin-border rounded-lg shadow-lg p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <p className="mt-4 text-gray-400">กำลังโหลด...</p>
           </div>
-          <div className="text-sm text-gray-600">
-            ทั้งหมด {total} รายการ
+        ) : logs.length === 0 ? (
+          <div className="bg-admin-card border border-admin-border rounded-lg shadow-lg p-12 text-center">
+            <p className="text-gray-400 text-lg">ไม่พบข้อมูลประวัติการทำรายการ</p>
           </div>
-        </div>
-      </div>
-
-      {/* Logs Table */}
-      {loading ? (
-        <div className="text-center py-8">กำลังโหลด...</div>
-      ) : logs.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-          ไม่พบข้อมูลประวัติการทำรายการ
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    เวลา
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    ผู้ดำเนินการ
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    การกระทำ
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    ทรัพยากร
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    IP Address
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDate(log.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {log.adminUsername}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {log.adminFullName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getActionBadge(
-                          log.action
-                        )}`}
-                      >
-                        {formatAction(log.action)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {log.resourceType && (
-                        <div>
-                          <div className="text-sm text-gray-900">
-                            {log.resourceType}
-                          </div>
-                          {log.resourceId && (
-                            <div className="text-xs text-gray-500">
-                              {log.resourceId.slice(0, 8)}...
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {log.ipAddress || '-'}
-                    </td>
+        ) : (
+          <div className="bg-admin-card border border-admin-border rounded-lg shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-admin-border">
+                <thead className="bg-admin-bg">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-primary-400 uppercase tracking-wider">
+                      เวลา
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-primary-400 uppercase tracking-wider">
+                      ผู้ดำเนินการ
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-primary-400 uppercase tracking-wider">
+                      การกระทำ
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-primary-400 uppercase tracking-wider">
+                      ทรัพยากร
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-primary-400 uppercase tracking-wider">
+                      IP Address
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-admin-border">
+                  {logs.map((log) => (
+                    <tr key={log.id} className="hover:bg-admin-hover transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        {formatDate(log.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-200">
+                          {log.adminUsername}
+                        </div>
+                        <div className="text-sm text-gray-400">
+                          {log.adminFullName}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium ${getActionBadge(
+                            log.action
+                          )}`}
+                        >
+                          {formatAction(log.action)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {log.resourceType && (
+                          <div>
+                            <div className="text-sm text-gray-200 font-medium">
+                              {log.resourceType}
+                            </div>
+                            {log.resourceId && (
+                              <div className="text-xs text-gray-400 font-mono">
+                                {log.resourceId.slice(0, 8)}...
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
+                        {log.ipAddress || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Pagination */}
-      {total > limit && (
-        <div className="mt-4 flex justify-center gap-2">
-          <button
-            onClick={() => setOffset(Math.max(0, offset - limit))}
-            disabled={offset === 0}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
-          >
-            ก่อนหน้า
-          </button>
-          <span className="px-4 py-2">
-            หน้า {Math.floor(offset / limit) + 1} / {Math.ceil(total / limit)}
-          </span>
-          <button
-            onClick={() => setOffset(offset + limit)}
-            disabled={offset + limit >= total}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
-          >
-            ถัดไป
-          </button>
-        </div>
-      )}
+        {/* Pagination */}
+        {total > limit && (
+          <div className="mt-6 flex justify-center items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setOffset(Math.max(0, offset - limit))}
+              disabled={offset === 0}
+              className="px-5 py-2.5 bg-admin-card border border-admin-border rounded-lg text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-admin-hover hover:text-primary-400 transition-all shadow-lg"
+            >
+              ← ก่อนหน้า
+            </button>
+            <span className="px-6 py-2.5 bg-admin-card border border-admin-border rounded-lg text-gray-300">
+              หน้า <span className="text-primary-500 font-bold">{Math.floor(offset / limit) + 1}</span> / <span className="text-primary-400">{Math.ceil(total / limit)}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setOffset(offset + limit)}
+              disabled={offset + limit >= total}
+              className="px-5 py-2.5 bg-admin-card border border-admin-border rounded-lg text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-admin-hover hover:text-primary-400 transition-all shadow-lg"
+            >
+              ถัดไป →
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
