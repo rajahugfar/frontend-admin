@@ -28,12 +28,21 @@ const ProfitReport: React.FC = () => {
   const [dailyData, setDailyData] = useState<DailyData[]>([])
   const [loading, setLoading] = useState(false)
   const [startDate, setStartDate] = useState(() => {
+    // First day of current month
     const date = new Date()
-    date.setDate(date.getDate() - 30)
-    return date.toISOString().split('T')[0]
+    date.setDate(1)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    return `${year}-${month}-01`
   })
   const [endDate, setEndDate] = useState(() => {
-    return new Date().toISOString().split('T')[0]
+    // Last day of current month
+    const date = new Date()
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+    const year = lastDay.getFullYear()
+    const month = String(lastDay.getMonth() + 1).padStart(2, '0')
+    const day = String(lastDay.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   })
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [showCalendar, setShowCalendar] = useState(true)
@@ -143,7 +152,11 @@ const ProfitReport: React.FC = () => {
   }
 
   const getDailyDataForDate = (date: Date): DailyData | null => {
-    const dateStr = date.toISOString().split('T')[0]
+    // Format date as YYYY-MM-DD in local timezone (not UTC)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const dateStr = `${year}-${month}-${day}`
     return dailyData.find(d => d.date === dateStr) || null
   }
 
