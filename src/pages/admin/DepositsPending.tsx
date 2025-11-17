@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { adminDepositAPI } from '@/api/adminAPI'
 import { DepositWithMember } from '@/types/admin'
-import { FiCheckCircle, FiXCircle, FiEye, FiDollarSign, FiClock, FiTrendingUp, FiCalendar } from 'react-icons/fi'
+import { FiCheckCircle, FiXCircle, FiEye, FiDollarSign, FiClock, FiTrendingUp, FiCalendar, FiX } from 'react-icons/fi'
 import { BankInfo } from '@/components/BankIcon'
 import dayjs from 'dayjs'
 import toast from 'react-hot-toast'
@@ -46,6 +46,10 @@ export default function DepositsPending() {
   // Bulk approve states
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [showBulkApproveModal, setShowBulkApproveModal] = useState(false)
+
+  // Slip image modal states
+  const [showSlipModal, setShowSlipModal] = useState(false)
+  const [selectedSlipUrl, setSelectedSlipUrl] = useState('')
 
   useEffect(() => {
     fetchPendingDeposits()
@@ -387,15 +391,16 @@ export default function DepositsPending() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       {deposit.slipUrl ? (
-                        <a
-                          href={deposit.slipUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => {
+                            setSelectedSlipUrl(deposit.slipUrl!)
+                            setShowSlipModal(true)
+                          }}
                           className="inline-flex items-center gap-2 px-3 py-1.5 bg-info/10 hover:bg-info/20 text-info rounded-lg transition-all text-sm font-medium"
                         >
                           <FiEye className="w-4 h-4" />
                           ดูสลิป
-                        </a>
+                        </button>
                       ) : (
                         <span className="text-brown-500 text-sm">ไม่มีสลิป</span>
                       )}
@@ -573,6 +578,62 @@ export default function DepositsPending() {
               >
                 {processing ? 'กำลังดำเนินการ...' : 'ยืนยันปฏิเสธ'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Slip Image Modal */}
+      {showSlipModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-admin-border rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden">
+            <div className="p-4 border-b border-admin-border flex items-center justify-between bg-gradient-to-r from-admin-bg to-admin-card">
+              <h3 className="text-xl font-bold text-gold-500 flex items-center gap-2">
+                <FiEye className="w-6 h-6" />
+                สลิปการโอนเงิน
+              </h3>
+              <button
+                onClick={() => {
+                  setShowSlipModal(false)
+                  setSelectedSlipUrl('')
+                }}
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-admin-bg hover:bg-error/20 text-brown-400 hover:text-error transition-all"
+              >
+                <FiX className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6 bg-admin-bg">
+              <div className="rounded-xl overflow-hidden border border-admin-border shadow-lg">
+                <img
+                  src={selectedSlipUrl}
+                  alt="สลิปการโอนเงิน"
+                  className="w-full h-auto max-h-[70vh] object-contain bg-white"
+                  onError={(e) => {
+                    const target = e.currentTarget
+                    target.src = '/images/no-image.png'
+                  }}
+                />
+              </div>
+              <div className="mt-4 flex gap-3">
+                <a
+                  href={selectedSlipUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 px-4 py-2.5 bg-info/10 hover:bg-info/20 text-info rounded-lg transition-all font-medium text-center flex items-center justify-center gap-2"
+                >
+                  <FiEye className="w-4 h-4" />
+                  เปิดในแท็บใหม่
+                </a>
+                <button
+                  onClick={() => {
+                    setShowSlipModal(false)
+                    setSelectedSlipUrl('')
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-admin-bg hover:bg-admin-hover text-brown-300 rounded-lg transition-all font-medium"
+                >
+                  ปิด
+                </button>
+              </div>
             </div>
           </div>
         </div>
