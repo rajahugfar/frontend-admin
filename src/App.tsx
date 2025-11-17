@@ -29,6 +29,7 @@ import MembersManagement from '@pages/admin/MembersManagement';
 import TodayCustomers from '@pages/admin/TodayCustomers';
 import AdminMemberDetail from '@pages/admin/AdminMemberDetail';
 import AdminMemberPoys from '@pages/admin/AdminMemberPoys';
+import AdminMemberTransactions from '@pages/admin/AdminMemberTransactions';
 import AdminPoyDetail from '@pages/admin/AdminPoyDetail';
 
 // Transfers
@@ -75,6 +76,12 @@ import ReferralSettings from '@pages/admin/ReferralSettings';
 
 // Lucky Wheel
 import LuckyWheelManagement from '@pages/admin/LuckyWheelManagement';
+
+// Turnover
+import TurnoverOverview from '@pages/admin/TurnoverOverview';
+import TurnoverMembers from '@pages/admin/TurnoverMembers';
+import TurnoverRedemptions from '@pages/admin/TurnoverRedemptions';
+import TurnoverSettings from '@pages/admin/TurnoverSettings';
 
 // System
 import AdminLogs from '@pages/admin/AdminLogs';
@@ -149,6 +156,7 @@ function App() {
             <Route path="list" element={<MembersList />} />
             <Route path="today" element={<TodayCustomers />} />
             <Route path=":memberId" element={<AdminMemberDetail />} />
+            <Route path=":memberId/transactions" element={<AdminMemberTransactions />} />
             <Route path=":memberId/poys" element={<AdminMemberPoys />} />
             <Route path=":memberId/poys/:poyId" element={<AdminPoyDetail />} />
           </Route>
@@ -215,6 +223,15 @@ function App() {
 
           {/* Lucky Wheel */}
           <Route path="lucky-wheel" element={<LuckyWheelManagement />} />
+
+          {/* Turnover */}
+          <Route path="turnover">
+            <Route index element={<Navigate to="/admin/turnover/overview" replace />} />
+            <Route path="overview" element={<TurnoverOverview />} />
+            <Route path="members" element={<TurnoverMembers />} />
+            <Route path="redemptions" element={<TurnoverRedemptions />} />
+            <Route path="settings" element={<TurnoverSettings />} />
+          </Route>
 
           {/* System */}
           <Route path="logs" element={<AdminLogs />} />

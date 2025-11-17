@@ -130,18 +130,19 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
   if (!isOpen || !member) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-admin-card border border-admin-border rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+        <div className="flex items-center justify-between p-6 border-b border-admin-border sticky top-0 bg-admin-card z-20">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">แก้ไขข้อมูลยูส - {member.phone}</h2>
+            <h2 className="text-2xl font-display font-bold text-gold-500">แก้ไขข้อมูลยูส</h2>
+            <p className="text-brown-400 text-sm mt-1">{member.phone}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-admin-hover rounded transition-colors"
           >
-            <FiX className="w-6 h-6 text-gray-500" />
+            <FiX className="w-6 h-6 text-brown-400 hover:text-gold-500" />
           </button>
         </div>
 
@@ -150,8 +151,8 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Phone */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                เบอร์มือถือ <span className="text-red-500">*</span>
+              <label htmlFor="phone" className="block text-sm font-medium text-brown-300 mb-2">
+                เบอร์มือถือ <span className="text-error">*</span>
               </label>
               <input
                 type="tel"
@@ -160,13 +161,13 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 value={formData.phone}
                 readOnly
                 disabled
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                className="w-full px-4 py-2 border border-admin-border rounded-lg bg-admin-bg text-brown-500"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-brown-300 mb-2">
                 รหัสผ่าน (เว้นว่างถ้าไม่เปลี่ยน)
               </label>
               <input
@@ -176,18 +177,18 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="รหัสผ่านใหม่"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+                className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                 minLength={6}
               />
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-error mt-1">
                 ** รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร **
               </p>
             </div>
 
             {/* Fullname */}
             <div>
-              <label htmlFor="fullname" className="block text-sm font-semibold text-gray-700 mb-2">
-                ชื่อจริง นามสกุล <span className="text-red-500">*</span>
+              <label htmlFor="fullname" className="block text-sm font-medium text-brown-300 mb-2">
+                ชื่อจริง นามสกุล <span className="text-error">*</span>
               </label>
               <input
                 type="text"
@@ -196,22 +197,22 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 value={formData.fullname}
                 onChange={handleChange}
                 placeholder="ไม่ต้องใส่ นาย/นาง/นางสาว"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+                className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                 required
               />
             </div>
 
             {/* Bank */}
             <div>
-              <label htmlFor="bankCode" className="block text-sm font-semibold text-gray-700 mb-2">
-                เลือกธนาคาร <span className="text-red-500">*</span>
+              <label htmlFor="bankCode" className="block text-sm font-medium text-brown-300 mb-2">
+                เลือกธนาคาร <span className="text-error">*</span>
               </label>
               <select
                 id="bankCode"
                 name="bankCode"
                 value={formData.bankCode}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+                className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                 required
               >
                 <option value="">เลือกธนาคาร</option>
@@ -225,8 +226,8 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
 
             {/* Bank Number */}
             <div>
-              <label htmlFor="bankNumber" className="block text-sm font-semibold text-gray-700 mb-2">
-                เลขบัญชีธนาคาร <span className="text-red-500">*</span>
+              <label htmlFor="bankNumber" className="block text-sm font-medium text-brown-300 mb-2">
+                เลขบัญชีธนาคาร <span className="text-error">*</span>
               </label>
               <input
                 type="text"
@@ -235,14 +236,14 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 value={formData.bankNumber}
                 onChange={handleChange}
                 placeholder="เลขบัญชี"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+                className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                 required
               />
             </div>
 
             {/* Line ID */}
             <div>
-              <label htmlFor="line" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="line" className="block text-sm font-medium text-brown-300 mb-2">
                 ไลน์ไอดี
               </label>
               <input
@@ -252,13 +253,13 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 value={formData.line}
                 onChange={handleChange}
                 placeholder="ไลน์ไอดี (ถ้ามี)"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+                className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               />
             </div>
 
             {/* Status */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-brown-300 mb-2">
                 เปิด/ปิด การใช้งาน
               </label>
               <div className="flex items-center gap-3">
@@ -270,8 +271,8 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                     onChange={handleChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#C4A962]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                  <span className="ms-3 text-sm font-medium text-gray-900">
+                  <div className="w-11 h-6 bg-admin-bg peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gold-500/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-admin-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success"></div>
+                  <span className="ms-3 text-sm font-medium text-brown-200">
                     {formData.status === 'active' ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                   </span>
                 </label>
@@ -279,13 +280,13 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
             </div>
           </div>
 
-          <hr className="my-6" />
+          <div className="border-t border-admin-border my-6"></div>
 
           {/* Game Info */}
-          <h3 className="text-lg font-bold text-gray-900 mb-4">ข้อมูลย่อยอื่นๆ</h3>
+          <h3 className="text-lg font-bold text-gold-500 mb-4">ข้อมูลย่อยอื่นๆ</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="gameUsername" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="gameUsername" className="block text-sm font-medium text-brown-300 mb-2">
                 ชื่อผู้ใช้ในเกม
               </label>
               <input
@@ -294,12 +295,12 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 name="gameUsername"
                 value={formData.gameUsername}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                className="w-full px-4 py-2 border border-admin-border rounded-lg bg-admin-bg text-brown-500"
               />
             </div>
 
             <div>
-              <label htmlFor="gamePassword" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="gamePassword" className="block text-sm font-medium text-brown-300 mb-2">
                 รหัสผ่านเข้าเกม
               </label>
               <input
@@ -308,14 +309,14 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 name="gamePassword"
                 value={formData.gamePassword}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                className="w-full px-4 py-2 border border-admin-border rounded-lg bg-admin-bg text-brown-500"
               />
             </div>
           </div>
 
           {/* Remark */}
           <div className="mt-4">
-            <label htmlFor="remark" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="remark" className="block text-sm font-medium text-brown-300 mb-2">
               หมายเหตุ
             </label>
             <textarea
@@ -324,17 +325,17 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
               value={formData.remark}
               onChange={handleChange}
               rows={5}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A962] focus:border-transparent"
+              className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent resize-none"
               placeholder="หมายเหตุเพิ่มเติม..."
             />
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-admin-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 text-brown-300 bg-admin-card border border-admin-border rounded-lg hover:border-gold-500/50 transition-colors"
               disabled={loading}
             >
               ยกเลิก
@@ -342,7 +343,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-[#C4A962] text-white rounded-lg hover:bg-[#B39952] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-gradient-to-r from-gold-600 to-gold-500 text-white rounded-lg hover:from-gold-700 hover:to-gold-600 transition-all shadow-lg hover:shadow-gold-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'กำลังบันทึก...' : 'บันทึกข้อมูล'}
             </button>

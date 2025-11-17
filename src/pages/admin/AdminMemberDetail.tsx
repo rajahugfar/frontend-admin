@@ -208,7 +208,7 @@ const AdminMemberDetail: React.FC = () => {
             className="mb-6"
           >
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/admin/members')}
               className="flex items-center gap-2 text-gray-300 hover:text-gold-400 transition-colors mb-4"
             >
               <FiArrowLeft className="text-xl" />

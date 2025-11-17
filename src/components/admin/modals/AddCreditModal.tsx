@@ -94,19 +94,19 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
   if (!isOpen || !member) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-admin-card border border-admin-border rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+        <div className="flex items-center justify-between p-6 border-b border-admin-border sticky top-0 bg-admin-card z-20">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">เพิ่มเครดิต</h2>
-            <p className="text-sm text-gray-600 mt-1">{member.phone} - {member.fullname}</p>
+            <h2 className="text-2xl font-display font-bold text-gold-500">เพิ่มเครดิต</h2>
+            <p className="text-brown-400 text-sm mt-1">{member.phone} - {member.fullname}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-admin-hover rounded transition-colors"
           >
-            <FiX className="w-6 h-6 text-gray-500" />
+            <FiX className="w-6 h-6 text-brown-400 hover:text-gold-500" />
           </button>
         </div>
 
@@ -114,21 +114,21 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
         <form onSubmit={handleSubmit} className="p-6">
           {/* Current Balance */}
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-brown-300 mb-2">
               เครดิตล่าสุด
             </label>
             <input
               type="text"
               value={member.credit.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
               readOnly
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700 font-semibold"
+              className="w-full px-4 py-2 border border-admin-border rounded-lg bg-admin-bg text-gold-500 font-bold text-lg"
             />
           </div>
 
           {/* Amount */}
           <div className="mb-4">
-            <label htmlFor="amount" className="block text-sm font-semibold text-gray-700 mb-2">
-              จำนวนเครดิต <span className="text-red-500">*</span>
+            <label htmlFor="amount" className="block text-sm font-medium text-brown-300 mb-2">
+              จำนวนเครดิต <span className="text-error">*</span>
             </label>
             <input
               type="number"
@@ -138,14 +138,14 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
               onChange={handleChange}
               min="1"
               step="0.01"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               required
             />
           </div>
 
           {/* Type */}
           <div className="mb-4">
-            <label htmlFor="type" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="type" className="block text-sm font-medium text-brown-300 mb-2">
               ประเภท
             </label>
             <select
@@ -153,7 +153,7 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
             >
               <option value="manual">ธนาคารมีปัญหา</option>
               <option value="refund">คืนเครดิตหาย</option>
@@ -164,7 +164,7 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
 
           {/* Remark */}
           <div className="mb-4">
-            <label htmlFor="remark" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="remark" className="block text-sm font-medium text-brown-300 mb-2">
               หมายเหตุ
             </label>
             <textarea
@@ -173,20 +173,20 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
               value={formData.remark}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent resize-none"
               placeholder="ระบุเหตุผลในการเพิ่มเครดิต..."
             />
           </div>
 
           {/* File Upload */}
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-brown-300 mb-2">
               อัพโหลดหลักฐาน (ถ้ามี)
             </label>
             <div className="flex items-center gap-2">
-              <label className="flex-1 flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
-                <FiUpload className="w-5 h-5 text-gray-400 mr-2" />
-                <span className="text-sm text-gray-600">
+              <label className="flex-1 flex items-center justify-center px-4 py-2 border-2 border-dashed border-admin-border rounded-lg cursor-pointer hover:border-gold-500 transition-colors bg-admin-bg">
+                <FiUpload className="w-5 h-5 text-brown-400 mr-2" />
+                <span className="text-sm text-brown-300">
                   {formData.file ? formData.file.name : 'เลือกไฟล์'}
                 </span>
                 <input
@@ -200,11 +200,11 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-admin-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 text-brown-300 bg-admin-card border border-admin-border rounded-lg hover:border-gold-500/50 transition-colors"
               disabled={loading}
             >
               ยกเลิก
@@ -212,7 +212,7 @@ export default function AddCreditModal({ isOpen, member, onClose, onSuccess }: A
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-gradient-to-r from-success to-success/90 text-white rounded-lg hover:from-success/90 hover:to-success/80 transition-all shadow-lg hover:shadow-success/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'กำลังบันทึก...' : 'เพิ่มเครดิต'}
             </button>

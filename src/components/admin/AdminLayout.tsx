@@ -23,6 +23,7 @@ import {
   FiImage,
   FiMessageSquare,
   FiUserPlus,
+  FiRepeat,
 } from 'react-icons/fi'
 
 interface MenuItem {
@@ -115,6 +116,17 @@ export default function AdminLayout() {
         { name: 'รายงานธนาคาร SCB', path: '/admin/reports/bank-scb', icon: null },
         { name: 'รายงาน Pincode', path: '/admin/reports/pincode', icon: null },
         { name: 'จัดการรีวิว', path: '/admin/games/reviews', icon: null },
+      ],
+    },
+    {
+      name: 'ระบบเทิร์นโอเวอร์',
+      path: '/admin/turnover',
+      icon: <FiRepeat className="w-5 h-5" />,
+      children: [
+        { name: 'ภาพรวม', path: '/admin/turnover/overview', icon: null },
+        { name: 'สมาชิกและเทิร์น', path: '/admin/turnover/members', icon: null },
+        { name: 'ประวัติการแลก', path: '/admin/turnover/redemptions', icon: null },
+        { name: 'ตั้งค่าระบบ', path: '/admin/turnover/settings', icon: null },
       ],
     },
     {

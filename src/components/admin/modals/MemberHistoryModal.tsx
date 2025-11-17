@@ -11,11 +11,12 @@ interface Member {
 
 interface Transaction {
   id: string
-  type: 'deposit' | 'withdrawal'
+  type: string
   amount: number
   status: string
   createdAt: string
   remark?: string
+  method?: string
 }
 
 interface MemberHistoryModalProps {
@@ -69,75 +70,105 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
   }
 
   const getStatusBadge = (status: string) => {
+    const statusLower = status.toLowerCase()
     const badges: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      approved: 'bg-green-100 text-green-800 border-green-200',
-      success: 'bg-green-100 text-green-800 border-green-200',
-      rejected: 'bg-red-100 text-red-800 border-red-200',
-      cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
+      pending: 'bg-warning/10 text-warning border-warning/20',
+      approved: 'bg-success/10 text-success border-success/20',
+      success: 'bg-success/10 text-success border-success/20',
+      completed: 'bg-success/10 text-success border-success/20',
+      rejected: 'bg-error/10 text-error border-error/20',
+      cancelled: 'bg-brown-500/10 text-brown-400 border-brown-500/20',
     }
     const labels: Record<string, string> = {
       pending: 'รอดำเนินการ',
       approved: 'อนุมัติ',
       success: 'สำเร็จ',
+      completed: 'สำเร็จ',
       rejected: 'ปฏิเสธ',
       cancelled: 'ยกเลิก',
     }
     return (
-      <span className={`px-2 py-1 text-xs font-semibold rounded border ${badges[status] || 'bg-gray-100 text-gray-800'}`}>
-        {labels[status] || status}
+      <span className={`px-2 py-1 text-xs rounded-full ${badges[statusLower] || 'bg-brown-500/10 text-brown-400'}`}>
+        {labels[statusLower] || status}
       </span>
     )
   }
 
-  const getTypeInfo = (type: string) => {
-    if (type === 'deposit') {
-      return {
-        label: 'ฝากเงิน',
-        color: 'text-green-600',
-        sign: '+',
+  const getTypeInfo = (type: string, amount: number) => {
+    // Check by amount for CREDIT_ADJUSTMENT
+    if (type === 'CREDIT_ADJUSTMENT' || type === 'ADJUSTMENT') {
+      if (amount >= 0) {
+        return {
+          label: 'เพิ่มเครดิต',
+          color: 'text-success',
+          sign: '',
+          isDeposit: true,
+        }
+      } else {
+        return {
+          label: 'ลดเครดิต',
+          color: 'text-error',
+          sign: '',
+          isDeposit: false,
+        }
       }
     }
-    return {
-      label: 'ถอนเงิน',
-      color: 'text-red-600',
-      sign: '-',
+
+    // Other types
+    const types: Record<string, any> = {
+      'DEPOSIT': { label: 'ฝากเงิน', color: 'text-success', sign: '', isDeposit: true },
+      'WITHDRAW': { label: 'ถอนเงิน', color: 'text-error', sign: '', isDeposit: false },
+      'deposit': { label: 'ฝากเงิน', color: 'text-success', sign: '', isDeposit: true },
+      'withdrawal': { label: 'ถอนเงิน', color: 'text-error', sign: '', isDeposit: false },
+    }
+
+    return types[type] || {
+      label: type,
+      color: 'text-brown-200',
+      sign: '',
+      isDeposit: amount >= 0,
     }
   }
 
   const filteredTransactions = transactions.filter((tx) => {
     if (filter === 'all') return true
-    return tx.type === filter
+    const typeInfo = getTypeInfo(tx.type, tx.amount)
+    if (filter === 'deposit') return typeInfo.isDeposit
+    if (filter === 'withdrawal') return !typeInfo.isDeposit
+    return false
   })
+
+  const depositCount = transactions.filter(tx => getTypeInfo(tx.type, tx.amount).isDeposit).length
+  const withdrawalCount = transactions.filter(tx => !getTypeInfo(tx.type, tx.amount).isDeposit).length
 
   if (!isOpen || !member) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-admin-card border border-admin-border rounded-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between p-6 border-b border-admin-border sticky top-0 bg-admin-card z-10">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">ประวัติการเติมเงิน/ถอนเงิน</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-2xl font-display font-bold text-gold-500">ประวัติการเติมเงิน/ถอนเงิน</h2>
+            <p className="text-brown-400 text-sm mt-1">
               {member.phone} - {member.fullname}
             </p>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <FiX className="w-6 h-6 text-gray-500" />
+          <button onClick={onClose} className="p-1 hover:bg-admin-hover rounded transition-colors">
+            <FiX className="w-6 h-6 text-brown-400" />
           </button>
         </div>
 
         {/* Filter */}
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <div className="p-4 border-b border-admin-border bg-admin-bg">
           <div className="flex items-center gap-4">
             <div className="flex gap-2">
               <button
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   filter === 'all'
-                    ? 'bg-[#C4A962] text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    ? 'bg-gold-500 text-white'
+                    : 'bg-admin-card text-brown-200 border border-admin-border hover:bg-admin-hover'
                 }`}
               >
                 ทั้งหมด ({transactions.length})
@@ -146,27 +177,27 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
                 onClick={() => setFilter('deposit')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   filter === 'deposit'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    ? 'bg-success text-white'
+                    : 'bg-admin-card text-brown-200 border border-admin-border hover:bg-admin-hover'
                 }`}
               >
-                ฝากเงิน ({transactions.filter((t) => t.type === 'deposit').length})
+                ฝากเงิน ({depositCount})
               </button>
               <button
                 onClick={() => setFilter('withdrawal')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   filter === 'withdrawal'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    ? 'bg-error text-white'
+                    : 'bg-admin-card text-brown-200 border border-admin-border hover:bg-admin-hover'
                 }`}
               >
-                ถอนเงิน ({transactions.filter((t) => t.type === 'withdrawal').length})
+                ถอนเงิน ({withdrawalCount})
               </button>
             </div>
             <button
               onClick={fetchTransactions}
               disabled={loading}
-              className="ml-auto p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+              className="ml-auto p-2 hover:bg-admin-hover rounded-lg transition-colors disabled:opacity-50 text-brown-300"
             >
               <FiRefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -177,38 +208,38 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <FiRefreshCw className="w-8 h-8 animate-spin text-gray-400" />
+              <FiRefreshCw className="w-8 h-8 animate-spin text-brown-500" />
             </div>
           ) : filteredTransactions.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">ไม่พบประวัติธุรกรรม</div>
+            <div className="text-center py-12 text-brown-400">ไม่พบประวัติธุรกรรม</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-admin-bg border-b border-admin-border">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-brown-300 uppercase">
                       วันที่/เวลา
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-brown-300 uppercase">
                       ประเภท
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-brown-300 uppercase">
                       จำนวนเงิน
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-brown-300 uppercase">
                       สถานะ
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-brown-300 uppercase">
                       หมายเหตุ
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-admin-border">
                   {filteredTransactions.map((tx) => {
-                    const typeInfo = getTypeInfo(tx.type)
+                    const typeInfo = getTypeInfo(tx.type, tx.amount)
                     return (
-                      <tr key={tx.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                      <tr key={tx.id} className="hover:bg-admin-hover">
+                        <td className="px-4 py-3 text-sm text-brown-200">
                           {formatDate(tx.createdAt)}
                         </td>
                         <td className="px-4 py-3 text-sm">
@@ -220,11 +251,11 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
                         </td>
                         <td className="px-4 py-3 text-sm text-right">
                           <span className={`font-semibold ${typeInfo.color}`}>
-                            {typeInfo.sign} {formatCurrency(tx.amount)}
+                            {formatCurrency(Math.abs(tx.amount))}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm">{getStatusBadge(tx.status)}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
+                        <td className="px-4 py-3 text-sm text-brown-400">
                           {tx.remark || '-'}
                         </td>
                       </tr>
@@ -238,39 +269,41 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
 
         {/* Summary */}
         {!loading && filteredTransactions.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="px-6 py-4 border-t border-admin-border bg-admin-bg">
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
-                <div className="text-sm text-gray-600">ฝากเงินทั้งหมด</div>
-                <div className="text-lg font-bold text-green-600">
-                  +{' '}
+                <div className="text-sm text-brown-400">ฝากเงินทั้งหมด</div>
+                <div className="text-lg font-bold text-success">
                   {formatCurrency(
                     transactions
-                      .filter((t) => t.type === 'deposit' && t.status === 'approved')
-                      .reduce((sum, t) => sum + t.amount, 0)
+                      .filter((t) => {
+                        const typeInfo = getTypeInfo(t.type, t.amount)
+                        return typeInfo.isDeposit && (t.status === 'approved' || t.status === 'success' || t.status === 'completed')
+                      })
+                      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
                   )}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-gray-600">ถอนเงินทั้งหมด</div>
-                <div className="text-lg font-bold text-red-600">
-                  -{' '}
+                <div className="text-sm text-brown-400">ถอนเงินทั้งหมด</div>
+                <div className="text-lg font-bold text-error">
                   {formatCurrency(
                     transactions
-                      .filter((t) => t.type === 'withdrawal' && t.status === 'approved')
-                      .reduce((sum, t) => sum + t.amount, 0)
+                      .filter((t) => {
+                        const typeInfo = getTypeInfo(t.type, t.amount)
+                        return !typeInfo.isDeposit && (t.status === 'approved' || t.status === 'success' || t.status === 'completed')
+                      })
+                      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
                   )}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-gray-600">ยอดรวม</div>
-                <div className="text-lg font-bold text-[#C4A962]">
+                <div className="text-sm text-brown-400">ยอดรวม</div>
+                <div className="text-lg font-bold text-gold-500">
                   {formatCurrency(
                     transactions
-                      .filter((t) => t.status === 'approved')
-                      .reduce((sum, t) => {
-                        return t.type === 'deposit' ? sum + t.amount : sum - t.amount
-                      }, 0)
+                      .filter((t) => t.status === 'approved' || t.status === 'success' || t.status === 'completed')
+                      .reduce((sum, t) => sum + t.amount, 0)
                   )}
                 </div>
               </div>
@@ -279,10 +312,10 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
         )}
 
         {/* Footer */}
-        <div className="flex justify-end p-6 border-t border-gray-200">
+        <div className="flex justify-end p-6 border-t border-admin-border">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            className="px-6 py-2 bg-admin-card border border-admin-border text-brown-200 rounded-lg hover:border-gold-500/50 transition-colors"
           >
             ปิด
           </button>
