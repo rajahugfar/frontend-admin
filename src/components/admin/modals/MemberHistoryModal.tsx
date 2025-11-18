@@ -278,7 +278,8 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
                     transactions
                       .filter((t) => {
                         const typeInfo = getTypeInfo(t.type, t.amount)
-                        return typeInfo.isDeposit && (t.status === 'approved' || t.status === 'success' || t.status === 'completed')
+                        const status = t.status?.toUpperCase()
+                        return typeInfo.isDeposit && (status === 'APPROVED' || status === 'SUCCESS' || status === 'COMPLETED')
                       })
                       .reduce((sum, t) => sum + Math.abs(t.amount), 0)
                   )}
@@ -291,7 +292,8 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
                     transactions
                       .filter((t) => {
                         const typeInfo = getTypeInfo(t.type, t.amount)
-                        return !typeInfo.isDeposit && (t.status === 'approved' || t.status === 'success' || t.status === 'completed')
+                        const status = t.status?.toUpperCase()
+                        return !typeInfo.isDeposit && (status === 'APPROVED' || status === 'SUCCESS' || status === 'COMPLETED')
                       })
                       .reduce((sum, t) => sum + Math.abs(t.amount), 0)
                   )}
@@ -302,7 +304,10 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
                 <div className="text-lg font-bold text-gold-500">
                   {formatCurrency(
                     transactions
-                      .filter((t) => t.status === 'approved' || t.status === 'success' || t.status === 'completed')
+                      .filter((t) => {
+                        const status = t.status?.toUpperCase()
+                        return status === 'APPROVED' || status === 'SUCCESS' || status === 'COMPLETED'
+                      })
                       .reduce((sum, t) => sum + t.amount, 0)
                   )}
                 </div>

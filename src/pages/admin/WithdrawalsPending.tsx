@@ -52,8 +52,6 @@ export default function WithdrawalsPending() {
   const [remark, setRemark] = useState('')
   const [rejectReason, setRejectReason] = useState('')
   const [processing, setProcessing] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<'auto' | 'manual'>('manual')
-  const [selectedGateway, setSelectedGateway] = useState('bitpayz')
   const [slipUrl, setSlipUrl] = useState('')
   const [slipFile, setSlipFile] = useState<File | null>(null)
   const [uploadingSlip, setUploadingSlip] = useState(false)
@@ -109,7 +107,7 @@ export default function WithdrawalsPending() {
   const handleApprove = async () => {
     if (!selectedWithdrawal) return
 
-    if (paymentMethod === 'manual' && !slipUrl.trim()) {
+    if (!slipUrl.trim()) {
       toast.error('กรุณาอัพโหลดสลิปการโอนเงิน')
       return
     }
@@ -117,9 +115,8 @@ export default function WithdrawalsPending() {
     try {
       setProcessing(true)
       await adminWithdrawalAPI.approveWithdrawal(selectedWithdrawal.id, {
-        paymentMethod,
-        gateway: paymentMethod === 'auto' ? selectedGateway : undefined,
-        slipUrl: paymentMethod === 'manual' ? slipUrl : undefined,
+        paymentMethod: 'manual',
+        slipUrl: slipUrl,
         remark: remark || undefined,
       })
       toast.success('อนุมัติรายการถอนเรียบร้อย')
@@ -127,8 +124,6 @@ export default function WithdrawalsPending() {
       setSelectedWithdrawal(null)
       setActualAmount(0)
       setRemark('')
-      setPaymentMethod('manual')
-      setSelectedGateway('bitpayz')
       setSlipUrl('')
       setSlipFile(null)
       fetchPendingWithdrawals()
@@ -398,143 +393,81 @@ export default function WithdrawalsPending() {
               อนุมัติรายการถอน
             </h3>
 
-            <div className="mb-6 p-4 bg-admin-bg rounded-xl border border-admin-border">
-              <div className="text-sm text-brown-400 mb-2">สมาชิก: {selectedWithdrawal.memberPhone}</div>
-              <div className="text-3xl font-bold text-error mb-2">{formatCurrency(selectedWithdrawal.amount)}</div>
-              {selectedWithdrawal.bankCode && (
+            {/* Member Info */}
+            <div className="mb-4 p-4 bg-admin-bg rounded-xl border border-admin-border">
+              <div className="text-xs text-brown-400 mb-2">ข้อมูลสมาชิก</div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-gold-500/20 to-gold-600/10 rounded-full flex items-center justify-center text-gold-500 font-bold text-lg">
+                  {(selectedWithdrawal.memberFullname || selectedWithdrawal.memberPhone).charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div className="text-base font-bold text-brown-100">
+                    {selectedWithdrawal.memberFullname || 'ไม่ระบุชื่อ'}
+                  </div>
+                  <div className="text-sm text-brown-400">{selectedWithdrawal.memberPhone}</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-brown-400">ยอดเครดิตปัจจุบัน</span>
+                <span className="text-success font-bold">{formatCurrency(selectedWithdrawal.memberCredit)}</span>
+              </div>
+            </div>
+
+            {/* Withdrawal Amount */}
+            <div className="mb-4 p-4 bg-error/10 rounded-xl border border-error/30">
+              <div className="text-xs text-brown-400 mb-1">จำนวนเงินที่ต้องการถอน</div>
+              <div className="text-3xl font-bold text-error">{formatCurrency(selectedWithdrawal.amount)}</div>
+            </div>
+
+            {/* Bank Account Info */}
+            {selectedWithdrawal.bankCode && (
+              <div className="mb-4 p-4 bg-admin-bg rounded-xl border border-admin-border">
+                <div className="text-xs text-brown-400 mb-3">บัญชีที่โอนเข้า</div>
                 <BankInfo
                   bankCode={selectedWithdrawal.bankCode}
                   bankName={selectedWithdrawal.bankName || ''}
                   bankNumber={selectedWithdrawal.bankNumber || ''}
                   size="sm"
                 />
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="space-y-4">
-              {/* Payment Method Selection */}
-              <div>
-                <label className="block text-sm font-semibold text-brown-200 mb-3">
-                  วิธีการจ่ายเงิน <span className="text-error">*</span>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label
-                    className={`cursor-pointer border-2 rounded-lg p-4 transition-all ${
-                      paymentMethod === 'auto'
-                        ? 'border-gold-500 bg-gold-500/10'
-                        : 'border-admin-border bg-admin-bg hover:border-brown-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="auto"
-                      checked={paymentMethod === 'auto'}
-                      onChange={(e) => setPaymentMethod(e.target.value as 'auto' | 'manual')}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center gap-2 mb-1">
-                      <FiCreditCard className="w-5 h-5 text-gold-500" />
-                      <span className="font-semibold text-brown-100">อัตโนมัติ</span>
-                    </div>
-                    <p className="text-xs text-brown-400">ผ่าน Gateway</p>
-                  </label>
-
-                  <label
-                    className={`cursor-pointer border-2 rounded-lg p-4 transition-all ${
-                      paymentMethod === 'manual'
-                        ? 'border-gold-500 bg-gold-500/10'
-                        : 'border-admin-border bg-admin-bg hover:border-brown-400'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="manual"
-                      checked={paymentMethod === 'manual'}
-                      onChange={(e) => setPaymentMethod(e.target.value as 'auto' | 'manual')}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center gap-2 mb-1">
-                      <FiUpload className="w-5 h-5 text-gold-500" />
-                      <span className="font-semibold text-brown-100">Manual</span>
-                    </div>
-                    <p className="text-xs text-brown-400">โอนเอง + สลิป</p>
-                  </label>
-                </div>
-              </div>
-
-              {/* Gateway Selection - Show only for Auto */}
-              {paymentMethod === 'auto' && (
-                <div className="p-4 bg-info/10 border border-info/30 rounded-lg">
-                  <label className="block text-sm font-medium text-brown-200 mb-2">
-                    เลือก Payment Gateway <span className="text-error">*</span>
-                  </label>
-                  <select
-                    value={selectedGateway}
-                    onChange={(e) => setSelectedGateway(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                  >
-                    <option value="bitpayz">Bitpayz</option>
-                    <option value="scb_auto">SCB Auto</option>
-                    <option value="autopeer">Autopeer</option>
-                  </select>
-                </div>
-              )}
-
-              {/* Slip Upload - Show only for Manual */}
-              {paymentMethod === 'manual' && (
-                <div className="p-4 bg-warning/10 border border-warning/30 rounded-lg">
-                  <label className="block text-sm font-medium text-brown-200 mb-2">
-                    อัพโหลดสลิปการโอนเงิน <span className="text-error">*</span>
-                  </label>
-                  <div className="space-y-3">
-                    <label className="block cursor-pointer">
-                      <div className="flex items-center justify-center gap-3 px-4 py-3 bg-admin-bg hover:bg-admin-hover border-2 border-dashed border-admin-border hover:border-gold-500 rounded-lg transition-all">
-                        <FiUpload className="w-5 h-5 text-gold-500" />
-                        <span className="text-brown-200 font-medium">
-                          {slipFile ? slipFile.name : 'เลือกไฟล์สลิป'}
-                        </span>
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/gif"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        disabled={uploadingSlip}
-                      />
-                    </label>
-                    {uploadingSlip && (
-                      <div className="flex items-center gap-2 text-warning text-sm">
-                        <div className="animate-spin w-4 h-4 border-2 border-warning border-t-transparent rounded-full"></div>
-                        <span>กำลังอัพโหลด...</span>
-                      </div>
-                    )}
-                    {slipUrl && !uploadingSlip && (
-                      <div className="flex items-center gap-2 text-success text-sm">
-                        <FiCheckCircle className="w-4 h-4" />
-                        <span>อัพโหลดสำเร็จ</span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-brown-500 mt-2">รองรับไฟล์ JPG, PNG, GIF ขนาดไม่เกิน 10MB</p>
-                </div>
-              )}
-
-              <div>
+              {/* Slip Upload */}
+              <div className="p-4 bg-warning/10 border border-warning/30 rounded-lg">
                 <label className="block text-sm font-medium text-brown-200 mb-2">
-                  จำนวนเงินจริงที่โอน
+                  อัพโหลดสลิปการโอนเงิน <span className="text-error">*</span>
                 </label>
-                <input
-                  type="number"
-                  value={actualAmount}
-                  onChange={(e) => setActualAmount(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:ring-2 focus:ring-gold-500"
-                  placeholder={selectedWithdrawal.amount.toString()}
-                />
-                <p className="text-xs text-brown-500 mt-1">
-                  หากไม่ระบุ จะใช้จำนวนเดิม {formatCurrency(selectedWithdrawal.amount)}
-                </p>
+                <div className="space-y-3">
+                  <label className="block cursor-pointer">
+                    <div className="flex items-center justify-center gap-3 px-4 py-3 bg-admin-bg hover:bg-admin-hover border-2 border-dashed border-admin-border hover:border-gold-500 rounded-lg transition-all">
+                      <FiUpload className="w-5 h-5 text-gold-500" />
+                      <span className="text-brown-200 font-medium">
+                        {slipFile ? slipFile.name : 'เลือกไฟล์สลิป'}
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/gif"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      disabled={uploadingSlip}
+                    />
+                  </label>
+                  {uploadingSlip && (
+                    <div className="flex items-center gap-2 text-warning text-sm">
+                      <div className="animate-spin w-4 h-4 border-2 border-warning border-t-transparent rounded-full"></div>
+                      <span>กำลังอัพโหลด...</span>
+                    </div>
+                  )}
+                  {slipUrl && !uploadingSlip && (
+                    <div className="flex items-center gap-2 text-success text-sm">
+                      <FiCheckCircle className="w-4 h-4" />
+                      <span>อัพโหลดสำเร็จ</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-brown-500 mt-2">รองรับไฟล์ JPG, PNG, GIF ขนาดไม่เกิน 10MB</p>
               </div>
 
               <div>
@@ -569,7 +502,7 @@ export default function WithdrawalsPending() {
               <button
                 onClick={handleApprove}
                 className="flex-1 px-4 py-2.5 bg-success hover:bg-success/90 text-white rounded-lg transition-all disabled:opacity-50 font-semibold shadow-lg"
-                disabled={processing || (paymentMethod === 'manual' && !slipUrl)}
+                disabled={processing || !slipUrl}
               >
                 {processing ? 'กำลังดำเนินการ...' : 'ยืนยันอนุมัติ'}
               </button>
