@@ -45,7 +45,8 @@ const LotteryManagement: React.FC = () => {
     icon: '',
     status: true,
     flagNextday: false,
-    has4d: false
+    has4d: false,
+    detail: ''
   })
 
   useEffect(() => {
@@ -88,7 +89,8 @@ const LotteryManagement: React.FC = () => {
       icon: '',
       status: true,
       flagNextday: false,
-      has4d: false
+      has4d: false,
+      detail: ''
     })
     setModalOpen(true)
   }
@@ -127,7 +129,8 @@ const LotteryManagement: React.FC = () => {
           icon: lotteryData.icon ?? '',
           status: Boolean(lotteryData.status),
           flagNextday: Boolean(lotteryData.flagNextday),
-          has4d: Boolean(lotteryData.has4d || lotteryData.hauy4)
+          has4d: Boolean(lotteryData.has4d || lotteryData.hauy4),
+          detail: lotteryData.detail ?? ''
         })
         setLoadingModal(false)
       }, 100)
@@ -155,7 +158,8 @@ const LotteryManagement: React.FC = () => {
         icon: formData.icon || null,
         flagNextday: formData.flagNextday ? 1 : 0,
         has4d: formData.has4d ? 1 : 0,
-        status: formData.status ? 1 : 0
+        status: formData.status ? 1 : 0,
+        detail: formData.detail || ''
       }
 
       // สำหรับ create เท่านั้น
@@ -755,6 +759,17 @@ const LotteryManagement: React.FC = () => {
                     <option value="1">เปิดใช้งาน</option>
                     <option value="0">ปิดใช้งาน</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-300 mb-1">กติกา (Detail)</label>
+                  <textarea
+                    value={formData.detail}
+                    onChange={(e) => setFormData({ ...formData, detail: e.target.value })}
+                    className="w-full px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-200 focus:ring-2 focus:ring-gold-500 focus:border-transparent min-h-[120px]"
+                    placeholder="กรอกกติกาหวย (รองรับ HTML)"
+                  />
+                  <p className="text-xs text-brown-500 mt-1">สามารถใส่ HTML ได้ เช่น &lt;b&gt;, &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;</p>
                 </div>
               </div>
             )}
