@@ -22,7 +22,6 @@ import {
   FiAward,
   FiImage,
   FiMessageSquare,
-  FiUserPlus,
   FiRepeat,
 } from 'react-icons/fi'
 
@@ -126,7 +125,7 @@ export default function AdminLayout() {
         { name: 'ภาพรวม', path: '/admin/turnover/overview', icon: null },
         { name: 'สมาชิกและเทิร์น', path: '/admin/turnover/members', icon: null },
         { name: 'ประวัติการแลก', path: '/admin/turnover/redemptions', icon: null },
-        { name: 'ตั้งค่าระบบ', path: '/admin/turnover/settings', icon: null },
+        { name: 'ตั้งค่าระบบ', path: '/admin/turnover', icon: null },
       ],
     },
     {
@@ -149,15 +148,6 @@ export default function AdminLayout() {
         { name: 'ตั้งค่าโปรโมชั่น', path: '/admin/promotion-settings', icon: null },
         { name: 'สรุปโปรโมชั่น', path: '/admin/promotion-summary', icon: null },
         { name: 'ประวัติ Logs', path: '/admin/promotion-logs', icon: null },
-      ],
-    },
-    {
-      name: 'ระบบแนะนำเพื่อน',
-      path: '/admin/referral',
-      icon: <FiUserPlus className="w-5 h-5" />,
-      children: [
-        { name: 'จัดการแนะนำเพื่อน', path: '/admin/referral', icon: null },
-        { name: 'ตั้งค่าคอมมิชชั่น', path: '/admin/referral/settings', icon: null },
       ],
     },
     {

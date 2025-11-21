@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FiSave, FiAlertCircle } from 'react-icons/fi'
+import { FiSave, FiAlertCircle, FiUsers } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
 interface TurnoverConfig {
@@ -13,6 +13,19 @@ interface TurnoverConfig {
   lotteryTurnoverMultiplier: number
   gameTurnoverMultiplier: number
   description: string
+}
+
+interface ReferralSetting {
+  id: number
+  level: number
+  name: string
+  commission: number
+  gameCommission: number
+  lotteryCommissionEnabled: boolean
+  gameCommissionEnabled: boolean
+  minDeposit: number
+  minTurnover: number
+  enabled: boolean
 }
 
 export default function TurnoverSettings() {
@@ -30,25 +43,42 @@ export default function TurnoverSettings() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [referralSettings, setReferralSettings] = useState<ReferralSetting[]>([])
 
   useEffect(() => {
     fetchConfig()
+    fetchReferralSettings()
   }, [])
 
   const fetchConfig = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/v1/admin/turnover/config', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
-        },
-        credentials: 'include',
-      })
 
-      const data = await response.json()
+      // Fetch both configs in parallel
+      const [configRes, referralRes] = await Promise.all([
+        fetch('/api/v1/admin/turnover/config', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
+          },
+          credentials: 'include',
+        }),
+        fetch('/api/v1/admin/referral/settings', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
+          },
+          credentials: 'include',
+        })
+      ])
 
-      if (data.success && data.data) {
-        setConfig(data.data)
+      const configData = await configRes.json()
+      const referralData = await referralRes.json()
+
+      if (configData.success && configData.data) {
+        setConfig(configData.data)
+      }
+
+      if (referralData.success && referralData.data) {
+        setReferralSettings(referralData.data)
       }
     } catch (error) {
       console.error('Failed to fetch config:', error)
@@ -56,6 +86,58 @@ export default function TurnoverSettings() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const fetchReferralSettings = async () => {
+    try {
+      const response = await fetch('/api/v1/admin/referral/settings', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
+        },
+        credentials: 'include',
+      })
+
+      const data = await response.json()
+      if (data.success && data.data) {
+        setReferralSettings(data.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch referral settings:', error)
+    }
+  }
+
+  const handleSaveReferralSettings = async () => {
+    try {
+      setIsSaving(true)
+      const response = await fetch('/api/v1/admin/referral/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
+        },
+        credentials: 'include',
+        body: JSON.stringify({ settings: referralSettings }),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        toast.success('บันทึกการตั้งค่าค่าคอมมิชชั่นสำเร็จ')
+        fetchReferralSettings()
+      } else {
+        toast.error(data.message || 'เกิดข้อผิดพลาด')
+      }
+    } catch (error) {
+      console.error('Failed to save referral settings:', error)
+      toast.error('ไม่สามารถบันทึกการตั้งค่าได้')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const updateReferralSetting = (id: number, field: keyof ReferralSetting, value: any) => {
+    setReferralSettings(prev =>
+      prev.map(s => (s.id === id ? { ...s, [field]: value } : s))
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -245,6 +327,95 @@ export default function TurnoverSettings() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Affiliate Commission Settings */}
+        <div className="bg-admin-card border border-admin-border rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <FiUsers className="text-gold-500" />
+            <h3 className="text-lg font-semibold text-brown-100">ตั้งค่าค่าคอมมิชชั่นแนะนำเพื่อน</h3>
+          </div>
+
+          {referralSettings.length > 0 && (
+            <div className="space-y-6">
+              {referralSettings.filter(s => s.level === 1).map((setting) => (
+                <div key={setting.id} className="space-y-4">
+                  {/* Lottery Commission */}
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-brown-200 font-medium">ค่าคอมหวย</span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={setting.lotteryCommissionEnabled}
+                          onChange={(e) => updateReferralSetting(setting.id, 'lotteryCommissionEnabled', e.target.checked)}
+                          className="w-4 h-4 text-gold-500 bg-admin-bg border-admin-border rounded focus:ring-gold-500"
+                        />
+                        <span className="text-brown-400 text-sm">เปิดใช้งาน</span>
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={setting.commission}
+                        onChange={(e) => updateReferralSetting(setting.id, 'commission', parseFloat(e.target.value))}
+                        className="w-24 px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:border-gold-500"
+                      />
+                      <span className="text-brown-400">%</span>
+                      <span className="text-brown-500 text-sm ml-2">
+                        ตัวอย่าง: แทงหวย 100 บาท = ค่าคอม {(100 * setting.commission / 100).toFixed(2)} บาท
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Game Commission */}
+                  <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-brown-200 font-medium">ค่าคอมเกมส์</span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={setting.gameCommissionEnabled}
+                          onChange={(e) => updateReferralSetting(setting.id, 'gameCommissionEnabled', e.target.checked)}
+                          className="w-4 h-4 text-gold-500 bg-admin-bg border-admin-border rounded focus:ring-gold-500"
+                        />
+                        <span className="text-brown-400 text-sm">เปิดใช้งาน</span>
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={setting.gameCommission}
+                        onChange={(e) => updateReferralSetting(setting.id, 'gameCommission', parseFloat(e.target.value))}
+                        className="w-24 px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-100 focus:outline-none focus:border-gold-500"
+                      />
+                      <span className="text-brown-400">%</span>
+                      <span className="text-brown-500 text-sm ml-2">
+                        ตัวอย่าง: เล่นเกมส์ 1000 บาท = ค่าคอม {(1000 * setting.gameCommission / 100).toFixed(2)} บาท
+                      </span>
+                    </div>
+                    <p className="text-brown-500 text-xs mt-2">
+                      * แนะนำ 0.1% เนื่องจากยอดเทิร์นเกมส์มีจำนวนมาก
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={handleSaveReferralSettings}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all disabled:opacity-50"
+                disabled={isSaving}
+              >
+                <FiSave className="w-4 h-4" />
+                บันทึกค่าคอมมิชชั่น
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Description */}

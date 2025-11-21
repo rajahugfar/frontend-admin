@@ -70,10 +70,6 @@ import Verify2FA from '@pages/admin/Verify2FA';
 // Chat
 import ChatManagement from '@pages/admin/ChatManagement';
 
-// Referral
-import ReferralManagement from '@pages/admin/ReferralManagement';
-import ReferralSettings from '@pages/admin/ReferralSettings';
-
 // Lucky Wheel
 import LuckyWheelManagement from '@pages/admin/LuckyWheelManagement';
 
@@ -81,7 +77,7 @@ import LuckyWheelManagement from '@pages/admin/LuckyWheelManagement';
 import TurnoverOverview from '@pages/admin/TurnoverOverview';
 import TurnoverMembers from '@pages/admin/TurnoverMembers';
 import TurnoverRedemptions from '@pages/admin/TurnoverRedemptions';
-import TurnoverSettings from '@pages/admin/TurnoverSettings';
+import TurnoverManagement from '@pages/admin/TurnoverManagement';
 
 // System
 import AdminLogs from '@pages/admin/AdminLogs';
@@ -215,22 +211,22 @@ function App() {
           {/* Chat */}
           <Route path="chat" element={<ChatManagement />} />
 
-          {/* Referral */}
-          <Route path="referral">
-            <Route index element={<ReferralManagement />} />
-            <Route path="settings" element={<ReferralSettings />} />
-          </Route>
-
           {/* Lucky Wheel */}
           <Route path="lucky-wheel" element={<LuckyWheelManagement />} />
 
-          {/* Turnover */}
+          {/* Turnover (unified with referral) */}
           <Route path="turnover">
-            <Route index element={<Navigate to="/admin/turnover/overview" replace />} />
+            <Route index element={<TurnoverManagement />} />
             <Route path="overview" element={<TurnoverOverview />} />
             <Route path="members" element={<TurnoverMembers />} />
             <Route path="redemptions" element={<TurnoverRedemptions />} />
-            <Route path="settings" element={<TurnoverSettings />} />
+            <Route path="settings" element={<TurnoverManagement />} />
+          </Route>
+
+          {/* Referral redirects to turnover */}
+          <Route path="referral">
+            <Route index element={<Navigate to="/admin/turnover" replace />} />
+            <Route path="settings" element={<Navigate to="/admin/turnover" replace />} />
           </Route>
 
           {/* System */}
