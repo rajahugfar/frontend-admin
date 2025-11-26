@@ -363,6 +363,7 @@ export const adminMemberAPI = {
       bankName?: string
       bankAccount?: string
       lineId?: string
+      affiliateRate?: number | null
     }
   ) => {
     const response = await adminAPIClient.put(`/members/${memberId}`, data)

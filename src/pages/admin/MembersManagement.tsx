@@ -27,6 +27,7 @@ interface Member {
   createdAt: string
   gameUsername?: string
   gamePassword?: string
+  affiliateRate?: number | null
 }
 
 export default function MembersManagement() {
