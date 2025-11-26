@@ -15,6 +15,7 @@ interface Member {
   status: 'active' | 'inactive' | 'banned'
   gameUsername?: string
   gamePassword?: string
+  affiliateRate?: number | null
 }
 
 interface EditMemberModalProps {
@@ -54,6 +55,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
     gameUsername: '',
     gamePassword: '',
     remark: '',
+    affiliateRate: '' as string,
   })
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
         gameUsername: member.gameUsername || '',
         gamePassword: member.gamePassword || '',
         remark: '',
+        affiliateRate: member.affiliateRate != null ? String(member.affiliateRate) : '',
       })
     }
   }, [member])
@@ -104,6 +107,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
         bankName: formData.bankCode,
         bankAccount: formData.bankNumber,
         lineId: formData.line || undefined,
+        affiliateRate: formData.affiliateRate ? parseFloat(formData.affiliateRate) : null,
       })
 
       // Update status if changed
@@ -255,6 +259,28 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
                 placeholder="ไลน์ไอดี (ถ้ามี)"
                 className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
               />
+            </div>
+
+            {/* Affiliate Rate */}
+            <div>
+              <label htmlFor="affiliateRate" className="block text-sm font-medium text-brown-300 mb-2">
+                % แยกการได้รับ Ref
+              </label>
+              <input
+                type="number"
+                id="affiliateRate"
+                name="affiliateRate"
+                value={formData.affiliateRate}
+                onChange={handleChange}
+                placeholder="เว้นว่างเพื่อใช้ค่าเริ่มต้นของระบบ"
+                step="0.01"
+                min="0"
+                max="100"
+                className="w-full px-4 py-2 bg-admin-card border border-admin-border rounded-lg text-brown-200 placeholder-brown-500 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
+              />
+              <p className="text-xs text-brown-400 mt-1">
+                ถ้าเว้นว่าง จะใช้ค่าเริ่มต้นจากการตั้งค่าระบบ
+              </p>
             </div>
 
             {/* Status */}
