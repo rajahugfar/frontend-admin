@@ -60,6 +60,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
 
   useEffect(() => {
     if (member) {
+      console.log('Member data:', member)
       setFormData({
         phone: member.phone || '',
         password: '',
