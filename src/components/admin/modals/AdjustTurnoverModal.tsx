@@ -36,8 +36,9 @@ export default function AdjustTurnoverModal({ member, onClose, onSuccess }: Prop
 
     try {
       setIsSubmitting(true)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
-      const response = await fetch(`/api/v1/admin/turnover/members/${member.memberId}/adjust`, {
+      const response = await fetch(`${apiUrl}/api/v1/admin/turnover/members/${member.memberId}/adjust`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

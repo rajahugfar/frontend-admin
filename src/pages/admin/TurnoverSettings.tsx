@@ -53,10 +53,11 @@ export default function TurnoverSettings() {
   const fetchConfig = async () => {
     try {
       setIsLoading(true)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
       // Fetch both configs in parallel
       const [configRes, referralRes] = await Promise.all([
-        fetch('/api/v1/admin/turnover/config', {
+        fetch(`${apiUrl}/api/v1/admin/turnover/config`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
           },
@@ -145,7 +146,8 @@ export default function TurnoverSettings() {
 
     try {
       setIsSaving(true)
-      const response = await fetch('/api/v1/admin/turnover/config', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/turnover/config`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

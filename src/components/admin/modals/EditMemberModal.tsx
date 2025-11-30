@@ -61,6 +61,12 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
   useEffect(() => {
     if (member) {
       console.log('Member data:', member)
+      console.log('affiliateRate value:', member.affiliateRate)
+      console.log('affiliateRate type:', typeof member.affiliateRate)
+
+      const affiliateRateValue = member.affiliateRate != null ? String(member.affiliateRate) : ''
+      console.log('Setting affiliateRate to:', affiliateRateValue)
+
       setFormData({
         phone: member.phone || '',
         password: '',
@@ -72,7 +78,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSuccess }: 
         gameUsername: member.gameUsername || '',
         gamePassword: member.gamePassword || '',
         remark: '',
-        affiliateRate: member.affiliateRate != null ? String(member.affiliateRate) : '',
+        affiliateRate: affiliateRateValue,
       })
     }
   }, [member])

@@ -38,7 +38,8 @@ export default function TurnoverRedemptions() {
         endDate: dateFilter.endDate,
       })
 
-      const response = await fetch(`/api/v1/admin/turnover/transactions?${params}`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/turnover/transactions?${params}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
         },

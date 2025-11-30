@@ -113,9 +113,10 @@ export default function TurnoverManagement() {
   const fetchAllData = async () => {
     try {
       setIsLoading(true)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
       const [configRes, settingsRes, statsRes, usersRes, withdrawalsRes] = await Promise.all([
-        fetch('/api/v1/admin/turnover/config', {
+        fetch(`${apiUrl}/api/v1/admin/turnover/config`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('admin_selector')}` },
           credentials: 'include',
         }).then(res => res.json()).catch(() => ({ data: null })),
@@ -158,7 +159,8 @@ export default function TurnoverManagement() {
   const handleSaveConfig = async () => {
     try {
       setIsSaving(true)
-      const response = await fetch('/api/v1/admin/turnover/config', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/turnover/config`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
