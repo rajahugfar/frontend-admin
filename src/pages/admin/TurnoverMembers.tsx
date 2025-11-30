@@ -46,8 +46,9 @@ export default function TurnoverMembers() {
   const fetchMembers = async () => {
     try {
       setIsLoading(true)
-      // Use /admin/members endpoint instead which works on production
-      const response = await fetch('/api/v1/admin/members?limit=1000', {
+      // Use backend API directly to avoid nginx routing issues
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/members?limit=1000`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
         },
