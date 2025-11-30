@@ -46,18 +46,30 @@ export default function TurnoverMembers() {
   const fetchMembers = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/v1/admin/turnover/members', {
+      // Use /admin/members endpoint instead which works on production
+      const response = await fetch('/api/v1/admin/members?limit=1000', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('admin_selector')}`,
         },
         credentials: 'include',
       })
 
-      const data = await response.json()
+      const result = await response.json()
 
-      if (data.success && data.data) {
-        setMembers(data.data)
-        setFilteredMembers(data.data)
+      if (result.status === 'success' && result.data && result.data.members) {
+        // Transform admin members API to turnover format
+        const transformedMembers = result.data.members.map((m: any) => ({
+          memberId: m.id,
+          phone: m.phone,
+          fullname: m.fullname,
+          turnoverBalance: m.turnoverBalance || 0,
+          turnoverLifetime: m.turnoverLifetime || 0,
+          turnoverRedeemed: m.turnoverRedeemedLifetime || 0,
+          turnoverLastRedeemAt: m.turnoverLastRedeemAt || null,
+          turnoverUpdatedAt: m.turnoverUpdatedAt || m.updatedAt || m.createdAt,
+        }))
+        setMembers(transformedMembers)
+        setFilteredMembers(transformedMembers)
       }
     } catch (error) {
       console.error('Failed to fetch members:', error)
