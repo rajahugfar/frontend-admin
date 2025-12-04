@@ -6,8 +6,30 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/th'
 import LotteryDetailModal from '@/components/admin/modals/LotteryDetailModal'
 import HuayConfigModal from '@/components/admin/modals/HuayConfigModal'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 
 dayjs.locale('th')
+
+// ReactQuill modules configuration
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'color': [] }, { 'background': [] }],
+    ['link'],
+    ['clean']
+  ],
+}
+
+const quillFormats = [
+  'header',
+  'bold', 'italic', 'underline', 'strike',
+  'list', 'bullet',
+  'color', 'background',
+  'link'
+]
 
 const LotteryManagement: React.FC = () => {
   const [lotteries, setLotteries] = useState<Lottery[]>([])
@@ -762,14 +784,64 @@ const LotteryManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-300 mb-1">กติกา (Detail)</label>
-                  <textarea
-                    value={formData.detail}
-                    onChange={(e) => setFormData({ ...formData, detail: e.target.value })}
-                    className="w-full px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-200 focus:ring-2 focus:ring-gold-500 focus:border-transparent min-h-[120px]"
-                    placeholder="กรอกกติกาหวย (รองรับ HTML)"
-                  />
-                  <p className="text-xs text-brown-500 mt-1">สามารถใส่ HTML ได้ เช่น &lt;b&gt;, &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;</p>
+                  <label className="block text-sm font-medium text-brown-300 mb-2">กติกา (Detail)</label>
+                  <div className="rounded-lg overflow-hidden border border-admin-border" style={{ minHeight: '300px' }}>
+                    <style>{`
+                      .ql-toolbar {
+                        background-color: #2a2420 !important;
+                        border-bottom: 1px solid #4a3f35 !important;
+                        border-top-left-radius: 0.5rem;
+                        border-top-right-radius: 0.5rem;
+                      }
+                      .ql-toolbar .ql-stroke {
+                        stroke: #c9a876 !important;
+                      }
+                      .ql-toolbar .ql-fill {
+                        fill: #c9a876 !important;
+                      }
+                      .ql-toolbar .ql-picker-label {
+                        color: #c9a876 !important;
+                      }
+                      .ql-toolbar button:hover,
+                      .ql-toolbar button.ql-active {
+                        background-color: #3a3025 !important;
+                      }
+                      .ql-container {
+                        background-color: #1a1614 !important;
+                        border-bottom-left-radius: 0.5rem;
+                        border-bottom-right-radius: 0.5rem;
+                        font-family: inherit !important;
+                      }
+                      .ql-editor {
+                        color: #e8dcc8 !important;
+                        min-height: 250px;
+                        font-size: 14px;
+                      }
+                      .ql-editor.ql-blank::before {
+                        color: #6b5d4f !important;
+                        font-style: italic;
+                      }
+                      .ql-snow .ql-picker-options {
+                        background-color: #2a2420 !important;
+                        border: 1px solid #4a3f35 !important;
+                      }
+                      .ql-snow .ql-picker-options .ql-picker-item {
+                        color: #c9a876 !important;
+                      }
+                      .ql-snow .ql-picker-options .ql-picker-item:hover {
+                        background-color: #3a3025 !important;
+                      }
+                    `}</style>
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.detail}
+                      onChange={(value) => setFormData({ ...formData, detail: value })}
+                      modules={quillModules}
+                      formats={quillFormats}
+                      placeholder="กรอกกติกาหวย..."
+                    />
+                  </div>
+                  <p className="text-xs text-brown-500 mt-2">ใช้ HTML Editor สำหรับจัดรูปแบบข้อความ</p>
                 </div>
               </div>
             )}
