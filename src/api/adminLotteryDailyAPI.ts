@@ -146,6 +146,17 @@ export const adminLotteryDailyAPI = {
   },
 
   /**
+   * Fetch and process lottery result (re-fetch from API and re-process)
+   */
+  fetchAndProcess: async (date: string) => {
+    const response = await adminAPIClient.post<{ status: string; message: string; data?: any }>(
+      `/lottery/daily/fetch-and-process`,
+      { date }
+    );
+    return response.data;
+  },
+
+  /**
    * Save lottery result
    */
   saveResult: async (payload: {

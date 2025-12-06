@@ -182,6 +182,27 @@ const LotteryDaily: React.FC = () => {
     }
   }, [fetchData]);
 
+  const handleFetchAndProcess = useCallback(async () => {
+    try {
+      setLoading(true);
+      toast.loading('กำลังดึงผลและประมวลผลหวย...', { id: 'fetch-process' });
+
+      const response = await adminLotteryDailyAPI.fetchAndProcess(selectedDate);
+
+      if (response.status === 'success') {
+        toast.success(response.message || 'ประมวลผลเรียบร้อย', { id: 'fetch-process' });
+        fetchData(); // Reload data
+      } else {
+        toast.error(response.message || 'เกิดข้อผิดพลาด', { id: 'fetch-process' });
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch and process:', error);
+      toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาดในการประมวลผล', { id: 'fetch-process' });
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedDate, fetchData]);
+
   const getStatusBadge = useCallback((status: number) => {
     switch (status) {
       case 1:
@@ -335,7 +356,7 @@ const LotteryDaily: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">ค้นหา</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">ค้นหา / การประมวลผล</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -351,6 +372,15 @@ const LotteryDaily: React.FC = () => {
               >
                 <FaSearch />
                 ค้นหา
+              </button>
+              <button
+                onClick={handleFetchAndProcess}
+                disabled={loading}
+                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-medium rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                title="ดึงผลและประมวลผลหวยที่ยังไม่ประมวล"
+              >
+                <FaPlay />
+                ประมวลผล
               </button>
             </div>
           </div>
