@@ -121,22 +121,22 @@ export default function TurnoverManagement() {
           credentials: 'include',
         }).then(res => res.json()).catch(() => ({ data: null })),
 
-        fetch('/api/v1/admin/referral/settings', {
+        fetch(`${apiUrl}/api/v1/admin/referral/settings`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('admin_selector')}` },
           credentials: 'include',
         }).then(res => res.json()).catch(() => ({ data: [] })),
 
-        fetch('/api/v1/admin/referral/stats', {
+        fetch(`${apiUrl}/api/v1/admin/referral/stats`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('admin_selector')}` },
           credentials: 'include',
         }).then(res => res.json()).catch(() => ({ data: null })),
 
-        fetch('/api/v1/admin/referral/users', {
+        fetch(`${apiUrl}/api/v1/admin/referral/users`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('admin_selector')}` },
           credentials: 'include',
         }).then(res => res.json()).catch(() => ({ data: [] })),
 
-        fetch('/api/v1/admin/referral/withdrawals/pending', {
+        fetch(`${apiUrl}/api/v1/admin/referral/withdrawals/pending`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('admin_selector')}` },
           credentials: 'include',
         }).then(res => res.json()).catch(() => ({ data: [] })),
@@ -186,7 +186,8 @@ export default function TurnoverManagement() {
   const handleSaveReferralSettings = async () => {
     try {
       setIsSaving(true)
-      const response = await fetch('/api/v1/admin/referral/settings', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/referral/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +227,8 @@ export default function TurnoverManagement() {
     if (!reason) return
 
     try {
-      const response = await fetch(`/api/v1/admin/referral/withdrawals/${withdrawal.id}/reject`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/referral/withdrawals/${withdrawal.id}/reject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +251,8 @@ export default function TurnoverManagement() {
     if (!selectedWithdrawal) return
 
     try {
-      const response = await fetch(`/api/v1/admin/referral/withdrawals/${selectedWithdrawal.id}/approve`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/v1/admin/referral/withdrawals/${selectedWithdrawal.id}/approve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
