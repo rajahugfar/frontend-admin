@@ -62,17 +62,22 @@ const LotteryBetsGrouped: React.FC = () => {
     }
   };
 
+  // Helper to get field value from both camelCase and snake_case
+  const getField = (obj: any, camelCase: string, snake_case: string) => {
+    return obj[camelCase] ?? obj[snake_case];
+  };
+
   const groupPoysByLottery = (poys: PoyHeader[]) => {
     const grouped = new Map<number, LotteryGroup>();
 
     poys.forEach((poy) => {
-      const stockId = poy.stock_id;
+      const stockId = getField(poy, 'stockId', 'stock_id');
       if (!grouped.has(stockId)) {
         grouped.set(stockId, {
           stock_id: stockId,
-          stock_name: poy.stockName || poy.note || 'ไม่ระบุ',
-          huay_code: poy.huayCode || '',
-          huay_time: poy.huay_time || '',
+          stock_name: getField(poy, 'stockName', 'stockName') || getField(poy, 'note', 'note') || 'ไม่ระบุ',
+          huay_code: getField(poy, 'huayCode', 'huay_code') || '',
+          huay_time: getField(poy, 'huayTime', 'huay_time') || '',
           stock_status: poy.status,
           poys: [],
           totalPoys: 0,
@@ -88,8 +93,8 @@ const LotteryBetsGrouped: React.FC = () => {
       const group = grouped.get(stockId)!;
       group.poys.push(poy);
       group.totalPoys++;
-      group.totalBets += parseFloat(poy.totalprice?.toString() || '0');
-      group.totalWins += parseFloat(poy.win_price?.toString() || '0');
+      group.totalBets += parseFloat(getField(poy, 'totalPrice', 'totalprice')?.toString() || '0');
+      group.totalWins += parseFloat(getField(poy, 'winPrice', 'win_price')?.toString() || '0');
 
       if (poy.status === 1) group.activePoys++;
       else if (poy.status === 2) group.completedPoys++;
@@ -430,20 +435,20 @@ const LotteryBetsGrouped: React.FC = () => {
                               }`}
                             >
                               <td className="px-4 py-3">
-                                <span className="text-white font-medium">{poy.poy_number || '-'}</span>
+                                <span className="text-white font-medium">{getField(poy, 'poyNumber', 'poy_number') || '-'}</span>
                               </td>
                               <td className="px-4 py-3">
-                                <div className="text-white text-sm">{poy.poy_name?.split(' - ')[1] || '-'}</div>
-                                <div className="text-xs text-gray-400">{poy.member_id}</div>
+                                <div className="text-white text-sm">{getField(poy, 'poyName', 'poy_name') || '-'}</div>
+                                <div className="text-xs text-gray-400">{getField(poy, 'memberId', 'member_id')}</div>
                               </td>
                               <td className="px-4 py-3 text-center text-gray-300 text-sm">
-                                {formatDateTime(poy.date_buy)}
+                                {formatDateTime(getField(poy, 'dateBuy', 'date_buy'))}
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <span className="text-blue-400 font-medium">{formatCurrency(parseFloat(poy.totalprice?.toString() || '0'))}</span>
+                                <span className="text-blue-400 font-medium">{formatCurrency(parseFloat(getField(poy, 'totalPrice', 'totalprice')?.toString() || '0'))}</span>
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <span className="text-warning font-medium">{formatCurrency(parseFloat(poy.win_price?.toString() || '0'))}</span>
+                                <span className="text-warning font-medium">{formatCurrency(parseFloat(getField(poy, 'winPrice', 'win_price')?.toString() || '0'))}</span>
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex justify-center">{getStatusBadge(poy.status)}</div>
