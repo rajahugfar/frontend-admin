@@ -690,7 +690,18 @@ const LotteryManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-300 mb-2">วันที่เปิดหวย</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-brown-300">วันที่เปิดหวย</label>
+                    {formData.dateOpent.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, dateOpent: [] })}
+                        className="text-xs text-error hover:text-error/80 underline"
+                      >
+                        ล้างทั้งหมด
+                      </button>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
                       <label key={day} className="flex items-center cursor-pointer">
@@ -698,27 +709,42 @@ const LotteryManagement: React.FC = () => {
                           type="checkbox"
                           checked={formData.dateOpent.includes(day)}
                           onChange={() => toggleDateOpent(day)}
-                          disabled={formData.opentFix !== ''}
                           className="mr-2 w-4 h-4 text-gold-500 bg-admin-bg border-admin-border rounded focus:ring-gold-500 focus:ring-2"
                         />
                         <span className="text-sm text-brown-300">{getDayNameFull(day)}</span>
                       </label>
                     ))}
                   </div>
+                  {formData.opentFix !== '' && (
+                    <p className="text-xs text-warning mt-2">⚠️ หากเลือกวันในสัปดาห์ ค่า "Fix วันเปิด" จะถูกล้างอัตโนมัติ</p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-brown-300 mb-1">
-                    Fix วันเปิด <span className="text-xs text-brown-500">(เช่น 1,16 หรือ 17,27)</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-brown-300">
+                      Fix วันเปิด <span className="text-xs text-brown-500">(เช่น 1,16 หรือ 17,27)</span>
+                    </label>
+                    {formData.opentFix !== '' && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, opentFix: '' })}
+                        className="text-xs text-error hover:text-error/80 underline"
+                      >
+                        ล้างค่า
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     value={formData.opentFix}
                     onChange={(e) => setFormData({ ...formData, opentFix: e.target.value, dateOpent: [] })}
-                    disabled={formData.dateOpent.length > 0}
-                    className="w-full px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-200 focus:ring-2 focus:ring-gold-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2 bg-admin-bg border border-admin-border rounded-lg text-brown-200 focus:ring-2 focus:ring-gold-500 focus:border-transparent"
                     placeholder="17,27"
                   />
+                  {formData.dateOpent.length > 0 && (
+                    <p className="text-xs text-warning mt-2">⚠️ หากกรอก "Fix วันเปิด" วันในสัปดาห์ที่เลือกจะถูกล้างอัตโนมัติ</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
