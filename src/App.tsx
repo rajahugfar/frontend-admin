@@ -48,6 +48,7 @@ import ProfitReport from '@pages/admin/ProfitReport';
 import LotteryManagement from '@pages/admin/LotteryManagement';
 import LotteryBets from '@pages/admin/LotteryBets'; // Poy (โพยเกม)
 import LotteryBetsPage from '@pages/admin/LotteryBetsPage'; // Lottery Bets (หวย)
+import LotteryBetsGrouped from '@pages/admin/LotteryBetsGrouped'; // Lottery Bets Grouped (หวยแบ่งกลุ่ม)
 import StockMasterList from '@pages/admin/StockMasterList';
 import LotteryDaily from '@pages/admin/LotteryDaily';
 import LotteryDailyDetail from '@pages/admin/LotteryDailyDetail';
@@ -186,7 +187,8 @@ function App() {
             <Route path="daily" element={<LotteryDaily />} />
             <Route path="daily/:lotteryId" element={<LotteryDailyDetail />} />
             <Route path="management" element={<LotteryManagement />} />
-            <Route path="bets" element={<LotteryBetsPage />} /> {/* หวย */}
+            <Route path="bets" element={<LotteryBetsGrouped />} /> {/* หวยแบ่งกลุ่ม */}
+            <Route path="bets-all" element={<LotteryBetsPage />} /> {/* หวยทั้งหมด */}
             <Route path="poys" element={<LotteryBets />} /> {/* โพยเกม */}
             <Route path="poy/:poyId" element={<AdminPoyDetail />} />
             <Route path="stock-master" element={<StockMasterList />} />

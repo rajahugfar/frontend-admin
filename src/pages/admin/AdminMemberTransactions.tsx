@@ -55,15 +55,24 @@ const AdminMemberTransactions: React.FC = () => {
       }
 
       // Load transactions
-      const txRes = await adminAPIClient.get(`/members/${memberId}/transactions`);
-      if (txRes.data.status === 'success' && txRes.data.data) {
-        const txList = txRes.data.data.transactions || [];
-        console.log('Transactions:', txList);
-        if (txList.length > 0) {
-          console.log('First transaction type:', txList[0].type);
-        }
-        setTransactions(txList);
+      const txRes = await adminAPIClient.get(`/members/${memberId}/transactions?limit=1000`);
+      console.log('Transaction API Response:', txRes.data);
+
+      // Handle both response formats
+      let txList: Transaction[] = [];
+      if (txRes.data.success && txRes.data.data) {
+        // Backend format: { success: true, data: [...] }
+        txList = Array.isArray(txRes.data.data) ? txRes.data.data : [];
+      } else if (txRes.data.status === 'success' && txRes.data.data) {
+        // Alternative format: { status: 'success', data: { transactions: [...] } }
+        txList = txRes.data.data.transactions || [];
       }
+
+      console.log('Transactions loaded:', txList.length);
+      if (txList.length > 0) {
+        console.log('First transaction:', txList[0]);
+      }
+      setTransactions(txList);
     } catch (error: any) {
       console.error('Failed to load data:', error);
       toast.error('ไม่สามารถโหลดข้อมูลได้');
