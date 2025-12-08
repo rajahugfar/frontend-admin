@@ -136,14 +136,19 @@ const LotteryBetsGrouped: React.FC = () => {
     return new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
   };
 
-  const formatDateTime = (dateString: string) => {
-    const localDateString = dateString.replace('Z', '+07:00');
-    const date = new Date(localDateString);
-    return new Intl.DateTimeFormat('th-TH', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'Asia/Bangkok',
-    }).format(date);
+  const formatDateTime = (dateString: string | null | undefined) => {
+    if (!dateString) return '-';
+    try {
+      const localDateString = dateString.replace('Z', '+07:00');
+      const date = new Date(localDateString);
+      return new Intl.DateTimeFormat('th-TH', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Bangkok',
+      }).format(date);
+    } catch {
+      return '-';
+    }
   };
 
   const formatTime = (timeString: string) => {
