@@ -70,8 +70,8 @@ const LotteryBetsGrouped: React.FC = () => {
       if (!grouped.has(stockId)) {
         grouped.set(stockId, {
           stock_id: stockId,
-          stock_name: poy.poy_name?.split(' - ')[0] || 'ไม่ระบุ',
-          huay_code: poy.huay_id?.toString() || '',
+          stock_name: poy.stockName || poy.note || 'ไม่ระบุ',
+          huay_code: poy.huayCode || '',
           huay_time: poy.huay_time || '',
           stock_status: poy.status,
           poys: [],

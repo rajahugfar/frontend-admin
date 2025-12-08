@@ -7,6 +7,8 @@ import { adminAPIClient } from './adminAPI';
 export interface PoyHeader {
   id: string;
   stock_id: number;
+  stockName?: string;
+  huayCode?: string;
   member_id: string;
   huay_id: number;
   poy_type: string;
