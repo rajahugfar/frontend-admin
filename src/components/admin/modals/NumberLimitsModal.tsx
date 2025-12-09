@@ -239,7 +239,7 @@ const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
                             <div className="grid grid-cols-3 gap-4 mb-3">
                               <div>
                                 <label className="text-xs text-gray-400">เลข</label>
-                                <p className="text-white font-semibold">{limit.poyNumber || '-'}</p>
+                                <p className="text-white font-semibold break-words whitespace-normal">{limit.poyNumber || '-'}</p>
                               </div>
                               <div>
                                 <label className="text-xs text-gray-400">ราคาจ่าย</label>
