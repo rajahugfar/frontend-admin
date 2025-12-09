@@ -35,7 +35,7 @@ const LotteryDaily: React.FC = () => {
   // Payout Rates Modal
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [selectedPayoutLottery, setSelectedPayoutLottery] = useState<{
-    lotteryId: number;
+    stockId: number;  // Changed from lotteryId - now uses stock_master.id
     lotteryName: string;
   } | null>(null);
 
@@ -520,7 +520,7 @@ const LotteryDaily: React.FC = () => {
                             <button
                               onClick={() => {
                                 setSelectedPayoutLottery({
-                                  lotteryId: lottery.stockType,
+                                  stockId: lottery.id,  // Changed from stockType - now using stock_master.id
                                   lotteryName: lottery.name
                                 });
                                 setShowPayoutModal(true);
@@ -645,7 +645,7 @@ const LotteryDaily: React.FC = () => {
             setShowPayoutModal(false);
             setSelectedPayoutLottery(null);
           }}
-          lotteryId={selectedPayoutLottery.lotteryId}
+          stockId={selectedPayoutLottery.stockId}
           lotteryName={selectedPayoutLottery.lotteryName}
         />
       )}

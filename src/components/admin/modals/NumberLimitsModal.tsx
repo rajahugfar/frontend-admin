@@ -5,14 +5,14 @@ import { adminHuayLimitAPI, HuayLimit, CreateHuayLimitRequest } from '@/api/admi
 interface NumberLimitsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  lotteryId: number;
+  stockId: number;  // Changed from lotteryId - now uses stock_master.id
   lotteryName: string;
 }
 
 const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
   isOpen,
   onClose,
-  lotteryId,
+  stockId,
   lotteryName,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -41,12 +41,12 @@ const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
       });
       setExpandedGroups(initialExpanded);
     }
-  }, [isOpen, lotteryId]);
+  }, [isOpen, stockId]);
 
   const fetchLimits = async () => {
     try {
       setLoading(true);
-      const data = await adminHuayLimitAPI.getByLotteryId(lotteryId);
+      const data = await adminHuayLimitAPI.getByStockId(stockId);
       setLimits(data);
     } catch (error) {
       console.error('Failed to fetch number limits:', error);
@@ -70,7 +70,7 @@ const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
   const handleAdd = () => {
     setEditingId(-1);
     setFormData({
-      huayId: lotteryId,
+      stockId: stockId,  // Changed from huayId
       huayType: 'g',
       poyOption: '3top',
       multiply: 50,
@@ -94,7 +94,7 @@ const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
   const handleSave = async () => {
     try {
       if (editingId === -1) {
-        await adminHuayLimitAPI.create(lotteryId, formData as CreateHuayLimitRequest);
+        await adminHuayLimitAPI.create(stockId, formData as CreateHuayLimitRequest);
         alert('เพิ่มหวยอั๋นสำเร็จ');
       } else if (editingId) {
         await adminHuayLimitAPI.update(editingId, formData);

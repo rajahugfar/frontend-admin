@@ -6,7 +6,7 @@ import { adminAPIClient } from './adminAPI'
 
 export interface HuayLimit {
   id: number
-  huayId: number
+  stockId: number  // Changed from huayId - now references stock_master.id (lottery period/day)
   huayType: string // g/s/o/b
   poyOption: string // teng_bon_3, tode_3, etc.
   poyNumber?: string
@@ -16,7 +16,7 @@ export interface HuayLimit {
 }
 
 export interface CreateHuayLimitRequest {
-  huayId: number
+  stockId: number  // Changed from huayId - stock_master.id
   huayType: string
   poyOption: string
   poyNumber?: string
@@ -48,11 +48,11 @@ export const adminHuayLimitAPI = {
   },
 
   /**
-   * Get payout rates for a specific lottery
-   * @param lotteryId - The lottery ID
+   * Get payout rates for a specific stock/lottery period
+   * @param stockId - The stock ID (lottery period)
    */
-  getByLotteryId: async (lotteryId: number): Promise<HuayLimit[]> => {
-    const response = await adminAPIClient.get(`/lottery/${lotteryId}/huay-limit`)
+  getByStockId: async (stockId: number): Promise<HuayLimit[]> => {
+    const response = await adminAPIClient.get(`/stock/${stockId}/huay-limit`)
     return response.data.data || []
   },
 
@@ -67,11 +67,11 @@ export const adminHuayLimitAPI = {
 
   /**
    * Create a new payout rate
-   * @param lotteryId - The lottery ID
+   * @param stockId - The stock ID (lottery period)
    * @param data - The payout rate data
    */
-  create: async (lotteryId: number, data: CreateHuayLimitRequest): Promise<HuayLimit> => {
-    const response = await adminAPIClient.post(`/lottery/${lotteryId}/huay-limit`, data)
+  create: async (stockId: number, data: CreateHuayLimitRequest): Promise<HuayLimit> => {
+    const response = await adminAPIClient.post(`/stock/${stockId}/huay-limit`, data)
     return response.data.data
   },
 
