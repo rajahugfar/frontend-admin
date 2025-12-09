@@ -21,15 +21,19 @@ const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
   const [formData, setFormData] = useState<Partial<CreateHuayLimitRequest>>({});
   const [expandedGroups, setExpandedGroups] = useState<{ [key: string]: boolean }>({});
 
+  // Use the same poy_option values as the betting system
   const poyOptions = [
-    { value: '3top', label: 'หวย 3 ตัวบน' },
-    { value: '3tode', label: 'หวย 3 ตัวโต๊ด' },
-    { value: '3bottom', label: 'หวย 3 ตัวล่าง' },
-    { value: '2top', label: 'หวย 2 ตัวบน' },
-    { value: '2bottom', label: 'หวย 2 ตัวล่าง' },
-    { value: '2tode', label: 'หวย 2 ตัวโต๊ด' },
-    { value: 'run_top', label: 'วิ่งบน' },
-    { value: 'run_bottom', label: 'วิ่งล่าง' },
+    { value: 'teng_bon_4', label: 'หวย 4 ตัวบน' },
+    { value: 'tode_4', label: 'หวย 4 ตัวโต๊ด' },
+    { value: 'teng_bon_3', label: 'หวย 3 ตัวบน' },
+    { value: 'tode_3', label: 'หวย 3 ตัวโต๊ด' },
+    { value: 'teng_lang_3', label: 'หวย 3 ตัวล่าง' },
+    { value: 'teng_lang_nha_3', label: 'หวย 3 ตัวหน้า' },
+    { value: 'teng_bon_2', label: 'หวย 2 ตัวบน' },
+    { value: 'teng_lang_2', label: 'หวย 2 ตัวล่าง' },
+    { value: 'tode_2', label: 'หวย 2 ตัวโต๊ด' },
+    { value: 'wing_bon', label: 'วิ่งบน' },
+    { value: 'wing_lang', label: 'วิ่งล่าง' },
   ];
 
   useEffect(() => {
@@ -70,9 +74,9 @@ const NumberLimitsModal: React.FC<NumberLimitsModalProps> = ({
   const handleAdd = () => {
     setEditingId(-1);
     setFormData({
-      stockId: stockId,  // Changed from huayId
+      stockId: stockId,
       huayType: 'g',
-      poyOption: '3top',
+      poyOption: 'teng_bon_3',  // Changed to match betting system
       multiply: 50,
       pPrice: 100,
       status: 1,
