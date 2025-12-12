@@ -248,7 +248,7 @@ const LotteryManagement: React.FC = () => {
   const handleGenerateDailyStocks = async () => {
     setGeneratingStocks(true)
     try {
-      const result = await adminLotteryAPI.generateDailyStocks()
+      const result = await adminLotteryAPI.generateDailyStocks(selectedDate)
 
       if (result.errors && result.errors.length > 0) {
         if (result.created === 0) {
