@@ -83,7 +83,7 @@ export const adminWithdrawalAPI = {
     const response = await adminAPIClient.get('/withdrawals/pending', {
       params: { limit, offset },
     })
-    return response.data
+    return response.data.data
   },
 
   getWithdrawalDetails: async (id: string): Promise<WithdrawalDetailsResponse> => {
