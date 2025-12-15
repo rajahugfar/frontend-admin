@@ -243,7 +243,7 @@ export const adminWithdrawalAPI = {
     limit?: number
     offset?: number
   }) => {
-    const response = await adminAPIClient.get('/withdrawals', { params: filters })
+    const response = await adminAPIClient.get('/withdrawals/history', { params: filters })
     return response.data.data
   },
 
