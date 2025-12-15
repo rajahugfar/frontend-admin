@@ -489,8 +489,6 @@ export default function WithdrawalsPending() {
                   setSelectedWithdrawal(null)
                   setActualAmount(0)
                   setRemark('')
-                  setPaymentMethod('manual')
-                  setSelectedGateway('bitpayz')
                   setSlipUrl('')
                   setSlipFile(null)
                 }}
