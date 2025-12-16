@@ -203,7 +203,7 @@ const LimitsTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-brown-100 mb-2">วงเงินแทงหวยสูงสุดต่อวัน (บาท)</label>
+              <label className="block text-brown-100 mb-2">วงเงินแทงสูงสุดต่อหวยต่อวัน (บาท)</label>
               <input
                 type="number"
                 value={settings.lotteryMaxDailyBet}
@@ -211,7 +211,7 @@ const LimitsTab: React.FC = () => {
                 className="input"
                 placeholder="500000"
               />
-              <p className="text-xs text-brown-300 mt-1">จำกัดยอดแทงหวยต่อหวยต่อวันต่อสมาชิก</p>
+              <p className="text-xs text-brown-300 mt-1">จำกัดยอดแทงต่อหวยแต่ละชนิดต่อวัน (เช่น หวยรัฐบาล 500,000 บาท/วัน)</p>
             </div>
           </div>
         </div>
