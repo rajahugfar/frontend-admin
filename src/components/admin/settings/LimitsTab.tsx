@@ -23,6 +23,7 @@ const LimitsTab: React.FC = () => {
     cashbackTurnover: false,
     ambAuthToken: '',
     ambAuthTokenSeamless: '',
+    lotteryMaxDailyBet: 500000,
   });
 
   useEffect(() => {
@@ -52,6 +53,7 @@ const LimitsTab: React.FC = () => {
           cashbackTurnover: grouped.cashback?.site_cashback_turnover || false,
           ambAuthToken: grouped.integration?.site_amb_auth_token || '',
           ambAuthTokenSeamless: grouped.integration?.site_amb_auth_token_seamless || '',
+          lotteryMaxDailyBet: grouped.lottery?.lottery_max_daily_bet_per_stock || 500000,
         });
       }
     } catch (error) {
@@ -81,6 +83,7 @@ const LimitsTab: React.FC = () => {
         site_cashback_turnover: settings.cashbackTurnover ? 'true' : 'false',
         site_amb_auth_token: settings.ambAuthToken,
         site_amb_auth_token_seamless: settings.ambAuthTokenSeamless,
+        lottery_max_daily_bet_per_stock: settings.lotteryMaxDailyBet.toString(),
       };
       
       const response = await apiClient.put('/settings', updates);
@@ -197,6 +200,18 @@ const LimitsTab: React.FC = () => {
                 className="input"
                 placeholder="Line Notify Token"
               />
+            </div>
+
+            <div>
+              <label className="block text-brown-100 mb-2">วงเงินแทงหวยสูงสุดต่อวัน (บาท)</label>
+              <input
+                type="number"
+                value={settings.lotteryMaxDailyBet}
+                onChange={(e) => setSettings({ ...settings, lotteryMaxDailyBet: Number(e.target.value) })}
+                className="input"
+                placeholder="500000"
+              />
+              <p className="text-xs text-brown-300 mt-1">จำกัดยอดแทงหวยต่อหวยต่อวันต่อสมาชิก</p>
             </div>
           </div>
         </div>

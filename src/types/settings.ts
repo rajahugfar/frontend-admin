@@ -39,6 +39,7 @@ export interface LimitSettings {
   cashbackTurnover: boolean;
   ambAuthToken: string;
   ambAuthTokenSeamless: string;
+  lotteryMaxDailyBet: number;
 }
 
 export interface LineNotify {
