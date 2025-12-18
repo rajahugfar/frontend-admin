@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
 import { FaEdit, FaEye, FaTimes, FaHistory } from 'react-icons/fa'
+import { adminAPIClient } from '@/api/adminAPI'
 
 interface EditLog {
   id: number
@@ -48,13 +48,7 @@ export default function LotteryEditLogs() {
   const fetchEditLogs = async () => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('adminToken')
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/lottery/daily/edit-logs?limit=100&offset=0`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      const response = await adminAPIClient.get('/lottery/daily/edit-logs?limit=100&offset=0')
       setEditLogs(response.data.data.logs || [])
     } catch (error) {
       console.error('Failed to fetch edit logs:', error)
@@ -68,13 +62,7 @@ export default function LotteryEditLogs() {
     setReverseLoading(true)
     setSelectedStockId(stockId)
     try {
-      const token = localStorage.getItem('adminToken')
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/lottery/daily/${stockId}/reverse-logs`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      const response = await adminAPIClient.get(`/lottery/daily/${stockId}/reverse-logs`)
       setReverseLogs(response.data.data.logs || [])
       setShowModal(true)
     } catch (error) {
