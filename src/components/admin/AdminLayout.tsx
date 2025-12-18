@@ -106,6 +106,7 @@ export default function AdminLayout() {
         { name: 'หวยมาสเตอร์', path: '/admin/lottery', icon: null },
         { name: 'รายการหวยรายวัน', path: '/admin/lottery/daily', icon: null },
         { name: 'รายการแทง', path: '/admin/lottery/bets', icon: null },
+        { name: 'ประวัติการแก้ไขหวย', path: '/admin/lottery/edit-logs', icon: null },
       ],
     },
     {

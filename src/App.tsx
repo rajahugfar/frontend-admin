@@ -52,6 +52,7 @@ import LotteryBetsGrouped from '@pages/admin/LotteryBetsGrouped'; // Lottery Bet
 import StockMasterList from '@pages/admin/StockMasterList';
 import LotteryDaily from '@pages/admin/LotteryDaily';
 import LotteryDailyDetail from '@pages/admin/LotteryDailyDetail';
+import LotteryEditLogs from '@pages/admin/LotteryEditLogs';
 
 // Game Management
 import GameManagement from '@pages/admin/GameManagement';
@@ -186,6 +187,7 @@ function App() {
             <Route index element={<LotteryManagement />} />
             <Route path="daily" element={<LotteryDaily />} />
             <Route path="daily/:lotteryId" element={<LotteryDailyDetail />} />
+            <Route path="edit-logs" element={<LotteryEditLogs />} />
             <Route path="management" element={<LotteryManagement />} />
             <Route path="bets" element={<LotteryBetsGrouped />} /> {/* หวยแบ่งกลุ่ม */}
             <Route path="bets-all" element={<LotteryBetsPage />} /> {/* หวยทั้งหมด */}
