@@ -122,6 +122,8 @@ export default function MemberHistoryModal({ isOpen, member, onClose }: MemberHi
       'withdrawal': { label: 'ถอนเงิน', color: 'text-error', sign: '', isDeposit: false },
       'WIN_REVERSED': { label: 'หักเงินรางวัลคืน', color: 'text-error', sign: '', isDeposit: false },
       'win_reversed': { label: 'หักเงินรางวัลคืน', color: 'text-error', sign: '', isDeposit: false },
+      'LOTTERY_WIN': { label: 'ถูกรางวัล', color: 'text-success', sign: '', isDeposit: true },
+      'win': { label: 'ถูกรางวัล', color: 'text-success', sign: '', isDeposit: true },
     }
 
     return types[type] || {
