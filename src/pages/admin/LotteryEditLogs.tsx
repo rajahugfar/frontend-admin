@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
+import { FaEdit, FaEye, FaTimes, FaHistory } from 'react-icons/fa'
 
 interface EditLog {
   id: number
@@ -86,177 +87,201 @@ export default function LotteryEditLogs() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-xl">กำลังโหลด...</div>
+      <div className="min-h-screen bg-gradient-to-br from-admin-dark via-admin-darker to-black flex justify-center items-center">
+        <div className="text-xl text-gold-400">กำลังโหลด...</div>
       </div>
     )
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">ประวัติการแก้ไขผลหวย</h1>
-        <p className="text-gray-600 mt-1">
+    <div className="min-h-screen bg-gradient-to-br from-admin-dark via-admin-darker to-black p-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 rounded-2xl shadow-2xl p-8 mb-8 border border-gold-300">
+        <h1 className="text-3xl font-bold text-brown-900 mb-2 flex items-center gap-3">
+          <FaHistory className="text-4xl" />
+          ประวัติการแก้ไขผลหวย
+        </h1>
+        <p className="text-brown-800 mt-1">
           บันทึกทุกครั้งที่มีการแก้ไขผลหวยและดึงเงินรางวัลคืน
         </p>
       </div>
 
       {editLogs.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-          ไม่มีประวัติการแก้ไขหวย
+        <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border p-8 text-center">
+          <FaEdit className="text-6xl text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-400 text-lg">ไม่มีประวัติการแก้ไขหวย</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  วันที่แก้ไข
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ชื่อหวย
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  3 ตัวบน (เก่า → ใหม่)
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  2 ตัวบน (เก่า → ใหม่)
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  2 ตัวล่าง (เก่า → ใหม่)
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ดึงเงินคืน
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  การกระทำ
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {editLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {format(new Date(log.createdAt), 'dd MMM yyyy HH:mm', { locale: th })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {log.stockName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="text-red-600">{log.oldResult3Top || '-'}</span>
-                    <span className="mx-2">→</span>
-                    <span className="text-green-600 font-semibold">{log.newResult3Top || '-'}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="text-red-600">{log.oldResult2Top || '-'}</span>
-                    <span className="mx-2">→</span>
-                    <span className="text-green-600 font-semibold">{log.newResult2Top || '-'}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="text-red-600">{log.oldResult2Bottom || '-'}</span>
-                    <span className="mx-2">→</span>
-                    <span className="text-green-600 font-semibold">{log.newResult2Bottom || '-'}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="text-red-600 font-semibold">
-                      -{log.totalReversedAmount.toLocaleString()} ฿
-                    </div>
-                    <div className="text-xs text-gray-500">{log.totalWinners} คน</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <button
-                      onClick={() => fetchReverseLogs(log.stockId)}
-                      className="text-blue-600 hover:text-blue-800 underline"
-                      disabled={reverseLoading && selectedStockId === log.stockId}
-                    >
-                      {reverseLoading && selectedStockId === log.stockId ? 'กำลังโหลด...' : 'ดูรายละเอียด'}
-                    </button>
-                  </td>
+        <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-admin-border">
+              <thead className="bg-black/40">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    วันที่แก้ไข
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    ชื่อหวย
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    3 ตัวบน
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    2 ตัวบน
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    2 ตัวล่าง
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    ดึงเงินคืน
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gold-400 uppercase tracking-wider">
+                    การกระทำ
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-admin-border">
+                {editLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-black/20 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {format(new Date(log.createdAt), 'dd MMM yyyy HH:mm', { locale: th })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                      {log.stockName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-400">{log.oldResult3Top || '-'}</span>
+                        <span className="text-gray-500">→</span>
+                        <span className="text-green-400 font-semibold">{log.newResult3Top || '-'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-400">{log.oldResult2Top || '-'}</span>
+                        <span className="text-gray-500">→</span>
+                        <span className="text-green-400 font-semibold">{log.newResult2Top || '-'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-400">{log.oldResult2Bottom || '-'}</span>
+                        <span className="text-gray-500">→</span>
+                        <span className="text-green-400 font-semibold">{log.newResult2Bottom || '-'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="text-red-400 font-bold text-base">
+                        -{log.totalReversedAmount.toLocaleString()} ฿
+                      </div>
+                      <div className="text-xs text-gray-400">{log.totalWinners} คน</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={() => fetchReverseLogs(log.stockId)}
+                        disabled={reverseLoading && selectedStockId === log.stockId}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 text-brown-900 font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+                      >
+                        <FaEye />
+                        {reverseLoading && selectedStockId === log.stockId ? 'กำลังโหลด...' : 'ดูรายละเอียด'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* Modal แสดงรายละเอียดการดึงเงินคืน */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">รายละเอียดการดึงเงินรางวัลคืน</h2>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card border border-gold-500/50 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-gold-500/20 to-gold-600/20 p-6 border-b border-admin-border flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gold-400 flex items-center gap-3">
+                <FaHistory className="text-3xl" />
+                รายละเอียดการดึงเงินรางวัลคืน
+              </h2>
               <button
                 onClick={() => {
                   setShowModal(false)
                   setReverseLogs([])
                   setSelectedStockId(null)
                 }}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
+                className="text-gray-400 hover:text-red-400 transition-colors text-3xl"
               >
-                ×
+                <FaTimes />
               </button>
             </div>
             <div className="p-6 overflow-y-auto flex-1">
               {reverseLogs.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">ไม่มีข้อมูลการดึงเงินคืน</div>
+                <div className="text-center text-gray-400 py-12">
+                  <FaEdit className="text-6xl mx-auto mb-4 opacity-50" />
+                  <p>ไม่มีข้อมูลการดึงเงินคืน</p>
+                </div>
               ) : (
                 <>
-                  <div className="mb-4">
-                    <div className="text-sm text-gray-600">
-                      ยอดเงินรวมที่ดึงคืน:{' '}
-                      <span className="font-semibold text-red-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-black/40 rounded-xl p-4 border border-red-500/30">
+                      <div className="text-sm text-gray-400 mb-1">ยอดเงินรวมที่ดึงคืน</div>
+                      <div className="text-3xl font-bold text-red-400">
                         {reverseLogs.reduce((sum, log) => sum + log.reversedAmount, 0).toLocaleString()} ฿
-                      </span>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      จำนวนสมาชิก: <span className="font-semibold">{reverseLogs.length} คน</span>
+                    <div className="bg-black/40 rounded-xl p-4 border border-gold-500/30">
+                      <div className="text-sm text-gray-400 mb-1">จำนวนสมาชิกที่ได้รับผลกระทบ</div>
+                      <div className="text-3xl font-bold text-gold-400">{reverseLogs.length} คน</div>
                     </div>
                   </div>
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                          ผู้ใช้งาน
-                        </th>
-                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
-                          ยอดเงินก่อน
-                        </th>
-                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
-                          ดึงคืน
-                        </th>
-                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
-                          ยอดเงินหลัง
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                          วันที่
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {reverseLogs.map((log) => (
-                        <tr key={log.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 text-sm">
-                            <div className="font-medium text-gray-900">{log.username}</div>
-                            <div className="text-xs text-gray-500">{log.memberId.slice(0, 8)}...</div>
-                          </td>
-                          <td className="px-4 py-2 text-sm text-right text-gray-900">
-                            {log.balanceBefore.toLocaleString()} ฿
-                          </td>
-                          <td className="px-4 py-2 text-sm text-right">
-                            <span className="text-red-600 font-semibold">
-                              -{log.reversedAmount.toLocaleString()} ฿
-                            </span>
-                          </td>
-                          <td className="px-4 py-2 text-sm text-right text-gray-900">
-                            {log.balanceAfter.toLocaleString()} ฿
-                          </td>
-                          <td className="px-4 py-2 text-sm text-gray-500">
-                            {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm', { locale: th })}
-                          </td>
+
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-admin-border">
+                      <thead className="bg-black/40">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-gold-400 uppercase">
+                            ผู้ใช้งาน
+                          </th>
+                          <th className="px-4 py-3 text-right text-xs font-bold text-gold-400 uppercase">
+                            ยอดเงินก่อน
+                          </th>
+                          <th className="px-4 py-3 text-right text-xs font-bold text-gold-400 uppercase">
+                            ดึงคืน
+                          </th>
+                          <th className="px-4 py-3 text-right text-xs font-bold text-gold-400 uppercase">
+                            ยอดเงินหลัง
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-gold-400 uppercase">
+                            วันที่
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-admin-border">
+                        {reverseLogs.map((log) => (
+                          <tr key={log.id} className="hover:bg-black/20 transition-colors">
+                            <td className="px-4 py-3 text-sm">
+                              <div className="font-medium text-white">{log.username}</div>
+                              <div className="text-xs text-gray-500">{log.memberId.slice(0, 8)}...</div>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-right text-gray-300">
+                              {log.balanceBefore.toLocaleString()} ฿
+                            </td>
+                            <td className="px-4 py-3 text-sm text-right">
+                              <span className="text-red-400 font-bold">
+                                -{log.reversedAmount.toLocaleString()} ฿
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-right text-gray-300">
+                              {log.balanceAfter.toLocaleString()} ฿
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-400">
+                              {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm', { locale: th })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
             </div>
