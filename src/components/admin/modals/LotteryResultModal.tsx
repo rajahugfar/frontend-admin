@@ -54,20 +54,20 @@ const LotteryResultModal: React.FC<LotteryResultModalProps> = ({
     }
   }, [isOpen, lottery]);
 
-  // Auto-fill 2 ตัวหน้า from 3 ตัว (เอา 2 หลักท้ายของ 3 ตัว) - only if manually typing
+  // Auto-fill 2 ตัวหน้า from 3 ตัว (เอา 2 หลักท้ายของ 3 ตัว)
   useEffect(() => {
-    if (stockWin && stockWin.length === 3 && !lottery?.result3Up) {
+    if (stockWin && stockWin.length === 3) {
       setStock2Up(stockWin.substring(1, 3)); // ตัด digit 0 ทิ้ง เอา digit 1,2
     }
-  }, [stockWin, lottery?.result3Up]);
+  }, [stockWin]);
 
-  // Auto-fill สามตัว และ สองตัวบน from 4 ตัว - only if manually typing
+  // Auto-fill สามตัว และ สองตัวบน from 4 ตัว
   useEffect(() => {
-    if (g4Up && g4Up.length === 4 && !lottery?.result4Up) {
+    if (g4Up && g4Up.length === 4) {
       setStockWin(g4Up.substring(1, 4)); // ตัด digit 0 ทิ้ง = สามตัว
       setStock2Up(g4Up.substring(2, 4)); // ตัด digit 0,1 ทิ้ง = สองตัวบน
     }
-  }, [g4Up, lottery?.result4Up]);
+  }, [g4Up]);
 
   const isGLO = () => {
     // GLO = เฉพาะ code "glo" เท่านั้น
