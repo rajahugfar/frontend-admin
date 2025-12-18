@@ -30,6 +30,13 @@ const LotteryDaily: React.FC = () => {
     lotteryGroup: number;
     huayCode: string;
     has4d: boolean;
+    result3Up?: string;
+    result2Up?: string;
+    result2Low?: string;
+    result4Up?: string;
+    resultFull?: string;
+    result3Front?: string;
+    result3Down?: string;
   } | null>(null);
 
   // Payout Rates Modal
@@ -579,7 +586,14 @@ const LotteryDaily: React.FC = () => {
                                     stockName: lottery.name,
                                     lotteryGroup: lottery.lotteryGroup,
                                     huayCode: lottery.huayCode,
-                                    has4d: lottery.has4d
+                                    has4d: lottery.has4d,
+                                    result3Up: lottery.result3Up,
+                                    result2Up: lottery.result2Up,
+                                    result2Low: lottery.result2Low,
+                                    result4Up: lottery.result4Up,
+                                    resultFull: lottery.resultFull,
+                                    result3Front: lottery.result3Front,
+                                    result3Down: lottery.result3Down,
                                   });
                                   setShowResultModal(true);
                                 }}

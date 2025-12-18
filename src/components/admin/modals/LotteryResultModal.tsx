@@ -12,6 +12,13 @@ interface LotteryResultModalProps {
     lotteryGroup: number;
     huayCode: string;
     has4d?: boolean;
+    result3Up?: string;
+    result2Up?: string;
+    result2Low?: string;
+    result4Up?: string;
+    resultFull?: string;
+    result3Front?: string;
+    result3Down?: string;
   } | null;
   onClose: () => void;
   onSuccess: () => void;
@@ -36,31 +43,31 @@ const LotteryResultModal: React.FC<LotteryResultModalProps> = ({
 
   useEffect(() => {
     if (isOpen && lottery) {
-      // Reset form
-      setStockWin1('');
-      setStockWin('');
-      setG3Front('');
-      setG3Down('');
-      setG4Up('');
-      setStock2Up('');
-      setStock2Low('');
+      // Load existing results if available (for editing)
+      setStockWin1(lottery.resultFull || '');
+      setStockWin(lottery.result3Up || '');
+      setG3Front(lottery.result3Front || '');
+      setG3Down(lottery.result3Down || '');
+      setG4Up(lottery.result4Up || '');
+      setStock2Up(lottery.result2Up || '');
+      setStock2Low(lottery.result2Low || '');
     }
   }, [isOpen, lottery]);
 
-  // Auto-fill 2 ตัวหน้า from 3 ตัว (เอา 2 หลักท้ายของ 3 ตัว)
+  // Auto-fill 2 ตัวหน้า from 3 ตัว (เอา 2 หลักท้ายของ 3 ตัว) - only if manually typing
   useEffect(() => {
-    if (stockWin && stockWin.length === 3) {
+    if (stockWin && stockWin.length === 3 && !lottery?.result3Up) {
       setStock2Up(stockWin.substring(1, 3)); // ตัด digit 0 ทิ้ง เอา digit 1,2
     }
-  }, [stockWin]);
+  }, [stockWin, lottery?.result3Up]);
 
-  // Auto-fill สามตัว และ สองตัวบน from 4 ตัว
+  // Auto-fill สามตัว และ สองตัวบน from 4 ตัว - only if manually typing
   useEffect(() => {
-    if (g4Up && g4Up.length === 4) {
+    if (g4Up && g4Up.length === 4 && !lottery?.result4Up) {
       setStockWin(g4Up.substring(1, 4)); // ตัด digit 0 ทิ้ง = สามตัว
       setStock2Up(g4Up.substring(2, 4)); // ตัด digit 0,1 ทิ้ง = สองตัวบน
     }
-  }, [g4Up]);
+  }, [g4Up, lottery?.result4Up]);
 
   const isGLO = () => {
     // GLO = เฉพาะ code "glo" เท่านั้น
