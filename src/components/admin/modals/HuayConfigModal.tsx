@@ -37,6 +37,11 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
   const [sortField, setSortField] = useState<SortField>('optionType')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 
+  // Filter & Pagination
+  const [selectedOptionType, setSelectedOptionType] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+
   const [formData, setFormData] = useState<CreateHuayConfigRequest>({
     optionType: 'teng_bon_3',
     minPrice: 1,
@@ -77,8 +82,15 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
     }
   }
 
+  // Filter by option type
+  const filteredConfigs = useMemo(() => {
+    if (selectedOptionType === 'all') return configs
+    return configs.filter(c => c.optionType === selectedOptionType)
+  }, [configs, selectedOptionType])
+
+  // Sort configs
   const sortedConfigs = useMemo(() => {
-    const sorted = [...configs].sort((a, b) => {
+    const sorted = [...filteredConfigs].sort((a, b) => {
       let aValue: any = a[sortField]
       let bValue: any = b[sortField]
 
@@ -93,7 +105,24 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
       return 0
     })
     return sorted
-  }, [configs, sortField, sortOrder])
+  }, [filteredConfigs, sortField, sortOrder])
+
+  // Pagination
+  const totalPages = Math.ceil(sortedConfigs.length / itemsPerPage)
+  const paginatedConfigs = sortedConfigs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+  // Get unique option types for filter
+  const uniqueOptionTypes = useMemo(() => {
+    return Array.from(new Set(configs.map(c => c.optionType))).sort()
+  }, [configs])
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedOptionType, activeTab])
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab)
@@ -329,6 +358,40 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
             </div>
           </div>
 
+          {/* Filter by Option Type */}
+          {!showForm && uniqueOptionTypes.length > 0 && (
+            <div className="mb-4 p-4 bg-admin-bg border border-admin-border rounded-lg">
+              <label className="block text-sm font-medium text-brown-300 mb-3">
+                กรองตามประเภท ({filteredConfigs.length} รายการ)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedOptionType('all')}
+                  className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                    selectedOptionType === 'all'
+                      ? 'bg-gold-600 text-white shadow-lg'
+                      : 'bg-admin-card text-brown-300 hover:bg-admin-hover border border-admin-border'
+                  }`}
+                >
+                  ทั้งหมด ({configs.length})
+                </button>
+                {uniqueOptionTypes.map((optionType) => (
+                  <button
+                    key={optionType}
+                    onClick={() => setSelectedOptionType(optionType)}
+                    className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                      selectedOptionType === optionType
+                        ? 'bg-gold-600 text-white shadow-lg'
+                        : 'bg-admin-card text-brown-300 hover:bg-admin-hover border border-admin-border'
+                    }`}
+                  >
+                    {OPTION_TYPES.find(t => t.value === optionType)?.shortLabel || optionType} ({configs.filter(c => c.optionType === optionType).length})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Add Button */}
           {!showForm && (
             <div className="mb-4">
@@ -556,7 +619,7 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-admin-border">
-                    {sortedConfigs.map((config) => (
+                    {paginatedConfigs.map((config) => (
                       <tr key={config.id} className="hover:bg-admin-hover transition-colors">
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-brown-200">
                           {getOptionTypeLabel(config.optionType)}
@@ -622,6 +685,36 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
                     ))}
                   </tbody>
                 </table>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="px-6 py-4 border-t border-admin-border bg-admin-card">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-brown-400">
+                        แสดง {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, sortedConfigs.length)} จาก {sortedConfigs.length} รายการ
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className="px-3 py-1.5 text-sm bg-admin-bg border border-admin-border text-brown-300 rounded hover:bg-admin-hover hover:text-gold-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          ← ก่อนหน้า
+                        </button>
+                        <span className="text-sm text-brown-300 px-3">
+                          หน้า {currentPage} / {totalPages}
+                        </span>
+                        <button
+                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-1.5 text-sm bg-admin-bg border border-admin-border text-brown-300 rounded hover:bg-admin-hover hover:text-gold-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          ถัดไป →
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
