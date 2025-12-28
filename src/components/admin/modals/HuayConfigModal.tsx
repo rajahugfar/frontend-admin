@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { FiX, FiPlus, FiEdit2, FiTrash2, FiStar, FiAlertCircle, FiArrowUp, FiArrowDown } from 'react-icons/fi'
-import { Lottery } from '@/api/adminLotteryAPI'
+import { FiX, FiPlus, FiEdit2, FiTrash2, FiStar, FiAlertCircle, FiArrowUp, FiArrowDown, FiRefreshCw } from 'react-icons/fi'
+import { Lottery, adminLotteryAPI } from '@/api/adminLotteryAPI'
 import { adminHuayConfigAPI, HuayConfig, CreateHuayConfigRequest } from '@/api/adminHuayConfigAPI'
 import toast from 'react-hot-toast'
 
@@ -246,6 +246,37 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
     }
   }
 
+  const handleInitDefaults = async () => {
+    const typeLabel = activeTab === 1 ? 'อัตราจ่าย (Type 1)' : 'ลิมิต (Type 2)'
+
+    const confirmed = window.confirm(
+      `คุณต้องการสร้างค่าเริ่มต้น${typeLabel} สำหรับ ${lottery.huayName} หรือไม่?\n\nจะสร้าง Config สำหรับ type_config=${activeTab}`
+    )
+
+    if (!confirmed) return
+
+    setLoading(true)
+    try {
+      // Note: initDefaultConfigs uses lottery.huayType (g for government lottery)
+      // but creates configs for the selected type_config (1 or 2)
+      await adminLotteryAPI.initDefaultConfigs(
+        lottery.id.toString(),
+        lottery.huayType || 'g' // Use lottery's huay_type
+      )
+      toast.success(`สร้างค่าเริ่มต้น${typeLabel}สำเร็จ`)
+      fetchConfigs()
+    } catch (error: any) {
+      console.error('Failed to init defaults:', error)
+      if (error.response?.data?.message?.includes('duplicate key')) {
+        toast.error('มีค่าคอนฟิกอยู่แล้ว')
+      } else {
+        toast.error('ไม่สามารถสร้างค่าเริ่มต้นได้: ' + (error.response?.data?.message || error.message))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const getOptionTypeLabel = (optionType: string): string => {
     return OPTION_TYPES.find(t => t.value === optionType)?.label || optionType
   }
@@ -392,9 +423,17 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
             </div>
           )}
 
-          {/* Add Button */}
+          {/* Add Button & Init Defaults */}
           {!showForm && (
-            <div className="mb-4">
+            <div className="mb-4 flex gap-3">
+              <button
+                onClick={handleInitDefaults}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 transition-all shadow-lg hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FiRefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+                สร้างค่าเริ่มต้น {activeTab === 1 ? '(Type 1)' : '(Type 2)'}
+              </button>
               <button
                 onClick={handleAddNew}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gold-600 to-gold-500 text-white rounded-lg hover:from-gold-700 hover:to-gold-600 transition-all shadow-lg hover:shadow-gold-500/50"
