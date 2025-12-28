@@ -175,4 +175,15 @@ export const adminLotteryDailyAPI = {
     );
     return response.data;
   },
+
+  /**
+   * Update lottery date
+   */
+  updateLotteryDate: async (stockId: number, newDate: string) => {
+    const response = await adminAPIClient.post<{ status: string; message: string }>(
+      `/lottery/daily/${stockId}/update-date`,
+      { newDate }
+    );
+    return response.data;
+  },
 };

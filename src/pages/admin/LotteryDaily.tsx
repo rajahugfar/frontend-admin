@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLotteryDailyAPI, DailyLotteryItem, DailyListStatistics } from '@/api/adminLotteryDailyAPI';
-import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit, FaPercentage } from 'react-icons/fa';
+import { FaSearch, FaTrophy, FaCheckCircle, FaClock, FaBan, FaChartLine, FaCoins, FaMoneyBillWave, FaPlay, FaStop, FaEdit, FaPercentage, FaCalendarAlt } from 'react-icons/fa';
 import LotteryResultModal from '../../components/admin/modals/LotteryResultModal';
 import NumberLimitsModal from '../../components/admin/modals/NumberLimitsModal';
 import ConfirmModal from '../../components/admin/ConfirmModal';
@@ -59,6 +59,11 @@ const LotteryDaily: React.FC = () => {
     message: '',
     onConfirm: () => {},
   });
+
+  // Edit Date Modal
+  const [showEditDateModal, setShowEditDateModal] = useState(false);
+  const [editDateLottery, setEditDateLottery] = useState<{ id: number; name: string; currentDate: string } | null>(null);
+  const [newLotteryDate, setNewLotteryDate] = useState('');
 
   // Group lotteries by group
   const groupedLotteries = React.useMemo(() => {
@@ -209,6 +214,26 @@ const LotteryDaily: React.FC = () => {
       setLoading(false);
     }
   }, [selectedDate, fetchData]);
+
+  const handleUpdateLotteryDate = useCallback(async () => {
+    if (!editDateLottery || !newLotteryDate) return;
+
+    try {
+      const response = await adminLotteryDailyAPI.updateLotteryDate(editDateLottery.id, newLotteryDate);
+      if (response.status === 'success') {
+        toast.success(response.message || 'แก้ไขวันที่หวยเรียบร้อย');
+        setShowEditDateModal(false);
+        setEditDateLottery(null);
+        setNewLotteryDate('');
+        fetchData(); // Reload data
+      } else {
+        toast.error(response.message || 'เกิดข้อผิดพลาด');
+      }
+    } catch (error: any) {
+      console.error('Failed to update lottery date:', error);
+      toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาดในการแก้ไขวันที่');
+    }
+  }, [editDateLottery, newLotteryDate, fetchData]);
 
   const getStatusBadge = useCallback((status: number) => {
     switch (status) {
@@ -539,6 +564,24 @@ const LotteryDaily: React.FC = () => {
                               หวยอั๋น
                             </button>
 
+                            {/* ปุ่มแก้ไขวันที่ */}
+                            <button
+                              onClick={() => {
+                                setEditDateLottery({
+                                  id: lottery.id,
+                                  name: lottery.name,
+                                  currentDate: lottery.time.split('T')[0]
+                                });
+                                setNewLotteryDate(lottery.time.split('T')[0]);
+                                setShowEditDateModal(true);
+                              }}
+                              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm"
+                              title="แก้ไขวันที่หวยออก"
+                            >
+                              <FaCalendarAlt />
+                              วันที่
+                            </button>
+
                             {/* ปุ่มเปิด/ปิดแทง - แสดงเมื่อสถานะเปิดหรือปิดแทง */}
                             {lottery.status === 1 && (
                               <button
@@ -676,6 +719,48 @@ const LotteryDaily: React.FC = () => {
         message={confirmModal.message}
         type={confirmModal.type}
       />
+
+      {/* Edit Date Modal */}
+      {showEditDateModal && editDateLottery && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-admin-card rounded-2xl shadow-2xl border border-admin-border max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <FaCalendarAlt className="text-blue-400" />
+              แก้ไขวันที่หวยออก
+            </h2>
+            <div className="mb-4">
+              <p className="text-gray-300 mb-2">หวย: <span className="text-gold-400 font-medium">{editDateLottery.name}</span></p>
+              <p className="text-gray-400 text-sm mb-4">วันที่เดิม: {editDateLottery.currentDate}</p>
+              <label className="block text-gray-300 text-sm font-medium mb-2">วันที่ใหม่</label>
+              <input
+                type="date"
+                value={newLotteryDate}
+                onChange={(e) => setNewLotteryDate(e.target.value)}
+                className="w-full px-4 py-2 bg-black/40 border-2 border-gold-500/40 rounded-xl text-white focus:ring-2 focus:ring-gold-500 focus:border-gold-500"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowEditDateModal(false);
+                  setEditDateLottery(null);
+                  setNewLotteryDate('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-all"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={handleUpdateLotteryDate}
+                disabled={!newLotteryDate}
+                className="flex-1 px-4 py-2 bg-gold-500 hover:bg-gold-600 disabled:bg-gray-600 text-brown-900 font-medium rounded-lg transition-all"
+              >
+                บันทึก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
