@@ -53,6 +53,7 @@ interface ReferralUser {
   totalCommission: number
   pendingCommission: number
   withdrawnCommission: number
+  availableCommission: number
   createdAt: string
 }
 
@@ -572,14 +573,15 @@ export default function TurnoverManagement() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase">ผู้ใช้</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-brown-400 uppercase">รหัสแนะนำ</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">จำนวนแนะนำ</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">คอมมิชชั่น</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">คอมรวม</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-brown-400 uppercase">คอมคงเหลือ</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-brown-400 uppercase">วันที่</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-admin-border">
                 {referralUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-brown-400">ยังไม่มีข้อมูลผู้แนะนำ</td>
+                    <td colSpan={6} className="px-6 py-8 text-center text-brown-400">ยังไม่มีข้อมูลผู้แนะนำ</td>
                   </tr>
                 ) : (
                   referralUsers.map((user) => (
@@ -599,6 +601,9 @@ export default function TurnoverManagement() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="text-sm font-medium text-green-400">฿{user.totalCommission?.toLocaleString() || 0}</div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="text-sm font-medium text-gold-500">฿{(user.availableCommission || user.pendingCommission || 0).toLocaleString()}</div>
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-brown-400">
                         {dayjs(user.createdAt).format('DD/MM/YY')}
