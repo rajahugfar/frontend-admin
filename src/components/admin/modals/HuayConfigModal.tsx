@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { FiX, FiPlus, FiEdit2, FiTrash2, FiStar, FiAlertCircle, FiArrowUp, FiArrowDown, FiRefreshCw } from 'react-icons/fi'
+import { FiX, FiPlus, FiEdit2, FiTrash2, FiStar, FiAlertCircle, FiArrowUp, FiArrowDown, FiRefreshCw, FiCopy } from 'react-icons/fi'
 import { Lottery, adminLotteryAPI } from '@/api/adminLotteryAPI'
 import { adminHuayConfigAPI, HuayConfig, CreateHuayConfigRequest } from '@/api/adminHuayConfigAPI'
 import toast from 'react-hot-toast'
+import CopyConfigModal from './CopyConfigModal'
 
 interface HuayConfigModalProps {
   isOpen: boolean
@@ -36,6 +37,7 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
   const [submitting, setSubmitting] = useState(false)
   const [sortField, setSortField] = useState<SortField>('optionType')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+  const [showCopyModal, setShowCopyModal] = useState(false)
 
   // Filter & Pagination
   const [selectedOptionType, setSelectedOptionType] = useState<string>('all')
@@ -435,6 +437,14 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
                 สร้างค่าเริ่มต้น {activeTab === 1 ? '(Type 1)' : '(Type 2)'}
               </button>
               <button
+                onClick={() => setShowCopyModal(true)}
+                disabled={configs.length === 0}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FiCopy size={20} />
+                คัดลอกไปหวยอื่น
+              </button>
+              <button
                 onClick={handleAddNew}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gold-600 to-gold-500 text-white rounded-lg hover:from-gold-700 hover:to-gold-600 transition-all shadow-lg hover:shadow-gold-500/50"
               >
@@ -769,6 +779,17 @@ const HuayConfigModal: React.FC<HuayConfigModalProps> = ({ isOpen, onClose, lott
           </button>
         </div>
       </div>
+
+      {/* Copy Config Modal */}
+      <CopyConfigModal
+        isOpen={showCopyModal}
+        onClose={() => setShowCopyModal(false)}
+        sourceLottery={lottery}
+        onSuccess={() => {
+          toast.success('คัดลอก config สำเร็จ')
+          setShowCopyModal(false)
+        }}
+      />
     </div>
   )
 }

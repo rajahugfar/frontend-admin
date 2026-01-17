@@ -106,6 +106,19 @@ export const adminHuayConfigAPI = {
   setDefault: async (configId: number): Promise<HuayConfig> => {
     const response = await adminAPIClient.post(`/lottery/huay-config/${configId}/set-default`)
     return response.data.data
+  },
+
+  /**
+   * Copy configs from one lottery to another
+   * @param sourceLotteryId - The source lottery ID
+   * @param targetLotteryId - The target lottery ID
+   * @param overwrite - Whether to overwrite existing configs
+   */
+  copyConfigs: async (sourceLotteryId: number, targetLotteryId: number, overwrite: boolean = false): Promise<void> => {
+    await adminAPIClient.post(`/lottery/${sourceLotteryId}/huay-config/copy`, {
+      targetLotteryId,
+      overwrite
+    })
   }
 }
 
