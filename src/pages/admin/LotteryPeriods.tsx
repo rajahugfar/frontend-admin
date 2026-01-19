@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { adminLotteryAPI, Lottery, LotteryPeriod } from '@/api/adminLotteryAPI'
 import toast from 'react-hot-toast'
-import { FiPlus, FiX, FiCheck, FiClock, FiCalendar, FiDollarSign, FiEye } from 'react-icons/fi'
+import { FiPlus, FiX, FiCheck, FiClock, FiCalendar, FiDollarSign, FiEye, FiEdit } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 
 const LotteryPeriods: React.FC = () => {
@@ -33,6 +33,13 @@ const LotteryPeriods: React.FC = () => {
     result_2d_top: '',
     result_2d_bottom: '',
     result_4d: '',
+  })
+
+  // Edit close time modal state
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editForm, setEditForm] = useState({
+    close_date: '',
+    close_time: ''
   })
 
   useEffect(() => {
@@ -153,6 +160,40 @@ const LotteryPeriods: React.FC = () => {
     navigate(`/admin/lottery/bets?period_id=${periodId}`)
   }
 
+  const handleEditClick = (period: LotteryPeriod) => {
+    setSelectedPeriod(period)
+
+    // Parse the close time
+    const [date, time] = period.close_time.split(' ')
+    setEditForm({
+      close_date: date || '',
+      close_time: time || ''
+    })
+    setEditModalOpen(true)
+  }
+
+  const handleEditSubmit = async () => {
+    if (!selectedPeriod || !editForm.close_date || !editForm.close_time) {
+      toast.error('กรุณากรอกข้อมูลให้ครบถ้วน')
+      return
+    }
+
+    try {
+      const closeDateTime = `${editForm.close_date} ${editForm.close_time}`
+
+      await adminLotteryAPI.updatePeriodCloseTime(selectedPeriod.id, {
+        close_time: closeDateTime
+      })
+
+      toast.success('อัพเดทเวลาปิดรับแทงสำเร็จ')
+      setEditModalOpen(false)
+      fetchPeriods()
+    } catch (error: any) {
+      console.error('Failed to update close time:', error)
+      toast.error(error.response?.data?.message || 'ไม่สามารถอัพเดทเวลาปิดได้')
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const badges: { [key: string]: { bg: string; text: string; label: string } } = {
       OPEN: { bg: 'bg-green-100', text: 'text-green-700', label: 'เปิดรับ' },
@@ -271,7 +312,17 @@ const LotteryPeriods: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <FiClock className="text-gray-400" />
-                        {period.open_time} - {period.close_time}
+                        <span>{period.open_time} - {period.close_time}</span>
+                        {period.status === 'OPEN' && (
+                          <button
+                            type="button"
+                            onClick={() => handleEditClick(period)}
+                            className="text-blue-600 hover:text-blue-700 ml-2"
+                            title="แก้ไขเวลาปิด"
+                          >
+                            <FiEdit size={14} />
+                          </button>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(period.status)}</td>
@@ -505,6 +556,75 @@ const LotteryPeriods: React.FC = () => {
               >
                 <FiCheck />
                 ประกาศผล
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Close Time Modal */}
+      {editModalOpen && selectedPeriod && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-800">แก้ไขเวลาปิดรับแทง</h3>
+              <button
+                type="button"
+                onClick={() => setEditModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+              <div className="text-sm font-medium text-blue-800">{selectedPeriod.lottery_name}</div>
+              <div className="text-xs text-blue-600">{selectedPeriod.period_name}</div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">วันที่ปิด</label>
+                <input
+                  type="date"
+                  value={editForm.close_date}
+                  onChange={(e) => setEditForm({ ...editForm, close_date: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">เวลาปิด</label>
+                <input
+                  type="time"
+                  value={editForm.close_time}
+                  onChange={(e) => setEditForm({ ...editForm, close_time: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>หมายเหตุ:</strong> การเปลี่ยนเวลาปิดรับแทงจะมีผลทันที
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setEditModalOpen(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <FiCheck />
+                บันทึก
               </button>
             </div>
           </div>

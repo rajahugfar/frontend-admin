@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { adminLotteryAPI, Lottery } from '../../api/adminLotteryAPI'
 import toast from 'react-hot-toast'
-import { FiFilter, FiCalendar, FiDollarSign, FiAward } from 'react-icons/fi'
+import { FiFilter, FiCalendar, FiDollarSign, FiAward, FiEdit, FiX, FiCheck } from 'react-icons/fi'
 
 interface StockMaster {
   id: number
@@ -27,6 +27,13 @@ const StockMasterList: React.FC = () => {
   const [selectedLottery, setSelectedLottery] = useState<number>(0)
   const [currentStock, setCurrentStock] = useState<StockMaster | null>(null)
   const [loading, setLoading] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editForm, setEditForm] = useState({
+    stockDate: '',
+    stockTime: '',
+    dateClose: '',
+    timeClose: ''
+  })
 
   useEffect(() => {
     fetchLotteries()
@@ -120,6 +127,67 @@ const StockMasterList: React.FC = () => {
 
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString('th-TH', { minimumFractionDigits: 2 })
+  }
+
+  const handleEditClick = () => {
+    if (!currentStock) return
+
+    // Parse stock date and time
+    const stockDateTime = new Date(currentStock.stockTime)
+    const stockDateStr = stockDateTime.toISOString().split('T')[0]
+    const stockTimeStr = stockDateTime.toTimeString().slice(0, 5)
+
+    // Parse close date and time
+    const closeDate = new Date(currentStock.dateClose)
+    const closeDateStr = closeDate.toISOString().split('T')[0]
+    const closeTimeStr = closeDate.toTimeString().slice(0, 5)
+
+    setEditForm({
+      stockDate: stockDateStr,
+      stockTime: stockTimeStr,
+      dateClose: closeDateStr,
+      timeClose: closeTimeStr
+    })
+    setEditModalOpen(true)
+  }
+
+  const handleEditSubmit = async () => {
+    if (!currentStock || !editForm.stockDate || !editForm.stockTime || !editForm.dateClose || !editForm.timeClose) {
+      toast.error('กรุณากรอกข้อมูลให้ครบถ้วน')
+      return
+    }
+
+    try {
+      // Combine date and time
+      const stockDatetime = `${editForm.stockDate}T${editForm.stockTime}:00`
+      const closeDatetime = `${editForm.dateClose}T${editForm.timeClose}:00`
+
+      const response = await fetch(`http://localhost:3000/api/v1/admin/lottery/stock/${currentStock.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+          stockTime: stockDatetime,
+          dateClose: closeDatetime
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.status === 'success') {
+        toast.success('อัพเดทข้อมูลสำเร็จ')
+        setEditModalOpen(false)
+        // Refresh current stock data
+        fetchCurrentStock(selectedLottery)
+      } else {
+        toast.error(result.message || 'ไม่สามารถอัพเดทข้อมูลได้')
+      }
+    } catch (error) {
+      console.error('Failed to update stock:', error)
+      toast.error('เกิดข้อผิดพลาดในการอัพเดทข้อมูล')
+    }
   }
 
   // Count lotteries by group
@@ -273,8 +341,17 @@ const StockMasterList: React.FC = () => {
               <FiCalendar />
               {currentStock.stockName}
             </h2>
-            <div className="text-sm opacity-90 mt-1">
-              {formatDate(currentStock.stockTime)}
+            <div className="text-sm opacity-90 mt-1 flex items-center justify-between">
+              <span>{formatDate(currentStock.stockTime)}</span>
+              <button
+                type="button"
+                onClick={handleEditClick}
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded flex items-center gap-1 text-sm"
+                title="แก้ไขวันที่"
+              >
+                <FiEdit size={14} />
+                แก้ไขวันที่
+              </button>
             </div>
           </div>
 
@@ -381,6 +458,97 @@ const StockMasterList: React.FC = () => {
             <FiAward className="w-16 h-16 mx-auto" />
           </div>
           <p className="text-gray-600">กรุณาเลือกหวยเพื่อดูข้อมูล</p>
+        </div>
+      )}
+
+      {/* Edit Stock Modal */}
+      {editModalOpen && currentStock && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-800">แก้ไขวันที่หวยออก</h3>
+              <button
+                type="button"
+                onClick={() => setEditModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+              <div className="text-sm font-medium text-blue-800">หวย: {currentStock.huayName || currentStock.stockName}</div>
+              <div className="text-xs text-blue-600">วันที่เดิม: {formatDate(currentStock.stockTime)}</div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">วันที่ใหม่</label>
+                <input
+                  type="date"
+                  value={editForm.stockDate}
+                  onChange={(e) => setEditForm({ ...editForm, stockDate: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">เวลาหวยออก</label>
+                <input
+                  type="time"
+                  value={editForm.stockTime}
+                  onChange={(e) => setEditForm({ ...editForm, stockTime: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <hr className="my-4 border-gray-200" />
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">วันที่ปิดรับแทง</label>
+                <input
+                  type="date"
+                  value={editForm.dateClose}
+                  onChange={(e) => setEditForm({ ...editForm, dateClose: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">เวลาปิดรับแทง</label>
+                <input
+                  type="time"
+                  value={editForm.timeClose}
+                  onChange={(e) => setEditForm({ ...editForm, timeClose: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>หมายเหตุ:</strong> การเปลี่ยนวันที่จะมีผลทันที
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setEditModalOpen(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <FiCheck />
+                บันทึก
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

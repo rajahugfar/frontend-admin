@@ -310,6 +310,11 @@ export const adminLotteryAPI = {
     return response.data.data
   },
 
+  updatePeriodCloseTime: async (id: string, data: { close_time: string }): Promise<LotteryPeriod> => {
+    const response = await adminAPIClient.put(`/lottery/periods/${id}/close-time`, data)
+    return response.data.data
+  },
+
   announceResult: async (id: string, data: AnnounceResultRequest): Promise<LotteryPeriod> => {
     const response = await adminAPIClient.post(`/lottery/periods/${id}/result`, data)
     return response.data.data
