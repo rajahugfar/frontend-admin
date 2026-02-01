@@ -54,12 +54,18 @@ const LotteryResultModal: React.FC<LotteryResultModalProps> = ({
     }
   }, [isOpen, lottery]);
 
-  // Auto-fill 2 ตัวหน้า from 3 ตัว (เอา 2 หลักท้ายของ 3 ตัว)
+  // Auto-fill 2 ตัวหน้า from 6 หลัก (GLO) หรือจาก 3 ตัว (หวยอื่น)
   useEffect(() => {
-    if (stockWin && stockWin.length === 3) {
+    if (isGLO() && stockWin1 && stockWin1.length === 6) {
+      // สำหรับ GLO: 2 ตัวหน้า = 2 หลักท้ายของเลข 6 หลัก
+      setStock2Up(stockWin1.substring(4, 6)); // เอา 2 หลักสุดท้าย เช่น 174629 → 29
+      // และอัพเดต 3 ตัวบนจากเลข 6 หลักด้วย
+      setStockWin(stockWin1.substring(3, 6)); // เอา 3 หลักสุดท้าย เช่น 174629 → 629
+    } else if (!isGLO() && stockWin && stockWin.length === 3) {
+      // สำหรับหวยอื่นๆ: 2 ตัวหน้า = 2 หลักท้ายของ 3 ตัว
       setStock2Up(stockWin.substring(1, 3)); // ตัด digit 0 ทิ้ง เอา digit 1,2
     }
-  }, [stockWin]);
+  }, [stockWin, stockWin1]);
 
   // Auto-fill สามตัว และ สองตัวบน from 4 ตัว
   useEffect(() => {
@@ -116,16 +122,23 @@ const LotteryResultModal: React.FC<LotteryResultModalProps> = ({
     try {
       setSaving(true);
 
+      // สร้าง payload ด้วยค่าครบถ้วนเสมอ
       const payload: any = {
         stockId: lottery.stockId,
-        stockWin: stockWin,
-        stock2Up: stock2Up,
-        stock2Low: stock2Low,
+        stockWin: stockWin || '', // 3 ตัวบน
+        stock2Up: stock2Up || '', // 2 ตัวหน้า
+        stock2Low: stock2Low || '', // 2 ตัวล่าง
+        stockWin1: '', // 6 หลัก (default empty)
+        g3Front: '', // 3 ตัวหน้า (default empty)
+        g3Down: '', // 3 ตัวหลัง (default empty)
+        g4Up: '', // 4 ตัว (default empty)
       };
 
       // GLO specific fields
       if (isGLO()) {
         payload.stockWin1 = stockWin1; // 6 หลัก
+        payload.stockWin = stockWin1.substring(3, 6); // 3 ตัวบน = 3 หลักท้ายของ 6 หลัก
+        payload.stock2Up = stockWin1.substring(4, 6); // 2 ตัวหน้า = 2 หลักท้ายของ 6 หลัก
         payload.g3Front = g3Front; // 3 ตัวหน้า (ชุด)
         payload.g3Down = g3Down; // 3 ตัวหลัง (ชุด)
       }
@@ -307,12 +320,12 @@ const LotteryResultModal: React.FC<LotteryResultModalProps> = ({
                       type="text"
                       value={stock2Up}
                       readOnly
-                      placeholder="12"
+                      placeholder="29"
                       className="w-full px-4 py-3 bg-black/20 border-2 border-gold-500/20 rounded-xl text-gray-400 text-center text-xl font-bold placeholder-gray-500 cursor-not-allowed"
                       disabled
                     />
                     <p className="text-gray-400 text-xs mt-1 text-center">
-                      2 หลักท้ายของ 3 ตัวบน (อัตโนมัติ)
+                      {isGLO() ? '2 หลักท้ายของเลข 6 หลัก (อัตโนมัติ)' : '2 หลักท้ายของ 3 ตัวบน (อัตโนมัติ)'}
                     </p>
                   </div>
 
@@ -345,9 +358,15 @@ const LotteryResultModal: React.FC<LotteryResultModalProps> = ({
                       <>
                         <li>เลขเต็ม 6 หลัก = รางวัลที่ 1</li>
                         <li>3 ตัวหน้า/หลัง = รางวัลแยกต่างหาก (กรอกเป็นชุด เช่น 123,456)</li>
+                        <li>3 ตัวบน = 3 หลักท้ายของเลข 6 หลัก (เช่น 174629 → 629)</li>
+                        <li>2 ตัวหน้า = 2 หลักท้ายของเลข 6 หลัก (เช่น 174629 → 29)</li>
                       </>
                     )}
-                    <li>2 ตัวหน้า (2 ตัวบน) = 2 หลักท้ายของ 3 ตัวบน (เช่น 123 → 23)</li>
+                    {!isGLO() && (
+                      <>
+                        <li>2 ตัวหน้า (2 ตัวบน) = 2 หลักท้ายของ 3 ตัวบน (เช่น 123 → 23)</li>
+                      </>
+                    )}
                     <li>2 ตัวล่าง = กรอกด้วยตนเอง</li>
                     {is4Digit() && <li>4 ตัวตรง (1234) → 3 ตัว (234), 2 ตัวบน (34)</li>}
                   </ul>

@@ -17,7 +17,7 @@ const AdminChatNotification = () => {
   }, [])
 
   useEffect(() => {
-    const unreadCount = rooms.reduce((sum, room) => sum + room.unreadCount, 0)
+    const unreadCount = rooms ? rooms.reduce((sum, room) => sum + room.unreadCount, 0) : 0
 
     // Show notification if there are new unread messages
     if (unreadCount > totalUnread && totalUnread > 0) {
@@ -46,7 +46,7 @@ const AdminChatNotification = () => {
     setShowNotification(false)
   }
 
-  const unreadRooms = rooms.filter(room => room.unreadCount > 0)
+  const unreadRooms = rooms ? rooms.filter(room => room.unreadCount > 0) : []
 
   if (totalUnread === 0) {
     return null
